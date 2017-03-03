@@ -1,0 +1,1 @@
+Repository created for development of diploma thesis focused on synchronization of sequence diagrams with project source code
