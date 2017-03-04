@@ -6,6 +6,13 @@ Bundle-Version: 1.0.0
 Bundle-Activator: com.mlyncar.dp.analyzer.Activator
 Bundle-Vendor: Mlyncar
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.9.1",
+ org.eclipse.jdt.ui;bundle-version="3.10.2",
+ org.eclipse.jdt.core;bundle-version="3.10.2",
+ org.eclipse.gmt.modisco.java;bundle-version="0.12.2",
+ org.eclipse.modisco.java.discoverer;bundle-version="0.12.2",
+ org.eclipse.modisco.infra.discovery.core;bundle-version="0.12.2",
+ org.apache.commons.io;bundle-version="2.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy

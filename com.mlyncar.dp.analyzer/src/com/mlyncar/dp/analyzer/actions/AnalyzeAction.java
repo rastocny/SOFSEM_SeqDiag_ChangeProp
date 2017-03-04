@@ -21,6 +21,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
 
+import com.mlyncar.dp.analyzer.code.KdmAnalyzer;
+import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
+
 /**
  * Our sample action implements workbench action delegate.
  * The action proxy will be created by the workbench and
@@ -44,10 +47,20 @@ public class AnalyzeAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		MessageDialog.openInformation(
-			window.getShell(),
-			"KdmUmlAnalyzer",
-			"Executing KDM UML analysis");
+		KdmAnalyzer kdmAnalyer = new KdmAnalyzer(window);
+		try {
+			kdmAnalyer.extractSequenceDiagramFromMain();
+			MessageDialog.openInformation(
+					window.getShell(),
+					"Synchronization Tool",
+					"KDM successfully generated");
+		} catch (SourceCodeAnalyzerException ex) {
+			MessageDialog.openInformation(
+					window.getShell(),
+					"Analysis Failed",
+					ex.getMessage());
+		}
+
 	}
 
 	/**
