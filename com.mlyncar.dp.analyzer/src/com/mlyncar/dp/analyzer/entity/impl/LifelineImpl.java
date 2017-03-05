@@ -16,7 +16,6 @@
 package com.mlyncar.dp.analyzer.entity.impl;
 
 import com.mlyncar.dp.analyzer.entity.Lifeline;
-import java.util.List;
 
 /**
  *
@@ -24,18 +23,10 @@ import java.util.List;
  */
 public class LifelineImpl implements Lifeline {
 
-    private Integer seqNumber;
     private String name;
-    private List<MessageImpl> messages;
 
-    @Override
-    public Integer getSeqNumber() {
-        return seqNumber;
-    }
-
-    @Override
-    public void setSeqNumber(Integer seqNumber) {
-        this.seqNumber = seqNumber;
+    public LifelineImpl(String name) {	
+    	this.name = name;
     }
 
     @Override
@@ -47,15 +38,4 @@ public class LifelineImpl implements Lifeline {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Override
-    public List<MessageImpl> getMessages() {
-        return messages;
-    }
-
-    @Override
-    public void setMessages(List<MessageImpl> messages) {
-        this.messages = messages;
-    }
-
 }

@@ -15,7 +15,11 @@
  */
 package com.mlyncar.dp.analyzer.entity.impl;
 
+import com.mlyncar.dp.analyzer.entity.Lifeline;
+import com.mlyncar.dp.analyzer.entity.Message;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +30,7 @@ public class SeqDiagramImpl implements SeqDiagram {
 
     private String name;
     private String id;
-    private List<LifelineImpl> lifelines;
+    private List<Message> messages = new ArrayList<>();
 
     @Override
     public String getName() {
@@ -49,12 +53,13 @@ public class SeqDiagramImpl implements SeqDiagram {
     }
 
     @Override
-    public List<LifelineImpl> getLifelines() {
-        return lifelines;
+    public List<Message> getMessages() {
+        return this.messages;
     }
 
     @Override
-    public void setLifelines(List<LifelineImpl> lifelines) {
-        this.lifelines = lifelines;
+    public void addMessage(Message message) {
+        this.messages.add(message);
     }
+
 }

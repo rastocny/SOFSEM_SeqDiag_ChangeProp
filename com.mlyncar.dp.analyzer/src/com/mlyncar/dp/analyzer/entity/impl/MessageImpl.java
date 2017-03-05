@@ -15,6 +15,7 @@
  */
 package com.mlyncar.dp.analyzer.entity.impl;
 
+import com.mlyncar.dp.analyzer.entity.Lifeline;
 import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.Message;
 
@@ -26,7 +27,17 @@ public class MessageImpl implements Message {
 
     private String name;
     private MessageType type;
-    private LifelineImpl lifelineTarget;
+    private Lifeline targetLifeline;
+    private Lifeline sourceLifeline;
+    private final Integer seqNumber;
+
+    public MessageImpl(Integer seqNumber, MessageType type, String name, Lifeline targetLifeline, Lifeline sourceLifeline) {
+        this.type = type;
+        this.name = name;
+        this.targetLifeline = targetLifeline;
+        this.sourceLifeline = sourceLifeline;
+        this.seqNumber = seqNumber;
+    }
 
     @Override
     public String getName() {
@@ -49,12 +60,27 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public LifelineImpl getLifelineTarget() {
-        return lifelineTarget;
+    public Integer getSeqNumber() {
+        return this.seqNumber;
     }
 
     @Override
-    public void setLifelineTarget(LifelineImpl lifelineTarget) {
-        this.lifelineTarget = lifelineTarget;
+    public Lifeline getSourceLifeline() {
+        return this.sourceLifeline;
+    }
+
+    @Override
+    public Lifeline getTargetLifeline() {
+        return this.targetLifeline;
+    }
+
+    @Override
+    public void setTargetLifeline(LifelineImpl targetLifeline) {
+        this.targetLifeline = targetLifeline;
+    }
+
+    @Override
+    public void setSourceLifeline(LifelineImpl sourceLifeline) {
+        this.sourceLifeline = sourceLifeline;
     }
 }

@@ -15,7 +15,6 @@
  */
 package com.mlyncar.dp.analyzer.entity;
 
-import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
 import java.util.List;
 
 /**
@@ -32,7 +31,8 @@ public interface SeqDiagram {
 
     public void setId(String id);
 
-    public List<LifelineImpl> getLifelines();
+    public List<Message> getMessages();
 
-    public void setLifelines(List<LifelineImpl> lifelines);
+    public void addMessage(Message message);
+
 }

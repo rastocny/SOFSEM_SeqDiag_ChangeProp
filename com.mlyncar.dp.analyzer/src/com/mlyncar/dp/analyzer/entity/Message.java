@@ -23,6 +23,8 @@ import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
  */
 public interface Message {
 
+    public Integer getSeqNumber();
+
     public String getName();
 
     public void setName(String name);
@@ -31,7 +33,11 @@ public interface Message {
 
     public void setType(MessageType type);
 
-    public LifelineImpl getLifelineTarget();
+    public Lifeline getSourceLifeline();
 
-    public void setLifelineTarget(LifelineImpl lifelineTarget);
+    public Lifeline getTargetLifeline();
+
+    public void setTargetLifeline(LifelineImpl targetLifeline);
+
+    public void setSourceLifeline(LifelineImpl sourceLifeline);
 }

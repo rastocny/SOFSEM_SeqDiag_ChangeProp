@@ -15,7 +15,7 @@
  */
 package com.mlyncar.dp.analyzer.entity;
 
-import com.mlyncar.dp.analyzer.MessageTypeException;
+import com.mlyncar.dp.analyzer.exception.MessageTypeException;
 
 /**
  *

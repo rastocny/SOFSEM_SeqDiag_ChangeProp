@@ -16,26 +16,38 @@
 package com.mlyncar.dp.analyzer.code;
 
 import java.util.Iterator;
+import java.util.List;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.gmt.modisco.java.ExpressionStatement;
+import org.eclipse.gmt.modisco.java.MethodInvocation;
+import org.eclipse.gmt.modisco.omg.kdm.action.ActionElement;
+import org.eclipse.gmt.modisco.omg.kdm.action.BlockUnit;
+import org.eclipse.gmt.modisco.omg.kdm.action.Calls;
+import org.eclipse.gmt.modisco.omg.kdm.action.Creates;
+import org.eclipse.gmt.modisco.omg.kdm.code.AbstractCodeElement;
+import org.eclipse.gmt.modisco.omg.kdm.code.AbstractCodeRelationship;
 import org.eclipse.gmt.modisco.omg.kdm.code.ClassUnit;
 import org.eclipse.gmt.modisco.omg.kdm.code.MethodUnit;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.gmt.modisco.omg.kdm.kdm.Attribute;
 import org.eclipse.modisco.infra.discovery.core.exception.DiscoveryException;
 import org.eclipse.modisco.java.discoverer.DiscoverKDMModelFromJavaProject;
-import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.internal.Workbench;
 
+import com.mlyncar.dp.analyzer.entity.Lifeline;
+import com.mlyncar.dp.analyzer.entity.Message;
+import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
+import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
+import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
+import com.mlyncar.dp.analyzer.entity.impl.SeqDiagramImpl;
+import com.mlyncar.dp.analyzer.exception.MainMethodNotFoundException;
 import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
+import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
 
 /**
  *
@@ -60,47 +72,79 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
         discoverer.setSerializeTarget(true);
         IProgressMonitor monitor = new NullProgressMonitor();
         try {
-            discoverer.discoverElement(getCurrentProject(), monitor);
-        } catch (DiscoveryException ex) {
+            discoverer.discoverElement(EclipseProjectNavigatorHelper.getCurrentProject(), monitor);
+            Resource kdmResource = discoverer.getTargetModel();
+            SeqDiagram diagram = new SeqDiagramImpl();
+            MethodUnit mainMethod = findMainMethod(kdmResource, diagram);
+            analyzeMethodUnit(diagram, mainMethod);
+            validateDiagram(diagram);
+        } catch (DiscoveryException | MainMethodNotFoundException ex) {
             throw new SourceCodeAnalyzerException(
                     "Failed to create KDM file from project", ex);
         }
-        Resource kdmResource = discoverer.getTargetModel();
-        System.out.println("KDM Generated");
-        System.out.println("KDM Content size: "
-                + kdmResource.getContents().size());
+  
     }
-
-    private static IJavaProject getCurrentProject() {
-        ISelectionService selectionService = Workbench.getInstance()
-                .getActiveWorkbenchWindow().getSelectionService();
-
-        ISelection selection = selectionService.getSelection();
-
-        if (selection instanceof IStructuredSelection) {
-            Object element = ((IStructuredSelection) selection)
-                    .getFirstElement();
-            IProject selectedProject = (IProject) element;
-
-            return JavaCore.create(selectedProject);
-        }
-        return null;
-    }
-
-    private int checkKdmResults(Resource kdmResource) {
+    
+    private MethodUnit findMainMethod(Resource kdmResource, SeqDiagram diagram) throws MainMethodNotFoundException {
         Iterator<EObject> it = kdmResource.getAllContents();
-        int i = 0;
         while (it.hasNext()) {
             EObject next = it.next();
             if (next instanceof MethodUnit) {
                 MethodUnit methodUnit = (MethodUnit) next;
-                System.out.println("Method: " + methodUnit.getName());
-            } else if (next instanceof ClassUnit) {
-                ClassUnit classUnit = (ClassUnit) next;
-                System.out.println("Class: " + classUnit.getName());
-            }
-            i++;
+                if(methodUnit.getName().equals("main")) {
+                	ClassUnit classUnit = (ClassUnit) methodUnit.eContainer();
+                	Lifeline actorLifeline = new LifelineImpl("Actor");
+                	Lifeline lifeline = new LifelineImpl(classUnit.getName());
+                	Message startMessage = new MessageImpl(0, MessageType.SYNCH, "main", lifeline, actorLifeline);
+                	diagram.addMessage(startMessage);
+                	return methodUnit;
+                }
+            }      
         }
-        return i;
+        throw new MainMethodNotFoundException("Unable to find main method in KDM structure");
+    }
+    
+    
+    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method) {
+    	for(AbstractCodeElement element : method.getCodeElement()) {
+			analyzeCodeElement(element, diagram, method);
+    	}
+    }
+    
+    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method) {
+    	if(codeElement instanceof ActionElement) {
+    		ActionElement actionElement = (ActionElement) codeElement;
+    		//System.out.println("Analyzing code statement " + actionElement.toString());
+    		for(AbstractCodeElement innerBlockElement : actionElement.getCodeElement()) {
+    			//System.out.println("Inner element: " + innerBlockElement.toString());
+    			if(innerBlockElement.getName() != null && innerBlockElement.getName().equals("method invocation")) {
+    				for(EObject object : innerBlockElement.eContents()) {
+    					if(object instanceof Calls) {
+    						Calls call = (Calls) object;
+    						MethodUnit newMethod = (MethodUnit) call.getTo();
+    				    	diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(), 
+    				    			new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName()), 
+    				    			new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
+    				    	System.out.println("Adding new message to diagram: " + newMethod.toString());
+    				    	analyzeMethodUnit(diagram, newMethod);
+    					}
+    				}			
+    			} else {
+    				analyzeCodeElement(innerBlockElement, diagram, method);
+    			}
+    		}
+    	} else if(codeElement instanceof BlockUnit) {
+			BlockUnit unit = (BlockUnit) codeElement;
+			for(AbstractCodeElement blockElement : unit.getCodeElement()) {
+				//System.out.println("Block element: " + blockElement.toString());
+				analyzeCodeElement(blockElement, diagram, method);
+			}
+		}
+    }
+    
+    private void validateDiagram(SeqDiagram diagram) {
+    	for(Message message : diagram.getMessages()) {
+			System.out.println("MESSAGE: " + message.getName() + ";NUMBER: " + message.getSeqNumber() + ";SOURCE: " + message.getSourceLifeline().getName() + ";TARGET " + message.getTargetLifeline().getName());
+    	}
     }
 }

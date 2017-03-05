@@ -15,24 +15,14 @@
  */
 package com.mlyncar.dp.analyzer.entity;
 
-import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
-import java.util.List;
-
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public interface Lifeline {
 
-    public Integer getSeqNumber();
-
-    public void setSeqNumber(Integer seqNumber);
-
     public String getName();
 
     public void setName(String name);
 
-    public List<MessageImpl> getMessages();
-
-    public void setMessages(List<MessageImpl> messages);
 }
