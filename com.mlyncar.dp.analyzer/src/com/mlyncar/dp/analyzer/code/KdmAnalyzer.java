@@ -16,28 +16,20 @@
 package com.mlyncar.dp.analyzer.code;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.gmt.modisco.java.ExpressionStatement;
-import org.eclipse.gmt.modisco.java.MethodInvocation;
 import org.eclipse.gmt.modisco.omg.kdm.action.ActionElement;
 import org.eclipse.gmt.modisco.omg.kdm.action.BlockUnit;
 import org.eclipse.gmt.modisco.omg.kdm.action.Calls;
-import org.eclipse.gmt.modisco.omg.kdm.action.Creates;
 import org.eclipse.gmt.modisco.omg.kdm.code.AbstractCodeElement;
-import org.eclipse.gmt.modisco.omg.kdm.code.AbstractCodeRelationship;
 import org.eclipse.gmt.modisco.omg.kdm.code.ClassUnit;
 import org.eclipse.gmt.modisco.omg.kdm.code.MethodUnit;
-import org.eclipse.gmt.modisco.omg.kdm.kdm.Attribute;
 import org.eclipse.modisco.infra.discovery.core.exception.DiscoveryException;
 import org.eclipse.modisco.java.discoverer.DiscoverKDMModelFromJavaProject;
 import org.eclipse.ui.IWorkbenchWindow;
-
 import com.mlyncar.dp.analyzer.entity.Lifeline;
 import com.mlyncar.dp.analyzer.entity.Message;
 import com.mlyncar.dp.analyzer.entity.MessageType;
@@ -127,16 +119,34 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
     				    			new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
     				    	System.out.println("Adding new message to diagram: " + newMethod.toString());
     				    	analyzeMethodUnit(diagram, newMethod);
+    				    	diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName(), 
+    				    			new LifelineImpl(((ClassUnit) method.eContainer()).getName()), 
+    				    			new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName())));
     					}
     				}			
-    			} else {
+    			} else if(innerBlockElement.getName() != null && innerBlockElement.getName().equals("class instance creation")) {
+    				for(EObject object : innerBlockElement.eContents()) {
+    					if(object instanceof Calls) {
+    						Calls call = (Calls) object;
+    						MethodUnit newMethod = (MethodUnit) call.getTo();
+    				    	diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.CREATE, newMethod.getName(), 
+    				    			new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName()), 
+    				    			new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
+    				    	System.out.println("Adding new message to diagram: " + newMethod.toString());
+    				    	analyzeMethodUnit(diagram, newMethod);
+    				    	diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName(), 
+    				    			new LifelineImpl(((ClassUnit) method.eContainer()).getName()), 
+    				    			new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName())));
+    					}
+    				}
+    			}
+    			else {
     				analyzeCodeElement(innerBlockElement, diagram, method);
     			}
     		}
     	} else if(codeElement instanceof BlockUnit) {
 			BlockUnit unit = (BlockUnit) codeElement;
 			for(AbstractCodeElement blockElement : unit.getCodeElement()) {
-				//System.out.println("Block element: " + blockElement.toString());
 				analyzeCodeElement(blockElement, diagram, method);
 			}
 		}
@@ -144,7 +154,8 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
     
     private void validateDiagram(SeqDiagram diagram) {
     	for(Message message : diagram.getMessages()) {
-			System.out.println("MESSAGE: " + message.getName() + ";NUMBER: " + message.getSeqNumber() + ";SOURCE: " + message.getSourceLifeline().getName() + ";TARGET " + message.getTargetLifeline().getName());
+			System.out.println("TYPE:" + message.getType().getCode() + ";\nNAME: " + message.getName() + ";\nNUMBER: " + message.getSeqNumber() + ";\nSOURCE: " + message.getSourceLifeline().getName() + ";\nTARGET " + message.getTargetLifeline().getName());
+			System.out.println("---------------------------");
     	}
     }
 }
