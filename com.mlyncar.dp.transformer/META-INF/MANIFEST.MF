@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Graph Transformer
+Bundle-SymbolicName: com.mlyncar.dp.transformer;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: com.mlyncar.dp.transformer.Activator
+Bundle-Vendor: MLYNCAR
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.apache.commons.logging;bundle-version="1.1.1",
+ org.apache.commons.logging.source;bundle-version="1.1.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
