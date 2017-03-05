@@ -47,12 +47,15 @@ import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
  */
 public class KdmAnalyzer implements SourceCodeAnalyzer {
 
-    private final IWorkbenchWindow window;
+    private IWorkbenchWindow window;
 
     public KdmAnalyzer(IWorkbenchWindow window) {
         this.window = window;
     }
 
+    public KdmAnalyzer() {
+    }
+    
     @Override
     public SeqDiagram extractSequenceDiagramFromMain() throws SourceCodeAnalyzerException {
         initializeKdmStructure();

@@ -16,3 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.apache.commons.io;bundle-version="2.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
+Export-Package: com.mlyncar.dp.analyzer.code,
+ com.mlyncar.dp.analyzer.entity,
+ com.mlyncar.dp.analyzer.exception
