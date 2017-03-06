@@ -16,12 +16,16 @@
 package com.mlyncar.dp.analyzer.helper;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.internal.Workbench;
+
+import com.mlyncar.dp.analyzer.exception.AnalyzerException;
 
 /**
  *
@@ -32,17 +36,34 @@ public class EclipseProjectNavigatorHelper {
     public static IJavaProject getCurrentProject() {
         ISelectionService selectionService = Workbench.getInstance()
                 .getActiveWorkbenchWindow().getSelectionService();
-
         ISelection selection = selectionService.getSelection();
-
         if (selection instanceof IStructuredSelection) {
             Object element = ((IStructuredSelection) selection)
                     .getFirstElement();
             IProject selectedProject = (IProject) element;
-
             return JavaCore.create(selectedProject);
         }
         return null;
     }
 
+    public static String getCurrentProjectModel() throws AnalyzerException {
+        ISelectionService selectionService = Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();
+        ISelection selection = selectionService.getSelection();
+        if (selection instanceof IStructuredSelection) {
+            Object element = ((IStructuredSelection) selection)
+                    .getFirstElement();
+            IProject selectedProject = (IProject) element;        
+            try {
+				for(IResource resource : selectedProject.members()) {
+					if(resource.getFullPath().toOSString().endsWith(".uml") ||  resource.getFullPath().toOSString().endsWith(".UML")) {
+						return resource.getLocation().toString();
+					}
+				}
+			} catch (CoreException ex) {
+				throw new AnalyzerException("Error obtaining project uml model. ",ex);
+			}
+            
+        }
+        return null;
+    }
 }

@@ -21,7 +21,12 @@ package com.mlyncar.dp.analyzer.exception;
  */
 public class MessageTypeException extends Exception {
 
-    public MessageTypeException(String message, Throwable cause) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7086942982636902487L;
+
+	public MessageTypeException(String message, Throwable cause) {
         super(message, cause);
     }
 

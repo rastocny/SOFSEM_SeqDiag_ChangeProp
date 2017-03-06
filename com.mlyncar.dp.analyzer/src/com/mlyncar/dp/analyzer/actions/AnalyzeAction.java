@@ -49,7 +49,7 @@ public class AnalyzeAction implements IWorkbenchWindowActionDelegate {
      * @see IWorkbenchWindowActionDelegate#run
      */
     public void run(IAction action) {
-        KdmAnalyzer kdmAnalyer = new KdmAnalyzer(window);
+        KdmAnalyzer kdmAnalyer = new KdmAnalyzer();
         try {
             kdmAnalyer.extractSequenceDiagramFromMain();
             MessageDialog.openInformation(

@@ -2,7 +2,12 @@ package com.mlyncar.dp.analyzer.exception;
 
 public class MainMethodNotFoundException extends Exception {
 
-    public MainMethodNotFoundException(String message, Throwable cause) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6036307848777303048L;
+
+	public MainMethodNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 

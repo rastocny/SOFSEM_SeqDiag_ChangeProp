@@ -18,6 +18,7 @@ package com.mlyncar.dp.analyzer.uml;
 import java.util.List;
 
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
+import com.mlyncar.dp.analyzer.exception.AnalyzerException;
 import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
 
 /**
@@ -29,4 +30,6 @@ public interface UmlAnalyzer {
     public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException;
 
     public List<SeqDiagram> analyzeUmlModel(String pathToModel);
+    
+    public List<SeqDiagram> analyzeUmlModel() throws AnalyzerException;
 }

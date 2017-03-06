@@ -15,12 +15,11 @@
  */
 package com.mlyncar.dp.analyzer.entity.impl;
 
-import com.mlyncar.dp.analyzer.entity.Lifeline;
-import com.mlyncar.dp.analyzer.entity.Message;
-import com.mlyncar.dp.analyzer.entity.SeqDiagram;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mlyncar.dp.analyzer.entity.Message;
+import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 
 /**
  *

@@ -1,14 +1,13 @@
 package com.mlyncar.dp.synch.actions;
 
-import javax.xml.crypto.dsig.TransformService;
-
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
+import com.mlyncar.dp.transformer.exception.GraphTransformationException;
 import com.mlyncar.dp.transformer.service.TransformationService;
 
 /**
@@ -35,13 +34,13 @@ public class SynchAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) {
 		TransformationService service = new TransformationService();
-		try {
+		try {		
 			service.transform();
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synchronization Tool",
 					"Synchronization Successfull");
-		} catch (SourceCodeAnalyzerException ex) {
+		} catch (GraphTransformationException ex) {
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synch Failed",

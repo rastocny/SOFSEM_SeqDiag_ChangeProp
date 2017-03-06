@@ -10,9 +10,6 @@
     </extension>
     <extension
         point="org.eclipse.ui.handlers">
-        <handler
-            commandId="com.mlyncar.dp.analyzer.handler1">
-        </handler>
     </extension>
     <extension
         point="org.eclipse.ui.menus">

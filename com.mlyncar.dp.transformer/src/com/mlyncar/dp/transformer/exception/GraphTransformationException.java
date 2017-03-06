@@ -6,7 +6,12 @@ package com.mlyncar.dp.transformer.exception;
  */
 public class GraphTransformationException extends Exception {
 
-    public GraphTransformationException(String message, Throwable cause) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5927514380115097957L;
+
+	public GraphTransformationException(String message, Throwable cause) {
         super(message, cause);
     }
 

@@ -35,7 +35,9 @@ import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
 import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
 import com.mlyncar.dp.analyzer.entity.impl.SeqDiagramImpl;
+import com.mlyncar.dp.analyzer.exception.AnalyzerException;
 import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
+import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
 import com.mlyncar.dp.analyzer.test.TestHelper;
 
 /**
@@ -44,6 +46,11 @@ import com.mlyncar.dp.analyzer.test.TestHelper;
  */
 public class XmiUmlAnalyzer implements UmlAnalyzer {
 
+	@Override
+	public List<SeqDiagram> analyzeUmlModel() throws AnalyzerException {
+		return analyzeUmlModel(EclipseProjectNavigatorHelper.getCurrentProjectModel());
+	}
+	
     @Override
     public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException {
         Resource resource = loadModelResource(pathToDiagram);

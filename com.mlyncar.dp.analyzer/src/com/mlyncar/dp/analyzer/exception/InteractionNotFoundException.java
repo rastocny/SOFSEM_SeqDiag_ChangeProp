@@ -2,7 +2,12 @@ package com.mlyncar.dp.analyzer.exception;
 
 public class InteractionNotFoundException extends Exception {
 
-    public InteractionNotFoundException(String message, Throwable cause) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4526097440685722393L;
+
+	public InteractionNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 

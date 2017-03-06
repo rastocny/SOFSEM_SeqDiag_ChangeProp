@@ -29,7 +29,6 @@ import org.eclipse.gmt.modisco.omg.kdm.code.ClassUnit;
 import org.eclipse.gmt.modisco.omg.kdm.code.MethodUnit;
 import org.eclipse.modisco.infra.discovery.core.exception.DiscoveryException;
 import org.eclipse.modisco.java.discoverer.DiscoverKDMModelFromJavaProject;
-import org.eclipse.ui.IWorkbenchWindow;
 
 import com.mlyncar.dp.analyzer.entity.Lifeline;
 import com.mlyncar.dp.analyzer.entity.Message;
@@ -48,12 +47,6 @@ import com.mlyncar.dp.analyzer.test.TestHelper;
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public class KdmAnalyzer implements SourceCodeAnalyzer {
-
-    private IWorkbenchWindow window;
-
-    public KdmAnalyzer(IWorkbenchWindow window) {
-        this.window = window;
-    }
 
     public KdmAnalyzer() {
     }
