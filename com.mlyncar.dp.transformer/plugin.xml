@@ -2,8 +2,8 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension
-         point="org.eclipse.ui.actionSets">
-   </extension>
+    <extension
+        point="org.eclipse.ui.actionSets">
+    </extension>
 
 </plugin>

@@ -36,7 +36,7 @@ public class TreeGraph implements Graph {
 
     @Override
     public String getTreeGraphId() {
-       return this.treeGraphId;
+        return this.treeGraphId;
     }
 
 }

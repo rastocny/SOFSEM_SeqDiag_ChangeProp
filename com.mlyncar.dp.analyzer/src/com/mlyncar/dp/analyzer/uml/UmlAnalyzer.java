@@ -15,13 +15,18 @@
  */
 package com.mlyncar.dp.analyzer.uml;
 
+import java.util.List;
+
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
-import java.io.File;
+import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
 
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public interface UmlAnalyzer {
-    public SeqDiagram analyzeSequenceDiagram(File seqDiagramFile);
+
+    public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException;
+
+    public List<SeqDiagram> analyzeUmlModel(String pathToModel);
 }

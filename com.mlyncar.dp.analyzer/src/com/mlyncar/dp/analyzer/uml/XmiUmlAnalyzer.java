@@ -15,8 +15,28 @@
  */
 package com.mlyncar.dp.analyzer.uml;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.uml2.uml.Interaction;
+import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
+import org.eclipse.uml2.uml.MessageSort;
+import org.eclipse.uml2.uml.UMLPackage;
+import org.eclipse.uml2.uml.resource.UMLResource;
+
+import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
-import java.io.File;
+import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
+import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
+import com.mlyncar.dp.analyzer.entity.impl.SeqDiagramImpl;
+import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
+import com.mlyncar.dp.analyzer.test.TestHelper;
 
 /**
  *
@@ -25,8 +45,80 @@ import java.io.File;
 public class XmiUmlAnalyzer implements UmlAnalyzer {
 
     @Override
-    public SeqDiagram analyzeSequenceDiagram(File seqDiagramFile) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+    public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException {
+        Resource resource = loadModelResource(pathToDiagram);
+        Interaction interaction = findInteraction(diagramName, resource);
+        SeqDiagram diagram = analyzeInteration(interaction);
+        return diagram;
     }
-    
+
+    @Override
+    public List<SeqDiagram> analyzeUmlModel(String pathToModel) {
+        Resource resource = loadModelResource(pathToModel);
+        List<SeqDiagram> diagrams = new ArrayList<>();
+        Iterator<EObject> it = resource.getAllContents();
+        while (it.hasNext()) {
+            EObject object = it.next();
+            if (object instanceof Interaction) {
+                Interaction interaction = (Interaction) object;
+                diagrams.add(analyzeInteration(interaction));
+            }
+        }
+        return diagrams;
+    }
+
+    private Interaction findInteraction(String interactionName, Resource modelResource) throws InteractionNotFoundException {
+        Iterator<EObject> it = modelResource.getAllContents();
+        while (it.hasNext()) {
+            EObject object = it.next();
+            if (object instanceof Interaction) {
+                Interaction interaction = (Interaction) object;
+                if (interaction.getName().equals(interactionName)) {
+                    return interaction;
+                }
+            }
+        }
+        throw new InteractionNotFoundException("Interaction with name " + interactionName + " not found.");
+    }
+
+    private SeqDiagram analyzeInteration(Interaction interaction) {
+        SeqDiagram diagram = new SeqDiagramImpl();
+
+        Iterator<EObject> objects = interaction.eAllContents();
+        Integer counter = 0;
+        while (objects.hasNext()) {
+            EObject object = objects.next();
+            if (object instanceof MessageOccurrenceSpecification) {
+                MessageOccurrenceSpecification occurence = (MessageOccurrenceSpecification) object;
+                if (!occurence.getName().contains("Recv")) {
+                    MessageOccurrenceSpecification receiveOccurence = (MessageOccurrenceSpecification) occurence.getMessage().getReceiveEvent();
+
+                    if (occurence.getMessage().getMessageSort().equals(MessageSort.SYNCH_CALL_LITERAL)) {
+                        diagram.addMessage(new MessageImpl(counter++, MessageType.SYNCH, occurence.getMessage().getName(),
+                                new LifelineImpl(receiveOccurence.getCovered().getName()),
+                                new LifelineImpl(occurence.getCovered().getName())));
+                    } else if (occurence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
+                        diagram.addMessage(new MessageImpl(counter++, MessageType.RETURN, occurence.getMessage().getName(),
+                                new LifelineImpl(receiveOccurence.getCovered().getName()),
+                                new LifelineImpl(occurence.getCovered().getName())));
+                    }
+                }
+            }
+        }
+        TestHelper.validateDiagram(diagram);
+        return diagram;
+    }
+
+    private Resource loadModelResource(String pathToModel) {
+        ResourceSet set = new ResourceSetImpl();
+        set.getPackageRegistry().put(UMLPackage.eNS_URI, UMLPackage.eINSTANCE);
+        set.getResourceFactoryRegistry().getExtensionToFactoryMap()
+                .put(UMLResource.FILE_EXTENSION, UMLResource.Factory.INSTANCE);
+        Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+                .put(UMLResource.FILE_EXTENSION, UMLResource.Factory.INSTANCE);
+
+        Resource resource = set.getResource(URI.createFileURI(pathToModel), true);
+        return resource;
+    }
+
 }

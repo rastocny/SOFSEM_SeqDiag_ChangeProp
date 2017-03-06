@@ -1,4 +1,5 @@
 package com.mlyncar.dp.transformer.entity;
+
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
@@ -16,6 +17,6 @@ public interface CombinedFragment {
     public String getFragmentBody();
 
     public void setFragmentBody(String condition);
-    
+
     public boolean isFragmentEqual(CombinedFragment combinedFragment);
 }

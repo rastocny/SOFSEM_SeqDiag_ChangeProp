@@ -23,6 +23,6 @@ import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public interface SourceCodeAnalyzer {
-    
+
     public SeqDiagram extractSequenceDiagramFromMain() throws SourceCodeAnalyzerException;
 }

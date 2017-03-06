@@ -25,8 +25,8 @@ public class LifelineImpl implements Lifeline {
 
     private String name;
 
-    public LifelineImpl(String name) {	
-    	this.name = name;
+    public LifelineImpl(String name) {
+        this.name = name;
     }
 
     @Override

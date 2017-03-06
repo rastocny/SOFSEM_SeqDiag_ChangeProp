@@ -6,7 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import com.mlyncar.dp.transformer.entity.CombinedFragment;
 import com.mlyncar.dp.transformer.entity.CombinedFragmentType;
 
-
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
