@@ -58,11 +58,6 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
 
     @Override
     public SeqDiagram extractSequenceDiagramFromMain() throws SourceCodeAnalyzerException {
-        initializeKdmStructure();
-        return null;
-    }
-
-    private void initializeKdmStructure() throws SourceCodeAnalyzerException {
         DiscoverKDMModelFromJavaProject discoverer = new DiscoverKDMModelFromJavaProject();
         discoverer.setSerializeTarget(true);
         IProgressMonitor monitor = new NullProgressMonitor();
@@ -73,11 +68,11 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
             MethodUnit mainMethod = findMainMethod(kdmResource, diagram);
             analyzeMethodUnit(diagram, mainMethod);
             TestHelper.validateDiagram(diagram);
+            return diagram;
         } catch (DiscoveryException | MainMethodNotFoundException ex) {
             throw new SourceCodeAnalyzerException(
                     "Failed to create KDM file from project", ex);
         }
-
     }
 
     private MethodUnit findMainMethod(Resource kdmResource, SeqDiagram diagram) throws MainMethodNotFoundException {

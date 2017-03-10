@@ -6,8 +6,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import com.mlyncar.dp.transformer.exception.GraphTransformationException;
-import com.mlyncar.dp.transformer.service.TransformationService;
+import com.mlyncar.dp.comparison.exception.ComparisonException;
+import com.mlyncar.dp.comparison.service.ComparisonService;
 
 /**
  * Our sample action implements workbench action delegate.
@@ -32,14 +32,14 @@ public class SynchAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		TransformationService service = new TransformationService();
+		ComparisonService service = new ComparisonService();
 		try {		
-			service.getGraphStructureFromConcreteDiagram("SequenceDiagramTest1");
+			service.compareUmlModelWithSourceCode();
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synchronization Tool",
 					"Synchronization Successfull");
-		} catch (GraphTransformationException ex) {
+		} catch (ComparisonException ex) {
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synch Failed",
