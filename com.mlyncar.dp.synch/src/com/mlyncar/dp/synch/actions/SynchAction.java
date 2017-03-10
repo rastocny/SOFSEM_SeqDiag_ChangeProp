@@ -34,7 +34,7 @@ public class SynchAction implements IWorkbenchWindowActionDelegate {
 	public void run(IAction action) {
 		TransformationService service = new TransformationService();
 		try {		
-			service.transform();
+			service.getGraphStructureFromConcreteDiagram("SequenceDiagramTest1");
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synchronization Tool",

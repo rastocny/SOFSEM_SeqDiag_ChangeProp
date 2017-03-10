@@ -22,11 +22,11 @@ package com.mlyncar.dp.analyzer.exception;
 public class MessageTypeException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7086942982636902487L;
+     *
+     */
+    private static final long serialVersionUID = 7086942982636902487L;
 
-	public MessageTypeException(String message, Throwable cause) {
+    public MessageTypeException(String message, Throwable cause) {
         super(message, cause);
     }
 

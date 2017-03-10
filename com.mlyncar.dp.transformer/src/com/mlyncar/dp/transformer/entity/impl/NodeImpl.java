@@ -7,7 +7,8 @@ import com.mlyncar.dp.transformer.entity.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.transformer.entity.Edge;
 
@@ -23,7 +24,7 @@ public class NodeImpl implements Node {
     private Edge createEdge;
     private String id;
     private final List<CombinedFragment> combinedFragments = new ArrayList<>();
-    private final Logger logger = Logger.getLogger(NodeImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
 
     public NodeImpl(String id, Edge createEdge, Node parentNode, String name) {
         this.id = id;
@@ -151,8 +152,8 @@ public class NodeImpl implements Node {
         return true;
     }
 
-	@Override
-	public boolean isReply() {
-		return getCreateEdge().getEdgeType().getCode().equals(EdgeType.RETURN.getCode());
-	}
+    @Override
+    public boolean isReply() {
+        return getCreateEdge().getEdgeType().getCode().equals(EdgeType.RETURN.getCode());
+    }
 }

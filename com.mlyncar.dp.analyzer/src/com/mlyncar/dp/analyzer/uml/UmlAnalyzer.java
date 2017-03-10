@@ -30,6 +30,8 @@ public interface UmlAnalyzer {
     public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException;
 
     public List<SeqDiagram> analyzeUmlModel(String pathToModel);
-    
+
     public List<SeqDiagram> analyzeUmlModel() throws AnalyzerException;
+
+    public SeqDiagram analyzeSequenceDiagram(String diagramName) throws InteractionNotFoundException, AnalyzerException;
 }

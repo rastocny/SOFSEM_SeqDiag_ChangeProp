@@ -5,6 +5,6 @@ import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
 
 public interface TransformationEngine {
-	
-	public Graph transformSequenceDiagram(SeqDiagram diagram) throws GraphTransformationException;
+
+    public Graph transformSequenceDiagram(SeqDiagram diagram) throws GraphTransformationException;
 }

@@ -1,7 +1,7 @@
 package com.mlyncar.dp.transformer.entity.impl;
 
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.transformer.entity.CombinedFragment;
 import com.mlyncar.dp.transformer.entity.CombinedFragmentType;
@@ -15,7 +15,7 @@ public class CombinedFragmentImpl implements CombinedFragment {
     private String name;
     private CombinedFragmentType combinedFragmentType;
     private String fragmentBody;
-    private final Logger logger = Logger.getLogger(CombinedFragmentImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(CombinedFragmentImpl.class);
 
     public CombinedFragmentImpl(String name, CombinedFragmentType combinedFragmentType, String fragmentBody) {
         this.name = name;

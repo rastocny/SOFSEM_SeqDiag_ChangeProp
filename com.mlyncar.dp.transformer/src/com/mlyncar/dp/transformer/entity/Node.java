@@ -43,6 +43,6 @@ public interface Node {
     public boolean isNodeEqual(Node node);
 
     public boolean isLeaf();
-    
+
     public boolean isReply();
 }

@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
 
-import com.mlyncar.dp.analyzer.code.KdmAnalyzer;
+import com.mlyncar.dp.analyzer.code.impl.KdmAnalyzer;
 import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
 
 /**

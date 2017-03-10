@@ -7,11 +7,11 @@ package com.mlyncar.dp.transformer.exception;
 public class GraphTransformationException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5927514380115097957L;
+     *
+     */
+    private static final long serialVersionUID = 5927514380115097957L;
 
-	public GraphTransformationException(String message, Throwable cause) {
+    public GraphTransformationException(String message, Throwable cause) {
         super(message, cause);
     }
 

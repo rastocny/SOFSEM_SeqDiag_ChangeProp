@@ -18,11 +18,11 @@ package com.mlyncar.dp.analyzer.exception;
 public class SourceCodeAnalyzerException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4249203279107333099L;
+     *
+     */
+    private static final long serialVersionUID = -4249203279107333099L;
 
-	public SourceCodeAnalyzerException(String message, Throwable cause) {
+    public SourceCodeAnalyzerException(String message, Throwable cause) {
         super(message, cause);
     }
 

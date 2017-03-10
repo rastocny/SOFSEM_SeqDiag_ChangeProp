@@ -7,11 +7,11 @@ package com.mlyncar.dp.transformer.exception;
 public class MessageTypeException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6217874438931803026L;
+     *
+     */
+    private static final long serialVersionUID = 6217874438931803026L;
 
-	public MessageTypeException(String message, Throwable cause) {
+    public MessageTypeException(String message, Throwable cause) {
         super(message, cause);
     }
 

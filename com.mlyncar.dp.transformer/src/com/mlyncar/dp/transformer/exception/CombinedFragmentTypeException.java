@@ -7,11 +7,11 @@ package com.mlyncar.dp.transformer.exception;
 public class CombinedFragmentTypeException extends Exception {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2873581110114255898L;
+     *
+     */
+    private static final long serialVersionUID = 2873581110114255898L;
 
-	public CombinedFragmentTypeException(String message, Throwable cause) {
+    public CombinedFragmentTypeException(String message, Throwable cause) {
         super(message, cause);
     }
 

@@ -1,10 +1,10 @@
 package com.mlyncar.dp.transformer.entity.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
-
-import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Edge;
+import com.mlyncar.dp.transformer.entity.EdgeType;
 
 /**
  *
@@ -14,7 +14,7 @@ public class EdgeImpl implements Edge {
 
     private String name;
     private EdgeType edgeType;
-    private final Logger logger = Logger.getLogger(EdgeImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(EdgeImpl.class);
 
     public EdgeImpl(String name, EdgeType edgeType) {
         this.name = name;

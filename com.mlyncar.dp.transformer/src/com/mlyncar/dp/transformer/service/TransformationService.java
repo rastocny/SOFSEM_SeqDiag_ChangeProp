@@ -1,29 +1,61 @@
 package com.mlyncar.dp.transformer.service;
 
-import com.mlyncar.dp.analyzer.code.KdmAnalyzer;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mlyncar.dp.analyzer.code.SourceCodeAnalyzer;
+import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 import com.mlyncar.dp.analyzer.exception.AnalyzerException;
+import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
 import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
+import com.mlyncar.dp.analyzer.service.AnalyzerService;
 import com.mlyncar.dp.analyzer.uml.UmlAnalyzer;
-import com.mlyncar.dp.analyzer.uml.XmiUmlAnalyzer;
 import com.mlyncar.dp.transformer.core.TransformationEngine;
 import com.mlyncar.dp.transformer.core.impl.TransformationEngineImpl;
+import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
 
 public class TransformationService {
 
-    public void transform() throws GraphTransformationException {
+    public Graph getGraphStructureFromSourceCode() throws GraphTransformationException {
+        AnalyzerService service = new AnalyzerService();
+        SourceCodeAnalyzer analyzer = service.getSourceCodeAnalyzer();
+        TransformationEngine engine = new TransformationEngineImpl();
         try {
-            SourceCodeAnalyzer analyzer = new KdmAnalyzer();
-            analyzer.extractSequenceDiagramFromMain();	
-            UmlAnalyzer analyzerUml = new XmiUmlAnalyzer();
-            
-            TransformationEngine engine = new TransformationEngineImpl();
-            engine.transformSequenceDiagram(analyzerUml.analyzeUmlModel().get(0));
-		} catch (AnalyzerException | SourceCodeAnalyzerException ex) {
-			throw new GraphTransformationException("Unable to perfrom graph transformation ",ex);
-		}
-            
+            analyzer.extractSequenceDiagramFromMain();
+            Graph graph = engine.transformSequenceDiagram(analyzer.extractSequenceDiagramFromMain());
+            return graph;
+        } catch (SourceCodeAnalyzerException ex) {
+            throw new GraphTransformationException("Unable to start transformation proces because of source code analysis failure ", ex);
+        }
+    }
+
+    public List<Graph> getGraphStructuresFromUmlModel() throws GraphTransformationException {
+        AnalyzerService service = new AnalyzerService();
+        UmlAnalyzer analyzerUml = service.getUmlAnalyzer();
+        TransformationEngine engine = new TransformationEngineImpl();
+        List<Graph> graphs = new ArrayList<Graph>();
+        try {
+            for (SeqDiagram diagram : analyzerUml.analyzeUmlModel()) {
+                graphs.add(engine.transformSequenceDiagram(diagram));
+            }
+        } catch (AnalyzerException ex) {
+            throw new GraphTransformationException("Unable to start transformation proces because of UML model analysis failure ", ex);
+        }
+        return graphs;
+    }
+
+    public Graph getGraphStructureFromConcreteDiagram(String diagramIdentifier) throws GraphTransformationException {
+        AnalyzerService service = new AnalyzerService();
+        UmlAnalyzer analyzerUml = service.getUmlAnalyzer();
+        TransformationEngine engine = new TransformationEngineImpl();
+        Graph graph;
+        try {
+            graph = engine.transformSequenceDiagram(analyzerUml.analyzeSequenceDiagram(diagramIdentifier));
+        } catch (InteractionNotFoundException | AnalyzerException ex) {
+            throw new GraphTransformationException("Unable to start transformation proces because of UML model analysis failure ", ex);
+        }
+        return graph;
     }
 
 }

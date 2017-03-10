@@ -52,17 +52,17 @@ public class EclipseProjectNavigatorHelper {
         if (selection instanceof IStructuredSelection) {
             Object element = ((IStructuredSelection) selection)
                     .getFirstElement();
-            IProject selectedProject = (IProject) element;        
+            IProject selectedProject = (IProject) element;
             try {
-				for(IResource resource : selectedProject.members()) {
-					if(resource.getFullPath().toOSString().endsWith(".uml") ||  resource.getFullPath().toOSString().endsWith(".UML")) {
-						return resource.getLocation().toString();
-					}
-				}
-			} catch (CoreException ex) {
-				throw new AnalyzerException("Error obtaining project uml model. ",ex);
-			}
-            
+                for (IResource resource : selectedProject.members()) {
+                    if (resource.getFullPath().toOSString().endsWith(".uml") || resource.getFullPath().toOSString().endsWith(".UML")) {
+                        return resource.getLocation().toString();
+                    }
+                }
+            } catch (CoreException ex) {
+                throw new AnalyzerException("Error obtaining project uml model. ", ex);
+            }
+
         }
         return null;
     }
