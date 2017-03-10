@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
 import com.mlyncar.dp.transformer.service.TransformationService;
 

@@ -6,7 +6,7 @@ import com.mlyncar.dp.transformer.exception.MessageTypeException;
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
-public enum MessageType {
+public enum EdgeType {
 
     SYNCH("synchronous"),
     ASYNCH("asynchronous"),
@@ -17,7 +17,7 @@ public enum MessageType {
 
     private final String code;
 
-    private MessageType(String code) {
+    private EdgeType(String code) {
         this.code = code;
     }
 
@@ -25,8 +25,8 @@ public enum MessageType {
         return this.code;
     }
 
-    public static MessageType fromCode(String code) throws MessageTypeException {
-        for (MessageType type : MessageType.values()) {
+    public static EdgeType fromCode(String code) throws MessageTypeException {
+        for (EdgeType type : EdgeType.values()) {
             if (type.getCode().equals(code)) {
                 return type;
             }

@@ -10,10 +10,10 @@ public interface Edge {
 
     public void setName(String name);
 
-    public MessageType getMessageType();
+    public EdgeType getEdgeType();
 
-    public void setMessageType(MessageType messageType);
+    public void setEdgeType(EdgeType edgeType);
 
-    public boolean isMessageEqual(Edge message);
+    public boolean isEdgeEqual(Edge edge);
 
 }

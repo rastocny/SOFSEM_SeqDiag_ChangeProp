@@ -8,9 +8,9 @@ import java.util.List;
  */
 public interface Node {
 
-    public Edge getCreateMessage();
+    public Edge getCreateEdge();
 
-    public void setCreateMessage(Edge message);
+    public void setCreateEdge(Edge edge);
 
     public String getId();
 
@@ -43,4 +43,6 @@ public interface Node {
     public boolean isNodeEqual(Node node);
 
     public boolean isLeaf();
+    
+    public boolean isReply();
 }

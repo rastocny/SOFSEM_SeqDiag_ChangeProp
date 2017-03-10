@@ -7,8 +7,8 @@ Bundle-Activator: com.mlyncar.dp.transformer.Activator
 Bundle-Vendor: MLYNCAR
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.apache.commons.logging;bundle-version="1.1.1",
- com.mlyncar.dp.analyzer;bundle-version="1.0.0"
+ com.mlyncar.dp.analyzer;bundle-version="1.0.0",
+ org.apache.log4j;bundle-version="1.2.15"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.mlyncar.dp.analyzer.code

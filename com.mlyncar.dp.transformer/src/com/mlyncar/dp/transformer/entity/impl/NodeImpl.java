@@ -1,13 +1,14 @@
 package com.mlyncar.dp.transformer.entity.impl;
 
 import com.mlyncar.dp.transformer.entity.CombinedFragment;
+import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+
 import com.mlyncar.dp.transformer.entity.Edge;
 
 /**
@@ -19,14 +20,14 @@ public class NodeImpl implements Node {
     private final List<Node> childNodes = new ArrayList<>();
     private String name;
     private Node parentNode;
-    private Edge createMessage;
+    private Edge createEdge;
     private String id;
     private final List<CombinedFragment> combinedFragments = new ArrayList<>();
-    private final Log logger = LogFactory.getLog(NodeImpl.class);
+    private final Logger logger = Logger.getLogger(NodeImpl.class);
 
-    public NodeImpl(String id, Edge createMessage, Node parentNode, String name) {
+    public NodeImpl(String id, Edge createEdge, Node parentNode, String name) {
         this.id = id;
-        this.createMessage = createMessage;
+        this.createEdge = createEdge;
         this.parentNode = parentNode;
         this.name = name;
     }
@@ -91,13 +92,13 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public Edge getCreateMessage() {
-        return this.createMessage;
+    public Edge getCreateEdge() {
+        return this.createEdge;
     }
 
     @Override
-    public void setCreateMessage(Edge createMessage) {
-        this.createMessage = createMessage;
+    public void setCreateEdge(Edge createEdge) {
+        this.createEdge = createEdge;
     }
 
     @Override
@@ -124,8 +125,8 @@ public class NodeImpl implements Node {
     public boolean isNodeEqual(Node node) {
         this.logger.debug("Comparing node " + node.getId() + " and " + this.getId());
         if (node.getName().equals(this.getName())) {
-            if (node.getCreateMessage() != null) {
-                if (node.getCreateMessage().isMessageEqual(this.getCreateMessage())) {
+            if (node.getCreateEdge() != null) {
+                if (node.getCreateEdge().isEdgeEqual(this.getCreateEdge())) {
                     return compareCombinedFragments(node);
                 } else {
                     return false;
@@ -149,4 +150,9 @@ public class NodeImpl implements Node {
         }
         return true;
     }
+
+	@Override
+	public boolean isReply() {
+		return getCreateEdge().getEdgeType().getCode().equals(EdgeType.RETURN.getCode());
+	}
 }
