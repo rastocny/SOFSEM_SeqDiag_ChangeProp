@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Comparison
+Bundle-SymbolicName: com.mlyncar.dp.comparison;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: com.mlyncar.dp.comparison.Activator
+Bundle-Vendor: Mlyncar
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Import-Package: com.mlyncar.dp.transformer.entity,
+ com.mlyncar.dp.transformer.exception,
+ com.mlyncar.dp.transformer.service,
+ org.slf4j;version="1.4.3"
+Export-Package: com.mlyncar.dp.comparison.exception,
+ com.mlyncar.dp.comparison.service
