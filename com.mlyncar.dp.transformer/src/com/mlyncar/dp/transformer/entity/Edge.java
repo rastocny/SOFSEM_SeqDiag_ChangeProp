@@ -14,6 +14,5 @@ public interface Edge {
 
     public void setEdgeType(EdgeType edgeType);
 
-    public boolean isEdgeEqual(Edge edge);
 
 }

@@ -1,8 +1,11 @@
-package com.mlyncar.dp.comparison.comparator;
+package com.mlyncar.dp.comparison.graph;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mlyncar.dp.comparison.enums.NodeRelation;
+import com.mlyncar.dp.comparison.relation.NodeRelationComparator;
+import com.mlyncar.dp.comparison.relation.impl.NodeRelationComparatorImpl;
 import com.mlyncar.dp.transformer.entity.Node;
 
 
@@ -24,7 +27,9 @@ public class SubgraphComparator {
         }
         logger.debug("Starting to compare nodes {} {} ", rootReferenceNode.getName(), rootSubTreeNode.getName());
 
-        if (rootReferenceNode.isNodeEqual(rootSubTreeNode)) {
+        NodeRelationComparator comparator = new NodeRelationComparatorImpl();
+        
+        if (comparator.getNodeRelation(rootReferenceNode, rootSubTreeNode) == NodeRelation.SIMILAR) {
             logger.debug("Nodes {} {} and {} {} are equal", rootReferenceNode.getId(), rootReferenceNode.getName(), rootSubTreeNode.getId(), rootSubTreeNode.getName());
             if (rootReferenceNode.isLeaf()) {
                 logger.debug("Node {} is leaf", rootReferenceNode.getName());

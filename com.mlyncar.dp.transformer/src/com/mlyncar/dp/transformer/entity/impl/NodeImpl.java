@@ -27,6 +27,7 @@ public class NodeImpl implements Node {
     private final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
 
     public NodeImpl(String id, Edge createEdge, Node parentNode, String name) {
+    	logger.debug("Creating instance of NodeImpl with name: {} and createEdge: {}", name, createEdge.getName());
         this.id = id;
         this.createEdge = createEdge;
         this.parentNode = parentNode;
@@ -120,36 +121,6 @@ public class NodeImpl implements Node {
     @Override
     public boolean isLeaf() {
         return this.childNodes.isEmpty();
-    }
-
-    @Override
-    public boolean isNodeEqual(Node node) {
-        this.logger.debug("Comparing node " + node.getId() + " and " + this.getId());
-        if (node.getName().equals(this.getName())) {
-            if (node.getCreateEdge() != null) {
-                if (node.getCreateEdge().isEdgeEqual(this.getCreateEdge())) {
-                    return compareCombinedFragments(node);
-                } else {
-                    return false;
-                }
-            }
-            return compareCombinedFragments(node);
-        } else {
-            this.logger.debug("Name and Create message is NOT equal");
-            return false;
-        }
-    }
-
-    private boolean compareCombinedFragments(Node node) {
-        int fragmentIndex = 0;
-        for (CombinedFragment fragment : combinedFragments()) {
-            if (fragment.isFragmentEqual(node.combinedFragments().get(fragmentIndex))) {
-                fragmentIndex++;
-            } else {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

@@ -17,6 +17,7 @@ public class EdgeImpl implements Edge {
     private final Logger logger = LoggerFactory.getLogger(EdgeImpl.class);
 
     public EdgeImpl(String name, EdgeType edgeType) {
+    	logger.debug("Creating instance of EdgeImpl with name: {}", name);
         this.name = name;
         this.edgeType = edgeType;
     }
@@ -39,13 +40,6 @@ public class EdgeImpl implements Edge {
     @Override
     public void setEdgeType(EdgeType edgeType) {
         this.edgeType = edgeType;
-    }
-
-    @Override
-    public boolean isEdgeEqual(Edge edge) {
-        this.logger.debug("Checking equality of message " + edge.getName() + " and " + this.getName());
-        return edge.getEdgeType().getCode().equals(this.getEdgeType().getCode())
-                && edge.getName().equals(this.getName());
     }
 
 }

@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.comparison.change.Change;
 import com.mlyncar.dp.comparison.change.ChangeLog;
-import com.mlyncar.dp.comparison.comparator.SubgraphComparator;
 import com.mlyncar.dp.comparison.exception.ComparisonException;
+import com.mlyncar.dp.comparison.graph.SubgraphComparator;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.Node;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
