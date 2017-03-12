@@ -27,7 +27,11 @@ public class NodeImpl implements Node {
     private final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
 
     public NodeImpl(String id, Edge createEdge, Node parentNode, String name) {
-    	logger.debug("Creating instance of NodeImpl with name: {} and createEdge: {}", name, createEdge.getName());
+    	if (createEdge!=null) {
+        	logger.debug("Creating instance of NodeImpl with name: {} and createEdge: {}", name, createEdge.getName());
+    	} else {
+        	logger.debug("Creating instance of NodeImpl with name: {} and createEdge: Null", name);
+    	}
         this.id = id;
         this.createEdge = createEdge;
         this.parentNode = parentNode;

@@ -1,4 +1,4 @@
-package com.mlyncar.dp.comparison.change;
+package com.mlyncar.dp.comparison.entity;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -16,6 +16,8 @@ public interface ChangeLog {
     public Graph getSubGraph();
 
     public void addChange(Change change);
+    
+    public void addChanges(List<Change> changes);
 
     public List<Change> changes();
     

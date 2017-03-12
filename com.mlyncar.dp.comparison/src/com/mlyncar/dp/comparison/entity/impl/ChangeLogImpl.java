@@ -1,7 +1,7 @@
-package com.mlyncar.dp.comparison.change.impl;
+package com.mlyncar.dp.comparison.entity.impl;
 
-import com.mlyncar.dp.comparison.change.Change;
-import com.mlyncar.dp.comparison.change.ChangeLog;
+import com.mlyncar.dp.comparison.entity.Change;
+import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.transformer.entity.Graph;
 
 import java.sql.Timestamp;
@@ -63,4 +63,9 @@ public class ChangeLogImpl implements ChangeLog {
     public Timestamp getChangeLogTimestamp() {
         return this.changeLogTimestamp;
     }
+
+	@Override
+	public void addChanges(List<Change> newChanges) {
+		this.changes.addAll(newChanges);
+	}
 }

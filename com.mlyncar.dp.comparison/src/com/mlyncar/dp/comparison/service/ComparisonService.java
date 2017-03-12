@@ -5,10 +5,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mlyncar.dp.comparison.change.Change;
-import com.mlyncar.dp.comparison.change.ChangeLog;
+import com.mlyncar.dp.comparison.core.GraphComparator;
+import com.mlyncar.dp.comparison.core.impl.GraphComparatorImpl;
+import com.mlyncar.dp.comparison.entity.Change;
+import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.comparison.exception.ComparisonException;
-import com.mlyncar.dp.comparison.graph.SubgraphComparator;
+import com.mlyncar.dp.comparison.test.ComparisonTestHelper;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.Node;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
@@ -27,8 +29,12 @@ public class ComparisonService {
 		TransformationService service = new TransformationService();
 		try {	
 			logger.debug("Starting to generate changes between graph structures.");
-			Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
-			Graph umlGraph = service.getGraphStructureFromConcreteDiagram("SequenceDiagramTest1");
+			//Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
+			Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");
+			Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction2");
+			GraphComparator comparator = new GraphComparatorImpl();
+			ChangeLog log = comparator.compareGraphStructures(umlGraph2, umlGraph1);
+			ComparisonTestHelper.printChanges(log);			
 		} catch (GraphTransformationException ex) {
 			throw new ComparisonException("Comparison Service failed: Error while transforming diagram structure to graph.", ex);
 		}
@@ -61,7 +67,7 @@ public class ComparisonService {
     public boolean isGraphSubgraph(Graph referenceTree, Graph subTree) {
         Node rootReferenceNode = referenceTree.getRootNode();
         Node rootSubTreeNode = subTree.getRootNode();
-        SubgraphComparator comparator = new SubgraphComparator();
+        GraphComparatorImpl comparator = new GraphComparatorImpl();
         return comparator.isSubTree(rootReferenceNode, rootSubTreeNode);
     }
 

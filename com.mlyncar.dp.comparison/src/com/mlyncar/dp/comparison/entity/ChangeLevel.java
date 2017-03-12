@@ -1,4 +1,4 @@
-package com.mlyncar.dp.comparison.change;
+package com.mlyncar.dp.comparison.entity;
 
 import com.mlyncar.dp.comparison.exception.ChangeLevelException;
 

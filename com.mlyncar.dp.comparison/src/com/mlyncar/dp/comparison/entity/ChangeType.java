@@ -1,4 +1,4 @@
-package com.mlyncar.dp.comparison.change;
+package com.mlyncar.dp.comparison.entity;
 
 import com.mlyncar.dp.comparison.exception.ChangeTypeException;
 
@@ -9,9 +9,15 @@ import com.mlyncar.dp.comparison.exception.ChangeTypeException;
  */
 public enum ChangeType {
     
-    ADD("add"),
-    DELETE("delete"),
-    MODIFY("modify");
+    LIFELINE_ADD("lifeline_add"),
+    MESSAGE_ADD("message_add"),
+    LIFELINE_REMOVE("lifeline_remove"),
+    MESSAGE_REMOVE("message_remove"),
+    LIFELINE_MODIFY("lifeline_modify"),
+    MESSAGE_MODIFY("message_modify"),
+    FRAGMENT_ADD("fragment_add"),
+    FRAGMENT_REMOVE("fragment_remove"),
+    FRAGMENT_MODIFY("fragment_modify");
 
     private final String code;
 

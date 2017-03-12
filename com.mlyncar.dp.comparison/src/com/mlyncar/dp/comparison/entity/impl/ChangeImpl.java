@@ -1,8 +1,8 @@
-package com.mlyncar.dp.comparison.change.impl;
+package com.mlyncar.dp.comparison.entity.impl;
 
-import com.mlyncar.dp.comparison.change.Change;
-import com.mlyncar.dp.comparison.change.ChangeLevel;
-import com.mlyncar.dp.comparison.change.ChangeType;
+import com.mlyncar.dp.comparison.entity.Change;
+import com.mlyncar.dp.comparison.entity.ChangeLevel;
+import com.mlyncar.dp.comparison.entity.ChangeType;
 
 /**
  *
