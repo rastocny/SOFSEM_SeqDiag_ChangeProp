@@ -40,7 +40,6 @@ public interface Node {
 
     public void removeCombinedFragment(CombinedFragment combinedFragment);
 
-
     public boolean isLeaf();
 
     public boolean isReply();

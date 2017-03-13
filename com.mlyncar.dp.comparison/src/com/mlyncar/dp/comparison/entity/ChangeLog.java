@@ -16,15 +16,15 @@ public interface ChangeLog {
     public Graph getSubGraph();
 
     public void addChange(Change change);
-    
+
     public void addChanges(List<Change> changes);
 
     public List<Change> changes();
-    
+
     public String getReferenceInteractionId();
-    
+
     public String getSubInteractionId();
-    
+
     public Timestamp getChangeLogTimestamp();
-    
+
 }

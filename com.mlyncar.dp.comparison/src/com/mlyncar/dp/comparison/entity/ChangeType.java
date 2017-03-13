@@ -2,13 +2,12 @@ package com.mlyncar.dp.comparison.entity;
 
 import com.mlyncar.dp.comparison.exception.ChangeTypeException;
 
-
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public enum ChangeType {
-    
+
     LIFELINE_ADD("lifeline_add"),
     MESSAGE_ADD("message_add"),
     LIFELINE_REMOVE("lifeline_remove"),

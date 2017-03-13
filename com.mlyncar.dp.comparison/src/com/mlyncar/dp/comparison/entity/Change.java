@@ -17,18 +17,18 @@ public interface Change {
     public void setChangeLevel(ChangeLevel changeLevel);
 
     public ChangeLevel getChangeLevel();
-    
+
     public String getNewValue();
-    
+
     public void setNewValue(String value);
-    
+
     public String getOldValue();
-    
+
     public void setOldValue(String oldValue);
-    
+
     public boolean isMessageRelated();
-    
+
     public boolean isLifelineRelated();
-    
+
     public boolean isCombinedFragmentRelated();
 }

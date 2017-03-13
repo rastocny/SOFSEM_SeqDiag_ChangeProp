@@ -17,7 +17,7 @@ public class EdgeImpl implements Edge {
     private final Logger logger = LoggerFactory.getLogger(EdgeImpl.class);
 
     public EdgeImpl(String name, EdgeType edgeType) {
-    	logger.debug("Creating instance of EdgeImpl with name: {}", name);
+        logger.debug("Creating instance of EdgeImpl with name: {}", name);
         this.name = name;
         this.edgeType = edgeType;
     }

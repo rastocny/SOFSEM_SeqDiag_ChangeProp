@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.internal.Workbench;
+import org.eclipse.ui.PlatformUI;
 
 import com.mlyncar.dp.analyzer.exception.AnalyzerException;
 
@@ -34,8 +34,7 @@ import com.mlyncar.dp.analyzer.exception.AnalyzerException;
 public class EclipseProjectNavigatorHelper {
 
     public static IJavaProject getCurrentProject() {
-        ISelectionService selectionService = Workbench.getInstance()
-                .getActiveWorkbenchWindow().getSelectionService();
+        ISelectionService selectionService = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
         ISelection selection = selectionService.getSelection();
         if (selection instanceof IStructuredSelection) {
             Object element = ((IStructuredSelection) selection)
@@ -47,7 +46,7 @@ public class EclipseProjectNavigatorHelper {
     }
 
     public static String getCurrentProjectModel() throws AnalyzerException {
-        ISelectionService selectionService = Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();
+        ISelectionService selectionService = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
         ISelection selection = selectionService.getSelection();
         if (selection instanceof IStructuredSelection) {
             Object element = ((IStructuredSelection) selection)

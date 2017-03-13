@@ -64,8 +64,8 @@ public class ChangeLogImpl implements ChangeLog {
         return this.changeLogTimestamp;
     }
 
-	@Override
-	public void addChanges(List<Change> newChanges) {
-		this.changes.addAll(newChanges);
-	}
+    @Override
+    public void addChanges(List<Change> newChanges) {
+        this.changes.addAll(newChanges);
+    }
 }

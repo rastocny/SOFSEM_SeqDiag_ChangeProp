@@ -1,4 +1,4 @@
-package com.mlyncar.dp.comparison.core.impl;
+package com.mlyncar.dp.comparison.entity.impl;
 
 import com.mlyncar.dp.transformer.entity.Node;
 
@@ -11,12 +11,12 @@ public class LeveledNode {
         this.level = level;
         this.node = node;
     }
-    
+
     public Integer getLevel() {
-    	return level;
+        return level;
     }
-    
+
     public Node getNode() {
-    	return node;
+        return node;
     }
 }

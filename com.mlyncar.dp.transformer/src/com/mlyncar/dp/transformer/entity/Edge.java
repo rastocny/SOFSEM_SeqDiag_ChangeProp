@@ -14,5 +14,4 @@ public interface Edge {
 
     public void setEdgeType(EdgeType edgeType);
 
-
 }

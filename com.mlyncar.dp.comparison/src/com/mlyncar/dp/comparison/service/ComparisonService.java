@@ -24,46 +24,27 @@ public class ComparisonService {
 
     private final Logger logger = LoggerFactory.getLogger(ComparisonService.class);
 
-	public ChangeLog compareUmlModelWithSourceCode() throws ComparisonException {
+    public ChangeLog compareUmlModelWithSourceCode() throws ComparisonException {
 
-		TransformationService service = new TransformationService();
-		try {	
-			logger.debug("Starting to generate changes between graph structures.");
-			//Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
-			Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");
-			Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction2");
-			GraphComparator comparator = new GraphComparatorImpl();
-			ChangeLog log = comparator.compareGraphStructures(umlGraph2, umlGraph1);
-			ComparisonTestHelper.printChanges(log);			
-		} catch (GraphTransformationException ex) {
-			throw new ComparisonException("Comparison Service failed: Error while transforming diagram structure to graph.", ex);
-		}
-		return null;
-	}
-	
-    public ChangeLog getChangesInTwoGraphs(String referenceInteractionId, String subInteractionId) {
-        
-/*        GraphCreator creator = new GraphCreatorImpl();
-        //random uuid classes
-        Graph subGraph = creator.createGraphFromId(UUID.randomUUID().toString());  
-        Graph referenceGraph = creator.createGraphFromId(UUID.randomUUID().toString());
-        
-        ChangeLog changeLog = new ChangeLogImpl(subGraph, referenceGraph);
-        //No changes detected - just return changelog
-        if (isGraphSubgraph(referenceGraph, subGraph)) {
-            return changeLog;
+        TransformationService service = new TransformationService();
+        try {
+            logger.debug("Starting to generate changes between graph structures.");
+            //Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
+            Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");
+            Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction2");
+            GraphComparator comparator = new GraphComparatorImpl();
+            ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
+            ComparisonTestHelper.printChanges(log);
+        } catch (GraphTransformationException ex) {
+            throw new ComparisonException("Comparison Service failed: Error while transforming diagram structure to graph.", ex);
         }
-        //check for changes in graph
-        changeLog.changes().addAll(findChangesInGraph(referenceGraph, subGraph));
-        return changeLog;
-  */
-    	return null;
+        return null;
     }
 
     public List<Change> findChangesInGraph(Graph referenceTree, Graph subTree) {
         throw new UnsupportedOperationException("Not supported yet");
     }
-    
+
     public boolean isGraphSubgraph(Graph referenceTree, Graph subTree) {
         Node rootReferenceNode = referenceTree.getRootNode();
         Node rootSubTreeNode = subTree.getRootNode();
