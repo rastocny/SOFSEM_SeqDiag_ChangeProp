@@ -6,8 +6,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import com.mlyncar.dp.comparison.exception.ComparisonException;
-import com.mlyncar.dp.comparison.service.ComparisonService;
+import com.mlyncar.dp.synch.exception.SynchronizationException;
+import com.mlyncar.dp.synch.service.SynchronizationService;
 
 /**
  * Our sample action implements workbench action delegate.
@@ -32,14 +32,14 @@ public class SynchAction implements IWorkbenchWindowActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
-		ComparisonService service = new ComparisonService();
+		SynchronizationService service = new SynchronizationService();
 		try {		
-			service.compareUmlModelWithSourceCode();
+			service.synchronizeDiagramsAndSourceCode();
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synchronization Tool",
 					"Synchronization Successfull");
-		} catch (ComparisonException ex) {
+		} catch (SynchronizationException ex) {
 			MessageDialog.openInformation(
 					window.getShell(),
 					"Synch Failed",

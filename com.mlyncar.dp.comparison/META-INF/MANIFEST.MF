@@ -13,5 +13,6 @@ Import-Package: com.mlyncar.dp.transformer.entity,
  com.mlyncar.dp.transformer.exception,
  com.mlyncar.dp.transformer.service,
  org.slf4j;version="1.4.3"
-Export-Package: com.mlyncar.dp.comparison.exception,
+Export-Package: com.mlyncar.dp.comparison.entity,
+ com.mlyncar.dp.comparison.exception,
  com.mlyncar.dp.comparison.service

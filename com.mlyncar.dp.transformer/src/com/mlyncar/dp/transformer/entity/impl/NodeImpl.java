@@ -6,6 +6,7 @@ import com.mlyncar.dp.transformer.entity.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +27,13 @@ public class NodeImpl implements Node {
     private final List<CombinedFragment> combinedFragments = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
 
-    public NodeImpl(String id, Edge createEdge, Node parentNode, String name) {
+    public NodeImpl(Edge createEdge, Node parentNode, String name) {
         if (createEdge != null) {
             logger.debug("Creating instance of NodeImpl with name: {} and createEdge: {}", name, createEdge.getName());
         } else {
             logger.debug("Creating instance of NodeImpl with name: {} and createEdge: Null", name);
         }
-        this.id = id;
+        this.id = UUID.randomUUID().toString();
         this.createEdge = createEdge;
         this.parentNode = parentNode;
         this.name = name;

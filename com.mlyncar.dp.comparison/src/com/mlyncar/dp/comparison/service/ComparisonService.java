@@ -35,10 +35,10 @@ public class ComparisonService {
             GraphComparator comparator = new GraphComparatorImpl();
             ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
             ComparisonTestHelper.printChanges(log);
+            return log;
         } catch (GraphTransformationException ex) {
             throw new ComparisonException("Comparison Service failed: Error while transforming diagram structure to graph.", ex);
         }
-        return null;
     }
 
     public List<Change> findChangesInGraph(Graph referenceTree, Graph subTree) {

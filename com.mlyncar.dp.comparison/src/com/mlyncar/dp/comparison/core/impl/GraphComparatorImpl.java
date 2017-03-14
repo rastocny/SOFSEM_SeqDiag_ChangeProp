@@ -135,7 +135,7 @@ public class GraphComparatorImpl implements GraphComparator {
                 }
                 if (!subNodeFound) {
                     ChangeListGenerator generator = new ChangeListGeneratorImpl();
-                    changeLog.addChanges(generator.createMessageRemovalChange(subNode.getNode(), referenceGraphNodes));
+                    changeLog.addChanges(generator.createMessageRemovalChange(subNode.getNode(), subGraphNodes));
                 }
             }
         }

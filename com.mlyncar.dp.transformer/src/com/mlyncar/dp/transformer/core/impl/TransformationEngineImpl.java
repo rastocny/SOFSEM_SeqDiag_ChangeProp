@@ -40,13 +40,13 @@ public class TransformationEngineImpl implements TransformationEngine {
             Edge edge = new EdgeImpl(message.getName(), EdgeType.fromCode(message.getType().getCode()));
             if (lastInsertedNode.getParentNode() == null) {
                 logger.debug("Adding node to root node");
-                Node node = new NodeImpl("id", edge, lastInsertedNode, message.getTargetLifeline().getName());
+                Node node = new NodeImpl(edge, lastInsertedNode, message.getTargetLifeline().getName());
                 lastInsertedNode.addChildNode(node);
                 return node;
             }
 
             if (lastInsertedNode.getName().equals(message.getSourceLifeline().getName()) && !lastInsertedNode.isReply()) {
-                Node node = new NodeImpl("id", edge, lastInsertedNode, message.getTargetLifeline().getName());
+                Node node = new NodeImpl(edge, lastInsertedNode, message.getTargetLifeline().getName());
                 lastInsertedNode.addChildNode(node);
                 logger.debug("Found place for node " + node.getName() + " with message " + node.getCreateEdge().getName());
                 logger.debug("Node inserted to " + lastInsertedNode.getName());
@@ -60,7 +60,7 @@ public class TransformationEngineImpl implements TransformationEngine {
     }
 
     private Graph initializeGraphStructure(Message initialMessage) {
-        Node rootNode = new NodeImpl("", null, null, initialMessage.getSourceLifeline().getName());
+        Node rootNode = new NodeImpl(null, null, initialMessage.getSourceLifeline().getName());
         Graph graph = new TreeGraph(rootNode);
         return graph;
     }
