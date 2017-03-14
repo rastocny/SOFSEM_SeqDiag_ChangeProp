@@ -13,33 +13,33 @@ import com.mlyncar.dp.interpreter.exception.InterpreterException;
 
 public class ChangeLogInterpreter implements ChangeInterpreter {
 
-	private final PrintWriter fileWriter;
-	
-	public ChangeLogInterpreter(String changeLogFileName) throws InterpreterException {
-		FileWriter fw;
-		try {
-			fw = new FileWriter(changeLogFileName, true);
-		    BufferedWriter bw = new BufferedWriter(fw);
-		    fileWriter = new PrintWriter(bw);
-		} catch (IOException ex) {
-			throw new InterpreterException("Unable to initialize changelog file", ex);
-		}
+    private final PrintWriter fileWriter;
 
-	}
-	
-	@Override
-	public void interpretChange(Change change) throws InterpreterException {
-		Date date = new Date();
-		String outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue();
-		fileWriter.println(outputLine);
-		fileWriter.close();
-	}
+    public ChangeLogInterpreter(String changeLogFileName) throws InterpreterException {
+        FileWriter fw;
+        try {
+            fw = new FileWriter(changeLogFileName, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            fileWriter = new PrintWriter(bw);
+        } catch (IOException ex) {
+            throw new InterpreterException("Unable to initialize changelog file", ex);
+        }
 
-	@Override
-	public void interpretChanges(List<Change> changes)
-			throws InterpreterException {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void interpretChange(Change change) throws InterpreterException {
+        Date date = new Date();
+        String outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue();
+        fileWriter.println(outputLine);
+        fileWriter.close();
+    }
+
+    @Override
+    public void interpretChanges(List<Change> changes)
+            throws InterpreterException {
+        // TODO Auto-generated method stub
+
+    }
 
 }

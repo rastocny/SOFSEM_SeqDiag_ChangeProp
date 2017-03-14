@@ -5,10 +5,10 @@ import com.mlyncar.dp.synch.rule.SynchRuleEngine;
 
 public class SynchRuleEngineImpl implements SynchRuleEngine {
 
-	@Override
-	public boolean shouldBeInterpreted(Change change) {
-		// TODO Auto-generated method stub
-		return true;
-	}
+    @Override
+    public boolean shouldBeInterpreted(Change change) {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
 }

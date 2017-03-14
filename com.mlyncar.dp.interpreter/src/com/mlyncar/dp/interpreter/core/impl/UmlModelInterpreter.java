@@ -8,17 +8,17 @@ import com.mlyncar.dp.interpreter.exception.InterpreterException;
 
 public class UmlModelInterpreter implements ChangeInterpreter {
 
-	@Override
-	public void interpretChange(Change change) throws InterpreterException {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void interpretChange(Change change) throws InterpreterException {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void interpretChanges(List<Change> changes)
-			throws InterpreterException {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void interpretChanges(List<Change> changes)
+            throws InterpreterException {
+        // TODO Auto-generated method stub
+
+    }
 
 }
