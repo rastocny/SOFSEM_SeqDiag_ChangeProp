@@ -3,7 +3,7 @@ package com.mlyncar.dp.comparison.core;
 import java.util.List;
 
 import com.mlyncar.dp.comparison.entity.Change;
-import com.mlyncar.dp.comparison.entity.impl.LeveledNode;
+import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
 
 public interface ChangeListGenerator {

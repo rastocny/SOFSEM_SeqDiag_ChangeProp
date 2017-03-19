@@ -10,10 +10,12 @@ import com.mlyncar.dp.comparison.core.GraphComparator;
 import com.mlyncar.dp.comparison.core.NodeRelationComparator;
 import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.comparison.entity.impl.ChangeLogImpl;
-import com.mlyncar.dp.comparison.entity.impl.LeveledNode;
 import com.mlyncar.dp.comparison.enums.NodeRelation;
 import com.mlyncar.dp.transformer.entity.Graph;
+import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.helper.TreeOrderGenerator;
+import com.mlyncar.dp.transformer.service.TransformationService;
 
 /**
  *
@@ -22,7 +24,11 @@ import com.mlyncar.dp.transformer.entity.Node;
 public class GraphComparatorImpl implements GraphComparator {
 
     private final Logger logger = LoggerFactory.getLogger(GraphComparatorImpl.class);
-
+    private final TransformationService transformationService;
+    
+    public GraphComparatorImpl(TransformationService transformationService) {
+    	this.transformationService = transformationService;
+    }
     public boolean isSubTree(Node rootReferenceNode, Node rootSubTreeNode) {
 
         if (rootSubTreeNode == null) {
@@ -57,7 +63,7 @@ public class GraphComparatorImpl implements GraphComparator {
 
     @Override
     public ChangeLog compareGraphStructures(Graph referenceGraph, Graph subGraph) {
-        TreeOrderGeneratorImpl orderGenerator = new TreeOrderGeneratorImpl();
+    	TreeOrderGenerator orderGenerator = transformationService.getTreeOrderGenerator();
         ChangeLog changeLog = new ChangeLogImpl(referenceGraph, subGraph);
         List<LeveledNode> referenceGraphNodes = orderGenerator.createTreeTravesralOrder(referenceGraph);
         List<LeveledNode> subGraphNodes = orderGenerator.createTreeTravesralOrder(subGraph);
@@ -73,13 +79,11 @@ public class GraphComparatorImpl implements GraphComparator {
         for (int currentLevel = 1; currentLevel <= maximumLevel; currentLevel++) {
             logger.debug("Analyzing tree layer {}", currentLevel);
             for (LeveledNode referenceNode : referenceGraphNodes) {
-                //source code
                 if (referenceNode.getLevel() != currentLevel) {
                     continue;
                 }
                 boolean subNodeFound = false;
                 for (LeveledNode subNode : subGraphNodes) {
-                    //diagram
                     if (subNode.getLevel() != currentLevel) {
                         continue;
                     }
@@ -108,13 +112,11 @@ public class GraphComparatorImpl implements GraphComparator {
         for (int currentLevel = 1; currentLevel <= maximumLevel; currentLevel++) {
             logger.debug("Analyzing tree layer {}", currentLevel);
             for (LeveledNode subNode : subGraphNodes) {
-                //source code
                 if (subNode.getLevel() != currentLevel) {
                     continue;
                 }
                 boolean subNodeFound = false;
                 for (LeveledNode referenceNode : referenceGraphNodes) {
-                    //diagram
                     if (referenceNode.getLevel() != currentLevel) {
                         continue;
                     }

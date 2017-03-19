@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: com.mlyncar.dp.comparison.entity
+Import-Package: com.mlyncar.dp.comparison.entity,
+ com.mlyncar.dp.transformer.entity
 Export-Package: com.mlyncar.dp.interpreter.exception,
  com.mlyncar.dp.interpreter.service

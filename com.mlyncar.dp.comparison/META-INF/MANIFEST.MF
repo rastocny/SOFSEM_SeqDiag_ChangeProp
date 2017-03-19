@@ -11,6 +11,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.mlyncar.dp.transformer.entity,
  com.mlyncar.dp.transformer.exception,
+ com.mlyncar.dp.transformer.helper,
  com.mlyncar.dp.transformer.service,
  org.slf4j;version="1.4.3"
 Export-Package: com.mlyncar.dp.comparison.entity,

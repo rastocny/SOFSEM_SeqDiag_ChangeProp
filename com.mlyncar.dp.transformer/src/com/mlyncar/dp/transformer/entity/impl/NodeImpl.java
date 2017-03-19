@@ -132,4 +132,25 @@ public class NodeImpl implements Node {
     public boolean isReply() {
         return getCreateEdge().getEdgeType().getCode().equals(EdgeType.RETURN.getCode());
     }
+
+	@Override
+	public Node getLeftSibling() {
+		if(this.getParentNode() == null) {
+			return null;
+		} else {
+			int index = 0;
+			for(Node node : this.getParentNode().childNodes()) {
+				if(node.getId().equals(this.getId()) && index != 0) {
+					return this.getParentNode().childNodes().get(index - 1);
+				}
+				index++;
+			}
+			return null;
+		}
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return childNodes().size() != 0;
+	}
 }

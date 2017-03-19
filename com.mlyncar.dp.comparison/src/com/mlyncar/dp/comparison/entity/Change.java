@@ -1,5 +1,7 @@
 package com.mlyncar.dp.comparison.entity;
 
+import com.mlyncar.dp.transformer.entity.Node;
+
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
@@ -13,22 +15,13 @@ public interface Change {
     public String getElementId();
 
     public void setElementId(String elementId);
+    
+    public Node getNewValue();
 
-    public void setChangeLevel(ChangeLevel changeLevel);
+    public void setNewValue(Node value);
 
-    public ChangeLevel getChangeLevel();
+    public Node getOldValue();
 
-    public String getNewValue();
+    public void setOldValue(Node oldValue);
 
-    public void setNewValue(String value);
-
-    public String getOldValue();
-
-    public void setOldValue(String oldValue);
-
-    public boolean isMessageRelated();
-
-    public boolean isLifelineRelated();
-
-    public boolean isCombinedFragmentRelated();
 }

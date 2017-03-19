@@ -32,7 +32,7 @@ public class ComparisonService {
             //Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
             Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");
             Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction2");
-            GraphComparator comparator = new GraphComparatorImpl();
+            GraphComparator comparator = new GraphComparatorImpl(service);
             ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
             ComparisonTestHelper.printChanges(log);
             return log;
@@ -48,7 +48,7 @@ public class ComparisonService {
     public boolean isGraphSubgraph(Graph referenceTree, Graph subTree) {
         Node rootReferenceNode = referenceTree.getRootNode();
         Node rootSubTreeNode = subTree.getRootNode();
-        GraphComparatorImpl comparator = new GraphComparatorImpl();
+        GraphComparatorImpl comparator = new GraphComparatorImpl(new TransformationService());
         return comparator.isSubTree(rootReferenceNode, rootSubTreeNode);
     }
 

@@ -30,7 +30,24 @@ public class ChangeLogInterpreter implements ChangeInterpreter {
     @Override
     public void interpretChange(Change change) throws InterpreterException {
         Date date = new Date();
-        String outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue();
+        String outputLine = "";
+        switch(change.getChangeType()) {
+        case LIFELINE_ADD:
+        case LIFELINE_REMOVE:
+            outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getName();
+            break;
+        case MESSAGE_ADD:
+        case MESSAGE_REMOVE:
+	    	if(change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
+	    		outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName() + "; " + change.getNewValue().getCreateEdge().getName();	    
+	    	} else {
+	    		outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getCreateEdge().getName();
+	    	}
+	    	break;
+		default:
+			outputLine = date.toString() + "Error: Unknown change detected";
+			break;
+        }
         fileWriter.println(outputLine);
         fileWriter.close();
     }

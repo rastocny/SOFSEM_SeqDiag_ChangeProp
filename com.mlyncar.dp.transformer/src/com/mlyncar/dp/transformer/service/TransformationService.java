@@ -14,9 +14,13 @@ import com.mlyncar.dp.transformer.core.TransformationEngine;
 import com.mlyncar.dp.transformer.core.impl.TransformationEngineImpl;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
+import com.mlyncar.dp.transformer.helper.TreeOrderGenerator;
+import com.mlyncar.dp.transformer.helper.impl.TreeOrderGeneratorImpl;
 
 public class TransformationService {
 
+	private TreeOrderGenerator treeOrderGenerator;
+	
     public Graph getGraphStructureFromSourceCode() throws GraphTransformationException {
         AnalyzerService service = new AnalyzerService();
         SourceCodeAnalyzer analyzer = service.getSourceCodeAnalyzer();
@@ -56,6 +60,13 @@ public class TransformationService {
             throw new GraphTransformationException("Unable to start transformation proces because of UML model analysis failure ", ex);
         }
         return graph;
+    }
+    
+    public TreeOrderGenerator getTreeOrderGenerator() {
+    	if(treeOrderGenerator == null) {
+    		treeOrderGenerator = new TreeOrderGeneratorImpl();
+    	}
+    	return treeOrderGenerator;
     }
 
 }

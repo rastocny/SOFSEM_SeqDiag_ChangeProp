@@ -1,13 +1,14 @@
-package com.mlyncar.dp.comparison.entity.impl;
+package com.mlyncar.dp.transformer.entity.impl;
 
+import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
 
-public class LeveledNode {
+public class LeveledNodeImpl implements LeveledNode {
 
     private final Integer level;
     private final Node node;
 
-    public LeveledNode(Integer level, Node node) {
+    public LeveledNodeImpl(Integer level, Node node) {
         this.level = level;
         this.node = node;
     }

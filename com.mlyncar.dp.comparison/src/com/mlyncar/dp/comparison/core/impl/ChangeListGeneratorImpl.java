@@ -7,20 +7,20 @@ import com.mlyncar.dp.comparison.core.ChangeListGenerator;
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.comparison.entity.ChangeType;
 import com.mlyncar.dp.comparison.entity.impl.ChangeImpl;
-import com.mlyncar.dp.comparison.entity.impl.LeveledNode;
+import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
 
 public class ChangeListGeneratorImpl implements ChangeListGenerator {
-
+	
     @Override
     public List<Change> createMessageAdditionChange(Node node, List<LeveledNode> additionalNodes) {
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_ADD);
-        change.setNewValue(node.getCreateEdge().getName());
+        change.setNewValue(node);
         changes.add(change);
         if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_ADD);
-            lifelineChange.setNewValue(node.getName());
+            lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
         }
         return changes;
@@ -30,11 +30,11 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
     public List<Change> createMessageRemovalChange(Node node, List<LeveledNode> additionalNodes) {
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_REMOVE);
-        change.setNewValue(node.getCreateEdge().getName());
+        change.setNewValue(node);
         changes.add(change);
         if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_REMOVE);
-            lifelineChange.setNewValue(node.getName());
+            lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
         }
         return changes;
