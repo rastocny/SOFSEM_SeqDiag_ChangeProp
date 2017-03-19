@@ -7,10 +7,10 @@ import com.mlyncar.dp.comparison.service.ComparisonService;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.interpreter.service.InterpreterService;
 import com.mlyncar.dp.synch.config.PropertyLoader;
+import com.mlyncar.dp.synch.core.SynchRuleEngine;
+import com.mlyncar.dp.synch.core.impl.SynchRuleEngineImpl;
 import com.mlyncar.dp.synch.exception.ConfigurationException;
 import com.mlyncar.dp.synch.exception.SynchronizationException;
-import com.mlyncar.dp.synch.rule.SynchRuleEngine;
-import com.mlyncar.dp.synch.rule.impl.SynchRuleEngineImpl;
 
 public class SynchronizationService {
 

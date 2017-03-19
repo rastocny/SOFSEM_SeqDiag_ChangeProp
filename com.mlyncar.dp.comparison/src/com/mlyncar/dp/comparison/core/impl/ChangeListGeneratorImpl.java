@@ -11,7 +11,7 @@ import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
 
 public class ChangeListGeneratorImpl implements ChangeListGenerator {
-	
+
     @Override
     public List<Change> createMessageAdditionChange(Node node, List<LeveledNode> additionalNodes) {
         List<Change> changes = new ArrayList<>();

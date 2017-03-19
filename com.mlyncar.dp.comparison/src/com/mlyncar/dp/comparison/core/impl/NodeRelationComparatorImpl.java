@@ -44,9 +44,9 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
         return SignatureType.EQUAL;
     }
 
-    private NodeRelation getNodeRelationWithoutSignature(Node referenceNode, Node subNode) {
+    public NodeRelation getNodeRelationWithoutSignature(Node referenceNode, Node subNode) {
         if (referenceNode.getName().equals(subNode.getName())) {
-            if (referenceNode.getCreateEdge() != null) {
+            if (referenceNode.getCreateEdge() != null && subNode.getCreateEdge() != null) {
                 if (referenceNode.getCreateEdge().getEdgeType().getCode().equals(subNode.getCreateEdge().getEdgeType().getCode())
                         && referenceNode.getCreateEdge().getName().equals(subNode.getCreateEdge().getName())) {
                     this.logger.debug("Relation is EQUAL");

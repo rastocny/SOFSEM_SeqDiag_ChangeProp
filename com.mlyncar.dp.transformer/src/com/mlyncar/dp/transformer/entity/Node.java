@@ -43,8 +43,6 @@ public interface Node {
     public boolean isLeaf();
 
     public boolean isReply();
-    
-    public boolean hasChildren();
-    
+
     public Node getLeftSibling();
 }

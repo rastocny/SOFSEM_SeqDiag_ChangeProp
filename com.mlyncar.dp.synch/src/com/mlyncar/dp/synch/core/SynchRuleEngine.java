@@ -1,4 +1,4 @@
-package com.mlyncar.dp.synch.rule;
+package com.mlyncar.dp.synch.core;
 
 import com.mlyncar.dp.comparison.entity.Change;
 

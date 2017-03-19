@@ -10,6 +10,7 @@ import com.mlyncar.dp.comparison.core.impl.GraphComparatorImpl;
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.comparison.exception.ComparisonException;
+import com.mlyncar.dp.comparison.exception.GraphBindingException;
 import com.mlyncar.dp.comparison.test.ComparisonTestHelper;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.Node;
@@ -38,6 +39,8 @@ public class ComparisonService {
             return log;
         } catch (GraphTransformationException ex) {
             throw new ComparisonException("Comparison Service failed: Error while transforming diagram structure to graph.", ex);
+        } catch (GraphBindingException ex) {
+            throw new ComparisonException("Comparison Service failed: Error while finding sequence diagram root in reference structure.", ex);
         }
     }
 

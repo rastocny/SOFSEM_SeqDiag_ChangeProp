@@ -6,11 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.comparison.core.ChangeListGenerator;
+import com.mlyncar.dp.comparison.core.GraphBindingEngine;
 import com.mlyncar.dp.comparison.core.GraphComparator;
 import com.mlyncar.dp.comparison.core.NodeRelationComparator;
 import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.comparison.entity.impl.ChangeLogImpl;
 import com.mlyncar.dp.comparison.enums.NodeRelation;
+import com.mlyncar.dp.comparison.exception.GraphBindingException;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
@@ -25,10 +27,11 @@ public class GraphComparatorImpl implements GraphComparator {
 
     private final Logger logger = LoggerFactory.getLogger(GraphComparatorImpl.class);
     private final TransformationService transformationService;
-    
+
     public GraphComparatorImpl(TransformationService transformationService) {
-    	this.transformationService = transformationService;
+        this.transformationService = transformationService;
     }
+
     public boolean isSubTree(Node rootReferenceNode, Node rootSubTreeNode) {
 
         if (rootSubTreeNode == null) {
@@ -62,10 +65,13 @@ public class GraphComparatorImpl implements GraphComparator {
     }
 
     @Override
-    public ChangeLog compareGraphStructures(Graph referenceGraph, Graph subGraph) {
-    	TreeOrderGenerator orderGenerator = transformationService.getTreeOrderGenerator();
-        ChangeLog changeLog = new ChangeLogImpl(referenceGraph, subGraph);
-        List<LeveledNode> referenceGraphNodes = orderGenerator.createTreeTravesralOrder(referenceGraph);
+    public ChangeLog compareGraphStructures(Graph referenceGraph, Graph subGraph) throws GraphBindingException {
+        GraphBindingEngine graphBindingEngine = new GraphBindingEngineImpl();
+        Graph referenceSubGraph = graphBindingEngine.createSubgraphBasedOnComparedGraph(referenceGraph, subGraph, transformationService);
+
+        TreeOrderGenerator orderGenerator = transformationService.getTreeOrderGenerator();
+        ChangeLog changeLog = new ChangeLogImpl(referenceSubGraph, subGraph);
+        List<LeveledNode> referenceGraphNodes = orderGenerator.createTreeTravesralOrder(referenceSubGraph);
         List<LeveledNode> subGraphNodes = orderGenerator.createTreeTravesralOrder(subGraph);
         int maximumLevel;
 

@@ -7,4 +7,5 @@ public interface NodeRelationComparator {
 
     public NodeRelation getNodeRelation(Node referenceNode, Node subNode);
 
+    public NodeRelation getNodeRelationWithoutSignature(Node referenceNode, Node subNode);
 }

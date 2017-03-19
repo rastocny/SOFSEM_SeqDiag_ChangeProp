@@ -14,4 +14,5 @@ Import-Package: com.mlyncar.dp.comparison.entity,
  com.mlyncar.dp.comparison.exception,
  com.mlyncar.dp.comparison.service,
  com.mlyncar.dp.interpreter.exception,
- com.mlyncar.dp.interpreter.service
+ com.mlyncar.dp.interpreter.service,
+ org.slf4j;version="1.4.3"

@@ -15,7 +15,7 @@ public interface Change {
     public String getElementId();
 
     public void setElementId(String elementId);
-    
+
     public Node getNewValue();
 
     public void setNewValue(Node value);
