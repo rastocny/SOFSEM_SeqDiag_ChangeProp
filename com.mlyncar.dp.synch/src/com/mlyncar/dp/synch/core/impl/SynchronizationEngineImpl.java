@@ -24,7 +24,7 @@ public class SynchronizationEngineImpl implements SynchronizationEngine {
     private final InterpreterService interpreterService;
     private StatsProviderHolder statsHolder;
     private final Logger logger = LoggerFactory.getLogger(SynchronizationEngineImpl.class);
-    
+
     public SynchronizationEngineImpl(InterpreterService interpreterService) {
         this.ruleProvider = new SynchRuleProviderImpl();
         this.interpreterService = interpreterService;
@@ -33,37 +33,37 @@ public class SynchronizationEngineImpl implements SynchronizationEngine {
     private boolean shouldBeInterpreted(Change change) throws SynchRuleException {
         List<SynchRule> rules = ruleProvider.getRulesForChange(change.getChangeType());
         for (SynchRule rule : rules) {
-            if (!rule.validateChange(change, statsHolder)) { 
+            if (!rule.validateChange(change, statsHolder)) {
                 return false;
             }
         }
         return true;
     }
 
-	@Override
-	public void processChangesViaSynchRules(ChangeLog changeLog) throws SynchronizationException {
-		try {
-			statsHolder = new StatsProviderHolderImpl(changeLog);
-			for(Change change : changeLog.changes()) {
-				if(shouldBeInterpreted(change)) {
-					interpreterService.interpretChange(change);
-					updateChangeLogStats(change);
-					logger.debug("Change was processed and interpreted by synch engine");
-				} else {
-					logger.debug("Change was not processed by synch engine");
-				}
-			}
-		} catch (InterpreterException ex) {
+    @Override
+    public void processChangesViaSynchRules(ChangeLog changeLog) throws SynchronizationException {
+        try {
+            statsHolder = new StatsProviderHolderImpl(changeLog);
+            for (Change change : changeLog.changes()) {
+                if (shouldBeInterpreted(change)) {
+                    interpreterService.interpretChange(change);
+                    updateChangeLogStats(change);
+                    logger.debug("Change was processed and interpreted by synch engine");
+                } else {
+                    logger.debug("Change was not processed by synch engine");
+                }
+            }
+        } catch (InterpreterException ex) {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception throw in interpreter part: ", ex);
         } catch (SynchRuleException ex) {
-        	throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception throw in Rule: " + ex.getSynchRule(), ex);
-		}
-	}
-	
-	private void updateChangeLogStats(Change change) {
-		if(change.getChangeType().equals(ChangeType.LIFELINE_ADD)) {
-			statsHolder.getChangeLogStats().incrementAddedLifelinesCount();
-		}
-	}
+            throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception throw in Rule: " + ex.getSynchRule(), ex);
+        }
+    }
+
+    private void updateChangeLogStats(Change change) {
+        if (change.getChangeType().equals(ChangeType.LIFELINE_ADD)) {
+            statsHolder.getChangeLogStats().incrementAddedLifelinesCount();
+        }
+    }
 
 }

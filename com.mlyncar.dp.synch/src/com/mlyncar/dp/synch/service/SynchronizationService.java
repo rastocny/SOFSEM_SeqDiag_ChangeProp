@@ -24,6 +24,6 @@ public class SynchronizationService {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception thrown in previous module: ", ex);
         } catch (ConfigurationException ex) {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception configuration part: ", ex);
-        } 
+        }
     }
 }
