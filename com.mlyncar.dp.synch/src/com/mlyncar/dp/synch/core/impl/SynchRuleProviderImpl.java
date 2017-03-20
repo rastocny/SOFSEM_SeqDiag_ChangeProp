@@ -6,6 +6,7 @@ import java.util.List;
 import com.mlyncar.dp.comparison.entity.ChangeType;
 import com.mlyncar.dp.synch.core.SynchRuleProvider;
 import com.mlyncar.dp.synch.rule.SynchRule;
+import com.mlyncar.dp.synch.rule.lifeline.MaximumLifelineRule;
 import com.mlyncar.dp.synch.rule.lifeline.TestLifelineRule;
 import com.mlyncar.dp.synch.rule.message.TestMessageRule;
 
@@ -17,6 +18,7 @@ public class SynchRuleProviderImpl implements SynchRuleProvider {
     public SynchRuleProviderImpl() {
         messageAddRules.add(new TestMessageRule());
         lifelineAddRules.add(new TestLifelineRule());
+        lifelineAddRules.add(new MaximumLifelineRule());
     }
 
     @Override

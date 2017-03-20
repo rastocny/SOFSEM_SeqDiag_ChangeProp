@@ -19,7 +19,7 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
     @Override
     public Graph createSubgraphBasedOnComparedGraph(Graph referenceGraph, Graph subGraph, TransformationService transService) throws GraphBindingException {
         logger.debug("Starting to find pair for sequence diagram root node " + subGraph.getRootNode().getName());
-        for (LeveledNode node : transService.getTreeOrderGenerator().createTreeTravesralOrder(referenceGraph)) {
+        for (LeveledNode node : referenceGraph.getOrderedNodes()) {
             if (isNodeSuitableForRoot(node.getNode(), subGraph.getRootNode())) {
                 return transService.createGraphStructure(node.getNode());
             }

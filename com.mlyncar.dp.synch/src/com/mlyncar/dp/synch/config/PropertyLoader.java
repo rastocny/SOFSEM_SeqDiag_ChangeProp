@@ -10,8 +10,16 @@ public class PropertyLoader {
 
     private Properties properties;
     private final static String CONFIG_PATH_PROPERTY_NAME = "resources/synchronization.properties";
-
-    public PropertyLoader() throws ConfigurationException {
+    private static PropertyLoader instance;
+    
+    public static PropertyLoader getInstance() throws ConfigurationException {
+    	if(instance == null) {
+    		instance = new PropertyLoader();
+    	}
+    	return instance;
+    }
+    
+    private PropertyLoader() throws ConfigurationException {
         this.properties = new Properties();
         InputStream configFileStream = getClass().getClassLoader().getResourceAsStream(CONFIG_PATH_PROPERTY_NAME);
         try {

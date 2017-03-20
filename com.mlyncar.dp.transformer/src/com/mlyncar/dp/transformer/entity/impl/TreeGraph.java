@@ -1,7 +1,11 @@
 package com.mlyncar.dp.transformer.entity.impl;
 
 import com.mlyncar.dp.transformer.entity.Graph;
+import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.helper.impl.TreeOrderGeneratorImpl;
+
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,5 +42,10 @@ public class TreeGraph implements Graph {
     public String getTreeGraphId() {
         return this.treeGraphId;
     }
+
+	@Override
+	public List<LeveledNode> getOrderedNodes() {
+		return new TreeOrderGeneratorImpl().createTreeTravesralOrder(this);
+	}
 
 }
