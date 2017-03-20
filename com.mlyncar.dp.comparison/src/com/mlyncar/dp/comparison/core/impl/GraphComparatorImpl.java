@@ -27,9 +27,11 @@ public class GraphComparatorImpl implements GraphComparator {
 
     private final Logger logger = LoggerFactory.getLogger(GraphComparatorImpl.class);
     private final TransformationService transformationService;
+    private final ChangeListGenerator generator;
 
     public GraphComparatorImpl(TransformationService transformationService) {
         this.transformationService = transformationService;
+        generator = new ChangeListGeneratorImpl();
     }
 
     public boolean isSubTree(Node rootReferenceNode, Node rootSubTreeNode) {
@@ -88,7 +90,8 @@ public class GraphComparatorImpl implements GraphComparator {
                 if (referenceNode.getLevel() != currentLevel) {
                     continue;
                 }
-                boolean subNodeFound = false;
+                boolean similarityFound = false;
+                innerLoop:
                 for (LeveledNode subNode : subGraphNodes) {
                     if (subNode.getLevel() != currentLevel) {
                         continue;
@@ -96,20 +99,21 @@ public class GraphComparatorImpl implements GraphComparator {
                     logger.debug("Node relation comparison started");
                     switch (nodeRelationComparator.getNodeRelation(referenceNode.getNode(), subNode.getNode())) {
                         case EQUAL:
-                            subNodeFound = true;
+                            similarityFound = true;
                             break;
                         case DIFFERENT:
                             break;
                         case SIMILAR:
-                            break;
+                            similarityFound = true;
+                            changeLog.addChanges(generator.createMessageModifyChange(referenceNode.getNode(), subNode.getNode(), referenceGraphNodes, subGraphNodes));
+                            break innerLoop;
                         case SIMILAR_DIFF_BRANCH:
                             break;
                         default:
                             break;
                     }
                 }
-                if (!subNodeFound) {
-                    ChangeListGenerator generator = new ChangeListGeneratorImpl();
+                if (!similarityFound) {
                     changeLog.addChanges(generator.createMessageAdditionChange(referenceNode.getNode(), referenceGraphNodes));
                 }
             }
@@ -121,7 +125,7 @@ public class GraphComparatorImpl implements GraphComparator {
                 if (subNode.getLevel() != currentLevel) {
                     continue;
                 }
-                boolean subNodeFound = false;
+                boolean similarityFound = false;
                 for (LeveledNode referenceNode : referenceGraphNodes) {
                     if (referenceNode.getLevel() != currentLevel) {
                         continue;
@@ -129,11 +133,12 @@ public class GraphComparatorImpl implements GraphComparator {
                     logger.debug("Node relation comparison started");
                     switch (nodeRelationComparator.getNodeRelation(referenceNode.getNode(), subNode.getNode())) {
                         case EQUAL:
-                            subNodeFound = true;
+                            similarityFound = true;
                             break;
                         case DIFFERENT:
                             break;
                         case SIMILAR:
+                            similarityFound = true;
                             break;
                         case SIMILAR_DIFF_BRANCH:
                             break;
@@ -141,8 +146,7 @@ public class GraphComparatorImpl implements GraphComparator {
                             break;
                     }
                 }
-                if (!subNodeFound) {
-                    ChangeListGenerator generator = new ChangeListGeneratorImpl();
+                if (!similarityFound) {
                     changeLog.addChanges(generator.createMessageRemovalChange(subNode.getNode(), subGraphNodes));
                 }
             }

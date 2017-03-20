@@ -45,10 +45,9 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
     }
 
     public NodeRelation getNodeRelationWithoutSignature(Node referenceNode, Node subNode) {
-        if (referenceNode.getName().equals(subNode.getName())) {
-            if (referenceNode.getCreateEdge() != null && subNode.getCreateEdge() != null) {
-                if (referenceNode.getCreateEdge().getEdgeType().getCode().equals(subNode.getCreateEdge().getEdgeType().getCode())
-                        && referenceNode.getCreateEdge().getName().equals(subNode.getCreateEdge().getName())) {
+        if (nodesEqualName(referenceNode, subNode)) {
+            if (edgesNotNull(referenceNode, subNode)) {
+                if (edgesEqualType(referenceNode, subNode) && edgesEqualName(referenceNode, subNode)) {
                     this.logger.debug("Relation is EQUAL");
                     return NodeRelation.EQUAL;
                 } else {
@@ -59,9 +58,29 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
                 this.logger.debug("Relation is EQUAL");
                 return NodeRelation.EQUAL;
             }
+        } else if (edgesNotNull(referenceNode, subNode) && edgesEqualName(referenceNode, subNode) && edgesEqualType(referenceNode, subNode)) {
+            //equal name but different node - message was moved from one lifeline to another
+            this.logger.debug("Relation is SIMILAR");
+            return NodeRelation.SIMILAR;
         } else {
             this.logger.debug("Relation is DIFFERENT");
             return NodeRelation.DIFFERENT;
         }
+    }
+
+    private boolean edgesEqualName(Node node1, Node node2) {
+        return node1.getCreateEdge().getName().equals(node2.getCreateEdge().getName());
+    }
+
+    private boolean nodesEqualName(Node node1, Node node2) {
+        return node1.getName().equals(node2.getName());
+    }
+
+    private boolean edgesNotNull(Node node1, Node node2) {
+        return !(node1.getCreateEdge() == null || node2.getCreateEdge() == null);
+    }
+
+    private boolean edgesEqualType(Node node1, Node node2) {
+        return node1.getCreateEdge().getEdgeType().equals(node2.getCreateEdge().getEdgeType());
     }
 }

@@ -44,6 +44,19 @@ public class ChangeLogInterpreter implements ChangeInterpreter {
                     outputLine = date.toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getCreateEdge().getName();
                 }
                 break;
+                
+            case MESSAGE_MODIFY: 
+            	if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
+                    outputLine = date.toString() + ": " + change.getChangeType().getCode() 
+                    			+ " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName()
+                    			+ "; New Value: " + change.getNewValue().getCreateEdge().getName()
+            					+ "; Old Value: " + change.getOldValue().getCreateEdge().getName();
+                } else {
+                    outputLine = date.toString() + ": " + change.getChangeType().getCode() 
+                    			+ " = New Value: " + change.getNewValue().getCreateEdge().getName() 
+                    			+ "; Old Value: " + change.getOldValue().getCreateEdge().getName();
+                }
+            	break;
             default:
                 outputLine = date.toString() + "Error: Unknown change detected";
                 break;

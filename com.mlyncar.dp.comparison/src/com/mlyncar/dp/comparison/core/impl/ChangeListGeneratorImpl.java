@@ -40,6 +40,26 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         return changes;
     }
 
+    @Override
+    public List<Change> createMessageModifyChange(Node newValue, Node oldValue, List<LeveledNode> additionalOldNodes, List<LeveledNode> addiditonalNewNodes) {
+        List<Change> changes = new ArrayList<>();
+        Change change = new ChangeImpl(newValue.getId(), ChangeType.MESSAGE_MODIFY);
+        change.setNewValue(newValue);
+        change.setOldValue(oldValue);
+        changes.add(change);
+        if (!isLifelinePresent(addiditonalNewNodes, newValue.getName(), newValue.getId())) {
+            Change lifelineChange = new ChangeImpl(newValue.getId(), ChangeType.LIFELINE_ADD);
+            lifelineChange.setNewValue(newValue);
+            changes.add(lifelineChange);
+        }
+        if (!isLifelinePresent(additionalOldNodes, oldValue.getName(), oldValue.getId())) {
+            Change lifelineChange = new ChangeImpl(oldValue.getId(), ChangeType.LIFELINE_REMOVE);
+            lifelineChange.setNewValue(oldValue);
+            changes.add(lifelineChange);
+        }
+        return changes;
+    }
+
     private boolean isLifelinePresent(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
         boolean found = false;
         for (LeveledNode node : leveledNodes) {
