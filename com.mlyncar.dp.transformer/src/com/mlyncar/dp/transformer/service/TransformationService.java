@@ -71,8 +71,8 @@ public class TransformationService {
         return treeOrderGenerator;
     }
 
-    public Graph createGraphStructure(Node rootNode) {
-        return new TreeGraph(rootNode);
+    public Graph createGraphStructure(Node rootNode, Graph oldGraph) {
+        return new TreeGraph(rootNode, oldGraph);
     }
 
 }

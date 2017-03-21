@@ -30,6 +30,7 @@ public class SeqDiagramImpl implements SeqDiagram {
     private String name;
     private String id;
     private List<Message> messages = new ArrayList<>();
+    private Object interaction;
 
     @Override
     public String getName() {
@@ -60,5 +61,15 @@ public class SeqDiagramImpl implements SeqDiagram {
     public void addMessage(Message message) {
         this.messages.add(message);
     }
+
+	@Override
+	public void setInteraction(Object interaction) {
+		this.interaction = interaction;
+	}
+
+	@Override
+	public Object getInteraction() {
+		return this.interaction;
+	}
 
 }

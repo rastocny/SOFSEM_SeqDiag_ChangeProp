@@ -2,6 +2,8 @@ package com.mlyncar.dp.transformer.entity;
 
 import java.util.List;
 
+import com.mlyncar.dp.analyzer.entity.SeqDiagram;
+
 /**
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
@@ -18,4 +20,5 @@ public interface Graph {
     
     public List<LeveledNode> getOrderedNodes();
 
+    public SeqDiagram getSeqDiagram();
 }

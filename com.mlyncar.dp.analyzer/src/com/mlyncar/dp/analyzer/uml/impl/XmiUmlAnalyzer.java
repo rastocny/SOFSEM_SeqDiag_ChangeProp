@@ -56,7 +56,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException {
         Resource resource = loadModelResource(pathToDiagram);
         Interaction interaction = findInteraction(diagramName, resource);
-        SeqDiagram diagram = analyzeInteration(interaction);
+        SeqDiagram diagram = analyzeInteraction(interaction);
         TestHelper.validateDiagram(diagram);
         return diagram;
     }
@@ -70,7 +70,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
             EObject object = it.next();
             if (object instanceof Interaction) {
                 Interaction interaction = (Interaction) object;
-                diagrams.add(analyzeInteration(interaction));
+                diagrams.add(analyzeInteraction(interaction));
             }
         }
         return diagrams;
@@ -80,7 +80,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     public SeqDiagram analyzeSequenceDiagram(String diagramName) throws InteractionNotFoundException, AnalyzerException {
         Resource resource = loadModelResource(EclipseProjectNavigatorHelper.getCurrentProjectModel());
         Interaction interaction = findInteraction(diagramName, resource);
-        SeqDiagram diagram = analyzeInteration(interaction);
+        SeqDiagram diagram = analyzeInteraction(interaction);
         TestHelper.validateDiagram(diagram);
         return diagram;
     }
@@ -99,9 +99,9 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
         throw new InteractionNotFoundException("Interaction with name " + interactionName + " not found.");
     }
 
-    private SeqDiagram analyzeInteration(Interaction interaction) {
+    private SeqDiagram analyzeInteraction(Interaction interaction) {
         SeqDiagram diagram = new SeqDiagramImpl();
-
+        diagram.setInteraction(interaction);
         Iterator<EObject> objects = interaction.eAllContents();
         Integer counter = 0;
         while (objects.hasNext()) {

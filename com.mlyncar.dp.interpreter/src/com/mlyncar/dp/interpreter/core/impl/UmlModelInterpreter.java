@@ -1,24 +1,51 @@
 package com.mlyncar.dp.interpreter.core.impl;
 
-import java.util.List;
+import org.eclipse.uml2.uml.Interaction;
 
 import com.mlyncar.dp.comparison.entity.Change;
-import com.mlyncar.dp.interpreter.core.ChangeInterpreter;
-import com.mlyncar.dp.interpreter.exception.InterpreterException;
+import com.mlyncar.dp.comparison.entity.ChangeLog;
 
-public class UmlModelInterpreter implements ChangeInterpreter {
+public class UmlModelInterpreter extends AbstractInterpreter {
 
-    @Override
-    public void interpretChange(Change change) throws InterpreterException {
-        // TODO Auto-generated method stub
+	private final Interaction interaction;
+	
+	public UmlModelInterpreter(ChangeLog changeLog) {
+		this.interaction = (Interaction) changeLog.getSubGraph().getSeqDiagram().getInteraction();
+	}
 
-    }
+	@Override
+	protected void interpretMessageAdd(Change change) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Override
-    public void interpretChanges(List<Change> changes)
-            throws InterpreterException {
-        // TODO Auto-generated method stub
+	@Override
+	protected void interpretLifelineAdd(Change change) {
+		interaction.createLifeline(change.getNewValue().getName());
+	}
 
-    }
+	@Override
+	protected void interpretMessageRemove(Change change) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void interpretMessageModify(Change change) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void interpretLifelineRemove(Change change) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void finalizeInterpretation() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

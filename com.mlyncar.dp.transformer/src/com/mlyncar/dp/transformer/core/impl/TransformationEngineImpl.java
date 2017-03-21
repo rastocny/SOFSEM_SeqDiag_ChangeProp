@@ -24,7 +24,7 @@ public class TransformationEngineImpl implements TransformationEngine {
     @Override
     public Graph transformSequenceDiagram(SeqDiagram diagram)
             throws GraphTransformationException {
-        Graph graph = initializeGraphStructure(diagram.getMessages().get(0));
+        Graph graph = initializeGraphStructure(diagram);
         Node previousNode = graph.getRootNode();
         for (Message message : diagram.getMessages()) {
             Node newNode = storeMessageIntoGraph(graph, message, previousNode);
@@ -59,9 +59,9 @@ public class TransformationEngineImpl implements TransformationEngine {
         }
     }
 
-    private Graph initializeGraphStructure(Message initialMessage) {
-        Node rootNode = new NodeImpl(null, null, initialMessage.getSourceLifeline().getName());
-        Graph graph = new TreeGraph(rootNode);
+    private Graph initializeGraphStructure(SeqDiagram diagram) {
+        Node rootNode = new NodeImpl(null, null, diagram.getMessages().get(0).getSourceLifeline().getName());
+        Graph graph = new TreeGraph(rootNode, diagram);
         return graph;
     }
 

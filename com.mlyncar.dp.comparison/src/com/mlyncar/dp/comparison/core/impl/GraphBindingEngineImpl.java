@@ -21,7 +21,7 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
         logger.debug("Starting to find pair for sequence diagram root node " + subGraph.getRootNode().getName());
         for (LeveledNode node : referenceGraph.getOrderedNodes()) {
             if (isNodeSuitableForRoot(node.getNode(), subGraph.getRootNode())) {
-                return transService.createGraphStructure(node.getNode());
+                return transService.createGraphStructure(node.getNode(), referenceGraph);
             }
         }
         throw new GraphBindingException("Unable to create subgraph structure, no suitable root found in reference structure");

@@ -34,5 +34,9 @@ public interface SeqDiagram {
     public List<Message> getMessages();
 
     public void addMessage(Message message);
+    
+    public void setInteraction(Object interaction);
+    
+    public Object getInteraction();
 
 }
