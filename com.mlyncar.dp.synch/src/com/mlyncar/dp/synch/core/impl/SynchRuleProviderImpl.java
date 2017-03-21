@@ -8,6 +8,8 @@ import com.mlyncar.dp.synch.core.SynchRuleProvider;
 import com.mlyncar.dp.synch.rule.SynchRule;
 import com.mlyncar.dp.synch.rule.lifeline.MaximumLifelineRule;
 import com.mlyncar.dp.synch.rule.lifeline.TestLifelineRule;
+import com.mlyncar.dp.synch.rule.message.IgnoreGetRule;
+import com.mlyncar.dp.synch.rule.message.IgnoreSetRule;
 import com.mlyncar.dp.synch.rule.message.TestMessageRule;
 
 public class SynchRuleProviderImpl implements SynchRuleProvider {
@@ -17,6 +19,8 @@ public class SynchRuleProviderImpl implements SynchRuleProvider {
 
     public SynchRuleProviderImpl() {
         messageAddRules.add(new TestMessageRule());
+        messageAddRules.add(new IgnoreGetRule());
+        messageAddRules.add(new IgnoreSetRule());
         lifelineAddRules.add(new TestLifelineRule());
         lifelineAddRules.add(new MaximumLifelineRule());
     }
