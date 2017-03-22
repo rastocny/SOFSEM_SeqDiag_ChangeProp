@@ -12,7 +12,9 @@ Bundle-ActivationPolicy: lazy
 Import-Package: com.mlyncar.dp.analyzer.entity,
  com.mlyncar.dp.comparison.entity,
  com.mlyncar.dp.transformer.entity,
+ org.eclipse.emf.ecore,
  org.eclipse.uml2.uml,
+ org.eclipse.uml2.uml.internal.impl,
  org.slf4j;version="1.4.3"
 Export-Package: com.mlyncar.dp.interpreter.exception,
  com.mlyncar.dp.interpreter.service

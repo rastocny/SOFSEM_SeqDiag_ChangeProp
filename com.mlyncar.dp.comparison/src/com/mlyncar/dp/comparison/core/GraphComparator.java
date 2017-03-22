@@ -5,6 +5,6 @@ import com.mlyncar.dp.comparison.exception.GraphBindingException;
 import com.mlyncar.dp.transformer.entity.Graph;
 
 public interface GraphComparator {
-
+	
     public ChangeLog compareGraphStructures(Graph referenceGraph, Graph subGraph) throws GraphBindingException;
 }

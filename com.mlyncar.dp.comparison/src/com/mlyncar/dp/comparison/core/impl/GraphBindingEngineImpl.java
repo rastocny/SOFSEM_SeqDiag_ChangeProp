@@ -21,7 +21,9 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
         logger.debug("Starting to find pair for sequence diagram root node " + subGraph.getRootNode().getName());
         for (LeveledNode node : referenceGraph.getOrderedNodes()) {
             if (isNodeSuitableForRoot(node.getNode(), subGraph.getRootNode())) {
-                return transService.createGraphStructure(node.getNode(), referenceGraph);
+            	Graph graph = transService.createGraphStructure(node.getNode(), referenceGraph);
+            	removeChildReplyMessage(node.getNode()); 
+                return graph;
             }
         }
         throw new GraphBindingException("Unable to create subgraph structure, no suitable root found in reference structure");
@@ -59,5 +61,17 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
             logger.debug("Comparison does not index match conditions, node {} is not suitable for ROOT", possibleRoot.getName());
             return false;
         }
+    }
+    
+    private void removeChildReplyMessage(Node parentNode) {
+    	Node nodeToRemove = null;
+    	for(Node node : parentNode.childNodes()) {
+    		if(node.isReply()) {
+    			nodeToRemove = node;
+    		}
+    	}
+    	if(nodeToRemove!=null) {
+    		parentNode.removeChildNode(nodeToRemove);
+    	}
     }
 }
