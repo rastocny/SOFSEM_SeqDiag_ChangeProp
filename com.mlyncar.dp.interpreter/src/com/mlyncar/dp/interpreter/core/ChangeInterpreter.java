@@ -7,5 +7,5 @@ public interface ChangeInterpreter {
 
     public void interpretChange(Change change) throws InterpreterException;
     
-    public void finalizeInterpretation();
+    public void finalizeInterpretation()throws InterpreterException;
 }

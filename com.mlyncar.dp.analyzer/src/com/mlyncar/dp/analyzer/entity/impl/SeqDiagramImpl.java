@@ -31,6 +31,8 @@ public class SeqDiagramImpl implements SeqDiagram {
     private String id;
     private List<Message> messages = new ArrayList<>();
     private Object interaction;
+    private Object interactionResourceHolder;
+    private Object notationResource;
 
     @Override
     public String getName() {
@@ -70,6 +72,26 @@ public class SeqDiagramImpl implements SeqDiagram {
 	@Override
 	public Object getInteraction() {
 		return this.interaction;
+	}
+
+	@Override
+	public Object getResourceInteractionHolder() {
+		return this.interactionResourceHolder;
+	}
+
+	@Override
+	public void setInteractionResourceHolder(Object interactionResourceHolder) {
+		this.interactionResourceHolder = interactionResourceHolder;
+	}
+
+	@Override
+	public Object getNotationResource() {
+		return this.notationResource;
+	}
+
+	@Override
+	public void setNotationResource(Object notationResource) {
+		this.notationResource = notationResource;
 	}
 
 }

@@ -85,7 +85,7 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 	}
 
 	@Override
-	public void finalizeInterpretation() {
+	public void finalizeInterpretation() throws InterpreterException {
         fileWriter.close();		
 	}
 

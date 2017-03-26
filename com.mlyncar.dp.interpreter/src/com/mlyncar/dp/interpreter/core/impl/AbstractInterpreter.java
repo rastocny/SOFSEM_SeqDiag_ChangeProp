@@ -6,15 +6,15 @@ import com.mlyncar.dp.interpreter.exception.InterpreterException;
 
 public abstract class AbstractInterpreter implements ChangeInterpreter {
 
-	protected abstract void interpretMessageAdd(Change change);
+	protected abstract void interpretMessageAdd(Change change) throws InterpreterException;
 	
-	protected abstract void interpretLifelineAdd(Change change);
+	protected abstract void interpretLifelineAdd(Change change) throws InterpreterException;
 	
-	protected abstract void interpretMessageRemove(Change change);
+	protected abstract void interpretMessageRemove(Change change) throws InterpreterException;
 	
-	protected abstract void interpretMessageModify(Change change);
+	protected abstract void interpretMessageModify(Change change) throws InterpreterException;
 	
-	protected abstract void interpretLifelineRemove(Change change);
+	protected abstract void interpretLifelineRemove(Change change) throws InterpreterException;
 	
 	@Override
 	public void interpretChange(Change change) throws InterpreterException {

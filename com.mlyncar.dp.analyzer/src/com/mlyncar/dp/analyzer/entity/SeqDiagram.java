@@ -39,4 +39,11 @@ public interface SeqDiagram {
     
     public Object getInteraction();
 
+    public Object getResourceInteractionHolder();
+    
+    public void setInteractionResourceHolder(Object interactionResourceHolder);
+    
+    public Object getNotationResource();
+    
+    public void setNotationResource(Object object);
 }

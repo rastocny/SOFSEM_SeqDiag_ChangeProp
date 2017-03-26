@@ -3,6 +3,9 @@ package com.mlyncar.dp.comparison.core.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mlyncar.dp.comparison.core.ChangeListGenerator;
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.comparison.entity.ChangeType;
@@ -12,17 +15,19 @@ import com.mlyncar.dp.transformer.entity.Node;
 
 public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
+    private final Logger logger = LoggerFactory.getLogger(ChangeListGeneratorImpl.class);
+    
     @Override
     public List<Change> createMessageAdditionChange(Node node, List<LeveledNode> additionalNodes) {
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_ADD);
         change.setNewValue(node);
-        changes.add(change);
         if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
         }
+        changes.add(change);
         return changes;
     }
 
@@ -31,12 +36,12 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_REMOVE);
         change.setNewValue(node);
-        changes.add(change);
         if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_REMOVE);
             lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
         }
+        changes.add(change);
         return changes;
     }
 
@@ -46,7 +51,6 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         Change change = new ChangeImpl(newValue.getId(), ChangeType.MESSAGE_MODIFY);
         change.setNewValue(newValue);
         change.setOldValue(oldValue);
-        changes.add(change);
         if (!isLifelinePresent(addiditonalNewNodes, newValue.getName(), newValue.getId())) {
             Change lifelineChange = new ChangeImpl(newValue.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(newValue);
@@ -57,6 +61,7 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
             lifelineChange.setNewValue(oldValue);
             changes.add(lifelineChange);
         }
+        changes.add(change);
         return changes;
     }
 

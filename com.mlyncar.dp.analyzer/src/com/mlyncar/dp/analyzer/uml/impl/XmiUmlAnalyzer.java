@@ -29,6 +29,8 @@ import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.eclipse.uml2.uml.MessageSort;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.resource.UMLResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
@@ -46,7 +48,11 @@ import com.mlyncar.dp.analyzer.uml.UmlAnalyzer;
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public class XmiUmlAnalyzer implements UmlAnalyzer {
-
+	
+	private Resource resource;
+	private Resource notationResource;
+    private final Logger logger = LoggerFactory.getLogger(XmiUmlAnalyzer.class);
+    
     @Override
     public List<SeqDiagram> analyzeUmlModel() throws AnalyzerException {
         return analyzeUmlModel(EclipseProjectNavigatorHelper.getCurrentProjectModel());
@@ -54,8 +60,9 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
 
     @Override
     public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException {
-        Resource resource = loadModelResource(pathToDiagram);
-        Interaction interaction = findInteraction(diagramName, resource);
+        this.resource = loadUmlModelResource(pathToDiagram);
+        this.notationResource = loadNotationModelResource(pathToDiagram);
+        Interaction interaction = findInteraction(diagramName);
         SeqDiagram diagram = analyzeInteraction(interaction);
         TestHelper.validateDiagram(diagram);
         return diagram;
@@ -63,7 +70,8 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
 
     @Override
     public List<SeqDiagram> analyzeUmlModel(String pathToModel) {
-        Resource resource = loadModelResource(pathToModel);
+        this.resource = loadUmlModelResource(pathToModel);
+        this.notationResource = loadNotationModelResource(pathToModel);
         List<SeqDiagram> diagrams = new ArrayList<>();
         Iterator<EObject> it = resource.getAllContents();
         while (it.hasNext()) {
@@ -78,15 +86,16 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
 
     @Override
     public SeqDiagram analyzeSequenceDiagram(String diagramName) throws InteractionNotFoundException, AnalyzerException {
-        Resource resource = loadModelResource(EclipseProjectNavigatorHelper.getCurrentProjectModel());
-        Interaction interaction = findInteraction(diagramName, resource);
+        this.resource = loadUmlModelResource(EclipseProjectNavigatorHelper.getCurrentProjectModel());
+        this.notationResource = loadNotationModelResource(EclipseProjectNavigatorHelper.getCurrentProjectModel());
+        Interaction interaction = findInteraction(diagramName);
         SeqDiagram diagram = analyzeInteraction(interaction);
         TestHelper.validateDiagram(diagram);
         return diagram;
     }
 
-    private Interaction findInteraction(String interactionName, Resource modelResource) throws InteractionNotFoundException {
-        Iterator<EObject> it = modelResource.getAllContents();
+    private Interaction findInteraction(String interactionName) throws InteractionNotFoundException {
+        Iterator<EObject> it = resource.getAllContents();
         while (it.hasNext()) {
             EObject object = it.next();
             if (object instanceof Interaction) {
@@ -102,6 +111,8 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     private SeqDiagram analyzeInteraction(Interaction interaction) {
         SeqDiagram diagram = new SeqDiagramImpl();
         diagram.setInteraction(interaction);
+        diagram.setInteractionResourceHolder(resource);
+        diagram.setNotationResource(notationResource);
         Iterator<EObject> objects = interaction.eAllContents();
         Integer counter = 0;
         while (objects.hasNext()) {
@@ -126,7 +137,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
         return diagram;
     }
 
-    private Resource loadModelResource(String pathToModel) {
+    private Resource loadUmlModelResource(String pathToModel) {
         ResourceSet set = new ResourceSetImpl();
         set.getPackageRegistry().put(UMLPackage.eNS_URI, UMLPackage.eINSTANCE);
         set.getResourceFactoryRegistry().getExtensionToFactoryMap()
@@ -138,4 +149,10 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
         return resource;
     }
 
+    private Resource loadNotationModelResource(String pathToModel) {
+    	String notationModel = pathToModel.substring(0, pathToModel.lastIndexOf('.')) + ".notation";
+        ResourceSet set = new ResourceSetImpl(); 
+        Resource resource = set.getResource(URI.createFileURI(notationModel), true);
+        return resource;
+    }
 }
