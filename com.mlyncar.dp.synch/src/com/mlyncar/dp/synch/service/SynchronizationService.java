@@ -10,6 +10,7 @@ import com.mlyncar.dp.synch.core.SynchronizationEngine;
 import com.mlyncar.dp.synch.core.impl.SynchronizationEngineImpl;
 import com.mlyncar.dp.synch.exception.ConfigurationException;
 import com.mlyncar.dp.synch.exception.SynchronizationException;
+import org.eclipse.ui.IWorkbenchWindow;
 
 public class SynchronizationService {
 

@@ -2,6 +2,7 @@ package com.mlyncar.dp.interpreter.service;
 
 import java.util.ListIterator;
 
+import org.eclipse.ui.IWorkbenchWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

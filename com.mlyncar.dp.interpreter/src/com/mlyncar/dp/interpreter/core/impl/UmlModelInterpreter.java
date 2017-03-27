@@ -4,7 +4,16 @@ import java.io.IOException;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.gmf.runtime.diagram.core.services.ViewService;
+import org.eclipse.gmf.runtime.notation.Bounds;
+import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.gmf.runtime.notation.Edge;
+import org.eclipse.gmf.runtime.notation.NotationFactory;
+import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.papyrus.infra.gmfdiag.css.notation.CSSDiagram;
+import org.eclipse.papyrus.uml.diagram.sequence.part.UMLDiagramEditorPlugin;
+import org.eclipse.papyrus.uml.diagram.sequence.part.UMLVisualIDRegistry;
+import org.eclipse.papyrus.uml.diagram.sequence.providers.UMLViewProvider;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
 import org.eclipse.uml2.uml.Interaction;
 import org.eclipse.uml2.uml.InteractionFragment;
@@ -28,12 +37,29 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 	private final Interaction interaction;
 	private final Resource resource;
 	private final Resource notationResource;
+	private Diagram diagram;
+	public static UMLViewProvider sequenceDiagViewProvider = new UMLViewProvider();
 	
-	public UmlModelInterpreter(ChangeLog changeLog) {
+	
+	public UmlModelInterpreter(ChangeLog changeLog) throws InterpreterException {
 		this.interaction = (Interaction) changeLog.getReferenceGraph().getSeqDiagram().getInteraction();
 		this.resource = (Resource) changeLog.getReferenceGraph().getSeqDiagram().getResourceInteractionHolder();
 		this.notationResource = (Resource) changeLog.getReferenceGraph().getSeqDiagram().getNotationResource();
-		notationTest();
+		logger.debug("Interpreter diagram " + changeLog.getReferenceGraph().getSeqDiagram().getName());
+		
+		for(EObject object : notationResource.getContents()) {
+			if(object instanceof CSSDiagram) {
+				Diagram diagram = (Diagram) object;
+				Interaction diagramInteraction = (Interaction) diagram.getElement();
+				if(diagramInteraction.getName().equals(interaction.getName())) {
+					this.diagram = diagram;
+				}
+			}
+		}
+		if(diagram == null) {
+			throw new InterpreterException("Unable to initialize notation instance of diagram interaction");
+		}
+		
 	}
 
 	@Override
@@ -106,6 +132,10 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 		messageOccurrenceReplyStart.setMessage(newReplyMessage);
 		messageOccurrenceReplyEnd.setMessage(newReplyMessage);
 		
+		//getLifelineView();
+		addMessage(newMessage, getLifelineView(sourceLifeline.getName()), getLifelineView(targetLifeline.getName()), false);
+		addMessage(newReplyMessage, getLifelineView(targetLifeline.getName()), getLifelineView(sourceLifeline.getName()), true);
+		storeNotationResource();
 		logger.debug("Message add interpreted to uml model");
 	}
 
@@ -114,6 +144,8 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 		logger.debug("Interpreting lifeline addition to uml model " + interaction.getName());
 		Lifeline newLifeline = interaction.createLifeline(change.getNewValue().getName());
 		newLifeline.setInteraction(interaction);
+		addLifeline(newLifeline);
+		storeNotationResource();
 		logger.debug("Lifeline add interpreted to uml model");
 	}
 
@@ -137,6 +169,7 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 	public void finalizeInterpretation() throws InterpreterException {
 		try {
 			this.resource.save(null);
+			this.notationResource.save(null);
 		} catch (IOException ex) {
 			throw new InterpreterException("Unable to finalize UML interpretation", ex);
 		}
@@ -175,15 +208,58 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 		return null;
 	}
 
-	private void notationTest() {
-		for(EObject object : notationResource.getContents()) {
-			logger.debug(object.toString());
-			if(object instanceof CSSDiagram) {
-				CSSDiagram diagram = (CSSDiagram) object;
-				diagram.createChild(null);
-				//for(EObject diagramObject :)
+
+	private View getLifelineView(String lifelineName) {
+		View compartment1 = (View) diagram.getChildren().get(0);
+		View compartment = (View) compartment1.getChildren().get(1);
+		for(Object obj :  compartment.getChildren()) {
+			logger.debug(obj.toString());
+			View view = (View) obj;
+			Lifeline lifeline = (Lifeline) view.getElement();
+			logger.debug(lifeline.toString());
+			if(((Lifeline)view.getElement()).getName().equals(lifelineName)) {
+				return view;
 			}
 		}
-		
+		return null;
+	}
+	
+	private View addLifeline(Lifeline lifeline) {
+		View compartment1 = (View) diagram.getChildren().get(0);
+		Object compartment = compartment1.getChildren().get(1);
+		final String nodeType = UMLVisualIDRegistry.getType(org.eclipse.papyrus.uml.diagram.sequence.edit.parts.LifelineEditPart.VISUAL_ID);
+		org.eclipse.gmf.runtime.notation.Node lifelineView = ViewService.createNode((View) compartment, lifeline, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+		Bounds location = NotationFactory.eINSTANCE.createBounds();
+		location.setX(300);
+		location.setY(40);
+		if(lifelineView instanceof Node) {
+			lifelineView.setLayoutConstraint(location);
+		}
+		return lifelineView;
+	}
+	
+	private void addMessage(Message message, View lifelineSrcV, View lifelineDstV, boolean isReply) {
+		View messageView;
+		if(isReply) {
+			messageView = sequenceDiagViewProvider.createMessage_4005(message, diagram, -1, true,
+					UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+		} else {
+			messageView = sequenceDiagViewProvider.createMessage_4003(message, diagram, -1, true,
+					UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);				
+		}
+		if(messageView instanceof Edge) {
+			//there should be action execution specs;
+			((Edge)messageView).setSource(lifelineSrcV);
+			((Edge)messageView).setTarget(lifelineDstV);
+		}
+	}
+	
+	private void storeNotationResource() throws InterpreterException {
+		try {
+			this.resource.save(null);
+			this.notationResource.save(null);
+		} catch (IOException e) {
+			throw new InterpreterException("Unable to update notation resource", e);
+		}
 	}
 }
