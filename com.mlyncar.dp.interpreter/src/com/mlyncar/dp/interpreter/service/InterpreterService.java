@@ -15,12 +15,12 @@ import com.mlyncar.dp.interpreter.core.impl.UmlModelInterpreter;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 
 public class InterpreterService {
-	
+
     private final Logger logger = LoggerFactory.getLogger(InterpreterService.class);
-	private final String changeLogFilePath;
-	private ChangeInterpreter umlInterpreter;
-	private ChangeInterpreter fileInterpreter;
-	
+    private final String changeLogFilePath;
+    private ChangeInterpreter umlInterpreter;
+    private ChangeInterpreter fileInterpreter;
+
     public InterpreterService(String changeLogFilePath) {
         this.changeLogFilePath = changeLogFilePath;
     }
@@ -28,37 +28,37 @@ public class InterpreterService {
     public void interpretChanges(ChangeLog changeLog) throws InterpreterException {
         this.fileInterpreter = new ChangeLogInterpreter(changeLogFilePath);
         this.umlInterpreter = new UmlModelInterpreter(changeLog);
-        
+
         interpretChangeBasedOnType(ChangeType.MESSAGE_REMOVE, changeLog, true);
         interpretChangeBasedOnType(ChangeType.LIFELINE_REMOVE, changeLog, false);
         interpretChangeBasedOnType(ChangeType.LIFELINE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_MODIFY, changeLog, false);
-        
-    	umlInterpreter.finalizeInterpretation();
-    	fileInterpreter.finalizeInterpretation();
+
+        umlInterpreter.finalizeInterpretation();
+        fileInterpreter.finalizeInterpretation();
     }
-    
+
     private void interpretChangeBasedOnType(ChangeType changeType, ChangeLog changeLog, boolean isReversed) throws InterpreterException {
-    	if(isReversed) {
-    		ListIterator<Change> listIterator = changeLog.changes().listIterator(changeLog.changes().size());
-    		while(listIterator.hasPrevious()) {
-    			Change change = listIterator.previous();
-        		if(changeType.equals(change.getChangeType())) {
-            		logger.debug("Interpreting change " + change.getNewValue().getName());
-            		umlInterpreter.interpretChange(change);
-            		fileInterpreter.interpretChange(change);
-        		}
-    		}
-    	} else {
-        	for(Change change : changeLog.changes()) {
-        		if(changeType.equals(change.getChangeType())) {
-            		logger.debug("Interpreting change " + change.getNewValue().getName());
-            		umlInterpreter.interpretChange(change);
-            		fileInterpreter.interpretChange(change);
-        		}
-        	}		
-    	}
+        if (isReversed) {
+            ListIterator<Change> listIterator = changeLog.changes().listIterator(changeLog.changes().size());
+            while (listIterator.hasPrevious()) {
+                Change change = listIterator.previous();
+                if (changeType.equals(change.getChangeType())) {
+                    logger.debug("Interpreting change " + change.getNewValue().getName());
+                    umlInterpreter.interpretChange(change);
+                    fileInterpreter.interpretChange(change);
+                }
+            }
+        } else {
+            for (Change change : changeLog.changes()) {
+                if (changeType.equals(change.getChangeType())) {
+                    logger.debug("Interpreting change " + change.getNewValue().getName());
+                    umlInterpreter.interpretChange(change);
+                    fileInterpreter.interpretChange(change);
+                }
+            }
+        }
 
     }
 }

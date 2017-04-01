@@ -6,6 +6,6 @@ import com.mlyncar.dp.interpreter.exception.InterpreterException;
 public interface ChangeInterpreter {
 
     public void interpretChange(Change change) throws InterpreterException;
-    
-    public void finalizeInterpretation()throws InterpreterException;
+
+    public void finalizeInterpretation() throws InterpreterException;
 }

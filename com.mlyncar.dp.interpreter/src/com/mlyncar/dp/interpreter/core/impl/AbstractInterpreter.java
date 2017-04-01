@@ -6,37 +6,37 @@ import com.mlyncar.dp.interpreter.exception.InterpreterException;
 
 public abstract class AbstractInterpreter implements ChangeInterpreter {
 
-	protected abstract void interpretMessageAdd(Change change) throws InterpreterException;
-	
-	protected abstract void interpretLifelineAdd(Change change) throws InterpreterException;
-	
-	protected abstract void interpretMessageRemove(Change change) throws InterpreterException;
-	
-	protected abstract void interpretMessageModify(Change change) throws InterpreterException;
-	
-	protected abstract void interpretLifelineRemove(Change change) throws InterpreterException;
-	
-	@Override
-	public void interpretChange(Change change) throws InterpreterException {
+    protected abstract void interpretMessageAdd(Change change) throws InterpreterException;
+
+    protected abstract void interpretLifelineAdd(Change change) throws InterpreterException;
+
+    protected abstract void interpretMessageRemove(Change change) throws InterpreterException;
+
+    protected abstract void interpretMessageModify(Change change) throws InterpreterException;
+
+    protected abstract void interpretLifelineRemove(Change change) throws InterpreterException;
+
+    @Override
+    public void interpretChange(Change change) throws InterpreterException {
         switch (change.getChangeType()) {
             case LIFELINE_ADD:
-            	interpretLifelineAdd(change);
-            	break;
+                interpretLifelineAdd(change);
+                break;
             case LIFELINE_REMOVE:
-            	interpretLifelineRemove(change);
-            	break;
+                interpretLifelineRemove(change);
+                break;
             case MESSAGE_ADD:
-            	interpretMessageAdd(change);
-            	break;
+                interpretMessageAdd(change);
+                break;
             case MESSAGE_REMOVE:
-            	interpretMessageRemove(change);
+                interpretMessageRemove(change);
                 break;
             case MESSAGE_MODIFY:
-            	interpretMessageModify(change);
-            	break;
+                interpretMessageModify(change);
+                break;
             default:
-            	break;
+                break;
         }
     }
-	
+
 }

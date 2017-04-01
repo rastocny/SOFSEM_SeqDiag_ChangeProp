@@ -16,7 +16,7 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 
     private final PrintWriter fileWriter;
     private final Logger logger = LoggerFactory.getLogger(ChangeLogInterpreter.class);
-    
+
     public ChangeLogInterpreter(String changeLogFileName) throws InterpreterException {
         FileWriter fw;
         try {
@@ -29,8 +29,8 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 
     }
 
-	@Override
-	protected void interpretMessageAdd(Change change) {		
+    @Override
+    protected void interpretMessageAdd(Change change) {
         String outputLine;
         if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName() + "; " + change.getNewValue().getCreateEdge().getName();
@@ -39,17 +39,17 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
         }
         logger.debug(outputLine);
         fileWriter.println(outputLine);
-	}
+    }
 
-	@Override
-	protected void interpretLifelineAdd(Change change) {
+    @Override
+    protected void interpretLifelineAdd(Change change) {
         String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getName();
         logger.debug(outputLine);
         fileWriter.println(outputLine);
-	}
+    }
 
-	@Override
-	protected void interpretMessageRemove(Change change) {
+    @Override
+    protected void interpretMessageRemove(Change change) {
         String outputLine;
         if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName() + "; " + change.getNewValue().getCreateEdge().getName();
@@ -58,10 +58,10 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
         }
         logger.debug(outputLine);
         fileWriter.println(outputLine);
-	}
+    }
 
-	@Override
-	protected void interpretMessageModify(Change change) {
+    @Override
+    protected void interpretMessageModify(Change change) {
         String outputLine;
         if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode()
@@ -75,19 +75,18 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
         }
         logger.debug(outputLine);
         fileWriter.println(outputLine);
-	}
+    }
 
-	@Override
-	protected void interpretLifelineRemove(Change change) {
+    @Override
+    protected void interpretLifelineRemove(Change change) {
         String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getName();
         logger.debug(outputLine);
         fileWriter.println(outputLine);
-	}
+    }
 
-	@Override
-	public void finalizeInterpretation() throws InterpreterException {
-        fileWriter.close();		
-	}
-
+    @Override
+    public void finalizeInterpretation() throws InterpreterException {
+        fileWriter.close();
+    }
 
 }
