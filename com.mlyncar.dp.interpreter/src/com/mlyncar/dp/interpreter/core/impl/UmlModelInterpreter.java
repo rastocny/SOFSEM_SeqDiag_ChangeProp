@@ -2,6 +2,7 @@ package com.mlyncar.dp.interpreter.core.impl;
 
 import java.io.IOException;
 
+import org.eclipse.uml2.uml.ActionExecutionSpecification;
 import org.eclipse.uml2.uml.Lifeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,13 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     @Override
     protected void interpretMessageModify(Change change) throws InterpreterException {
         // TODO Auto-generated method stub
-
+    	ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel(change.getOldValue(), change.getNewValue());
+    	notationManager.relocateMessage(change.getOldValue(), change.getNewValue(), spec);
+    	//find msg occurences and action ocurrences -  move them to another lifeline - update covereds by
+    	
+    	//remove childs from node, add childs to another node in notation
+    	storeModelResource();
+    	storeNotationResource();
     }
 
     @Override

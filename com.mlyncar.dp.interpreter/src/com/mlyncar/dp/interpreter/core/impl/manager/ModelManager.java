@@ -8,6 +8,7 @@ import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.Message;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.eclipse.uml2.uml.MessageSort;
+import org.eclipse.uml2.uml.OccurrenceSpecification;
 import org.eclipse.uml2.uml.UMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +110,46 @@ public class ModelManager {
         modelSet.getActionToRemoveStart().destroy();
     }
 
+    public ActionExecutionSpecification relocateMessageInModel(Node oldValue, Node newValue) {
+    	Lifeline oldLifeline = interaction.getLifeline(oldValue.getName());
+    	Lifeline newLifeline = interaction.getLifeline(newValue.getName());
+    	Message messageToRelocate = interaction.getMessage(oldValue.getCreateEdge().getName());
+    	
+    	logger.debug("Relocating {} from {} to {}", messageToRelocate.getName(), oldLifeline.getName(), newLifeline.getName());
+    	MessageOccurrenceSpecification msgSpecStart = null;
+    	for (InteractionFragment fragment : interaction.getFragments()) {
+    		if(fragment instanceof MessageOccurrenceSpecification) {
+    			MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
+    			if(spec.getMessage() != null && spec.getMessage().equals(messageToRelocate) && spec.getCovered().equals(oldLifeline)) {
+    				msgSpecStart = spec;
+    				break;
+    			}
+    		}
+    	}
+    	
+    	ActionExecutionSpecification execSpec = null;
+    	MessageOccurrenceSpecification msgSpecEnd = null;
+    	for (InteractionFragment fragment : interaction.getFragments()) {
+    		if(fragment instanceof ActionExecutionSpecification) {
+    			ActionExecutionSpecification spec = (ActionExecutionSpecification) fragment;
+    			if(spec.getStart().equals(msgSpecStart)) {
+    				execSpec = spec;
+    				msgSpecEnd = (MessageOccurrenceSpecification) execSpec.getFinish();
+    			}
+    		}
+    	}
+    	
+    	msgSpecEnd.setCovered(newLifeline);
+    	msgSpecStart.setCovered(newLifeline);
+    	oldLifeline.getCoveredBys().remove(execSpec);
+    	oldLifeline.getCoveredBys().remove(msgSpecEnd);
+    	oldLifeline.getCoveredBys().remove(msgSpecStart);
+    	newLifeline.getCoveredBys().add(execSpec);	
+    	newLifeline.getCoveredBys().add(msgSpecStart);
+    	newLifeline.getCoveredBys().add(msgSpecEnd);
+    	return execSpec;
+	}
+    
     private ActionExecutionSpecification getStartExecutionSpecification(Node nodeToAdd, Lifeline sourceLifeline) {
         MessageOccurrenceSpecification parentMsgOccurenceSpec = null;
         for (InteractionFragment fragment : interaction.getFragments()) {

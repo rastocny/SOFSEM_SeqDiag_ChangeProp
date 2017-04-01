@@ -1,5 +1,7 @@
 package com.mlyncar.dp.interpreter.core.impl.manager;
 
+import java.util.List;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.gmf.runtime.diagram.core.services.ViewService;
@@ -58,12 +60,12 @@ public class NotationManager {
         addLifeline(newLifeline);
     }
 
-    public void addMessageToNotation(Node nodeToAdd, Message newMessage, Message newReplyMessage, ActionExecutionSpecification actionSpecStart, ActionExecutionSpecification nactionSpecEnd) {
+    public void addMessageToNotation(Node nodeToAdd, Message newMessage, Message newReplyMessage, ActionExecutionSpecification actionSpecStart, ActionExecutionSpecification actionSpecEnd) {
         View sourceLifelineView = getLifelineView(nodeToAdd.getParentNode().getName());
         View targetLifelineView = getLifelineView(nodeToAdd.getName());
 
         org.eclipse.gmf.runtime.notation.Node executionViewInit = addActionExecution(sourceLifelineView, actionSpecStart);
-        org.eclipse.gmf.runtime.notation.Node executionViewEnd = addActionExecution(targetLifelineView, nactionSpecEnd);
+        org.eclipse.gmf.runtime.notation.Node executionViewEnd = addActionExecution(targetLifelineView, actionSpecEnd);
 
         Bounds location1 = NotationFactory.eINSTANCE.createBounds();
         location1.setX(31);
@@ -137,6 +139,23 @@ public class NotationManager {
         return new MessageRemoveModelSet(targetOccurrence, sourceOccurrence, actionToRemoveEnd, actionToRemoveStart);
     }
 
+    public void relocateMessage(Node oldNode, Node newNode, ActionExecutionSpecification specToRelocate) {
+    	View oldLifelineView = getLifelineView(oldNode.getName());
+    	View newLifelineView = getLifelineView(newNode.getName());
+    	
+    	View viewToMove = null;
+    	for(Object obj : oldLifelineView.getChildren()) {
+    		View objView = (View) obj;
+    		if(objView.getElement() != null && objView.getElement() instanceof ActionExecutionSpecification) {
+    			ActionExecutionSpecification exec = (ActionExecutionSpecification) objView.getElement();
+    			if(exec.getName().equals(specToRelocate.getName())) {
+    				viewToMove = objView;
+    			}
+    		}
+    	}
+    	newLifelineView.insertChild(viewToMove);
+    	oldLifelineView.removeChild(viewToMove);
+    }
     private void addMessage(Message message, View lifelineSrcV, View lifelineDstV, boolean isReply) {
 
         View messageView;
@@ -198,8 +217,7 @@ public class NotationManager {
     }
 
     private View getLifelineView(String lifelineName) {
-        View compartment1 = (View) diagram.getChildren().get(0);
-        View compartment = (View) compartment1.getChildren().get(1);
+        View compartment = (View) getLifelineCompartment();
         for (Object obj : compartment.getChildren()) {
             logger.debug(obj.toString());
             View view = (View) obj;
