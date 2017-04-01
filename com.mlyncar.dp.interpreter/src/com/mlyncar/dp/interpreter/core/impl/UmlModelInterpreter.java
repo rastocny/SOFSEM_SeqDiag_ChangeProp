@@ -86,12 +86,8 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretMessageModify(Change change) throws InterpreterException {
-        // TODO Auto-generated method stub
     	ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel(change.getOldValue(), change.getNewValue());
     	notationManager.relocateMessage(change.getOldValue(), change.getNewValue(), spec);
-    	//find msg occurences and action ocurrences -  move them to another lifeline - update covereds by
-    	
-    	//remove childs from node, add childs to another node in notation
     	storeModelResource();
     	storeNotationResource();
     }
@@ -99,10 +95,9 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     @Override
     protected void interpretLifelineRemove(Change change) throws InterpreterException {
         notationManager.removeLifelineFromNotation(change.getNewValue());
-        //lifelineCompartment.removeChild(lifelineToRemove);
-        //storeNotationResource();
-        //interaction.getLifeline(change.getNewValue().getName()).destroy();
-        //storeModelResource();
+        modelManager.removeLifelineFromModel(change.getNewValue());
+        storeNotationResource();
+        storeModelResource();
     }
 
     @Override

@@ -30,11 +30,11 @@ public class InterpreterService {
         this.umlInterpreter = new UmlModelInterpreter(changeLog);
 
         interpretChangeBasedOnType(ChangeType.MESSAGE_REMOVE, changeLog, true);
-        interpretChangeBasedOnType(ChangeType.LIFELINE_REMOVE, changeLog, false);
         interpretChangeBasedOnType(ChangeType.LIFELINE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_MODIFY, changeLog, false);
-
+        interpretChangeBasedOnType(ChangeType.LIFELINE_REMOVE, changeLog, false);
+        
         umlInterpreter.finalizeInterpretation();
         fileInterpreter.finalizeInterpretation();
     }

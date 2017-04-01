@@ -109,7 +109,11 @@ public class ModelManager {
         modelSet.getActionToRemoveEnd().destroy();
         modelSet.getActionToRemoveStart().destroy();
     }
-
+    
+    public void removeLifelineFromModel(Node nodeToRemove) {
+        interaction.getLifeline(nodeToRemove.getName()).destroy();
+    }
+   
     public ActionExecutionSpecification relocateMessageInModel(Node oldValue, Node newValue) {
     	Lifeline oldLifeline = interaction.getLifeline(oldValue.getName());
     	Lifeline newLifeline = interaction.getLifeline(newValue.getName());

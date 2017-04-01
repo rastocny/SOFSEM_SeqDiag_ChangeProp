@@ -97,6 +97,7 @@ public class NotationManager {
         if (lifelineToRemove == null) {
             throw new InterpreterException("Lifeline to remove " + nodeToRemove.getName() + " not found in diagram");
         }
+        lifelineCompartment.removeChild(lifelineToRemove);
     }
 
     public MessageRemoveModelSet removeMessageFromNotation(Node nodeToRemove, Node nodeToRemoveReturn, Interaction interaction) throws InterpreterException {
