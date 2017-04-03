@@ -118,18 +118,23 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
         while (objects.hasNext()) {
             EObject object = objects.next();
             if (object instanceof MessageOccurrenceSpecification) {
-                MessageOccurrenceSpecification occurence = (MessageOccurrenceSpecification) object;
-                if (!occurence.getName().contains("Recv")) {
-                    MessageOccurrenceSpecification receiveOccurence = (MessageOccurrenceSpecification) occurence.getMessage().getReceiveEvent();
+                MessageOccurrenceSpecification occurrence = (MessageOccurrenceSpecification) object;
+                if (occurrence.getName().contains("Send") || occurrence.getName().contains("Start")) {
+                	if(occurrence.getMessage() == null) {
+                		continue; //in case message occurrence does not contain message == message was removed 
+                		//should be handled differently, TODO - later, or whatever
+                	}
+                	logger.debug("Analyzing message of occurrence {} and message {}", occurrence.getName(), occurrence.getMessage().getName());
+                    MessageOccurrenceSpecification receiveOccurence = (MessageOccurrenceSpecification) occurrence.getMessage().getReceiveEvent();
 
-                    if (occurence.getMessage().getMessageSort().equals(MessageSort.SYNCH_CALL_LITERAL)) {
-                        diagram.addMessage(new MessageImpl(counter++, MessageType.SYNCH, occurence.getMessage().getName(),
+                    if (occurrence.getMessage().getMessageSort().equals(MessageSort.SYNCH_CALL_LITERAL)) {
+                        diagram.addMessage(new MessageImpl(counter++, MessageType.SYNCH, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurence.getCovered().getName())));
-                    } else if (occurence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
-                        diagram.addMessage(new MessageImpl(counter++, MessageType.RETURN, occurence.getMessage().getName(),
+                                new LifelineImpl(occurrence.getCovered().getName())));
+                    } else if (occurrence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
+                        diagram.addMessage(new MessageImpl(counter++, MessageType.RETURN, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurence.getCovered().getName())));
+                                new LifelineImpl(occurrence.getCovered().getName())));
                     }
                 }
             }

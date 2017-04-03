@@ -186,6 +186,42 @@ public class NotationManager {
         }
     }
 
+    private Object getLifelineCompartment() {
+        View compartment1 = (View) diagram.getChildren().get(0);
+        return compartment1.getChildren().get(1);
+    }
+
+    private View getLifelineView(String lifelineName) {
+        View compartment = (View) getLifelineCompartment();
+        for (Object obj : compartment.getChildren()) {
+            View view = (View) obj;
+            if (((Lifeline) view.getElement()).getName().equals(lifelineName)) {
+                return view;
+            }
+        }
+        return null;
+    }
+
+    private View addLifeline(Lifeline lifeline) {
+        Object compartment = getLifelineCompartment();
+        Integer newLifelinePositionX = calculateLifelinePosition();
+        final String nodeType = UMLVisualIDRegistry.getType(org.eclipse.papyrus.uml.diagram.sequence.edit.parts.LifelineEditPart.VISUAL_ID);
+        org.eclipse.gmf.runtime.notation.Node lifelineView = ViewService.createNode((View) compartment, lifeline, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+        Bounds location = NotationFactory.eINSTANCE.createBounds();
+        location.setX(newLifelinePositionX);
+        location.setY(10);
+        location.setHeight(650);
+        location.setWidth(78);
+        lifelineView.setLayoutConstraint(location);
+        return lifelineView;
+    }
+
+    private org.eclipse.gmf.runtime.notation.Node addActionExecution(View lifelineView, ActionExecutionSpecification specification) {
+        final String nodeType = UMLVisualIDRegistry.getType(org.eclipse.papyrus.uml.diagram.sequence.edit.parts.ActionExecutionSpecificationEditPart.VISUAL_ID);
+        org.eclipse.gmf.runtime.notation.Node executionView = ViewService.createNode(lifelineView, specification, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+        return executionView;
+    }
+
     private Integer calculateMessagePossition(Node newValue) {
         if (newValue.getLeftSibling() == null) {
             logger.debug("Sibling not found, returning 30");
@@ -211,43 +247,11 @@ public class NotationManager {
         }
         return 30;
     }
-
-    private Object getLifelineCompartment() {
-        View compartment1 = (View) diagram.getChildren().get(0);
-        return compartment1.getChildren().get(1);
+    
+    private Integer calculateLifelinePosition() {
+    	View lifelineCompartment = (View) getLifelineCompartment();
+    	org.eclipse.gmf.runtime.notation.Node lastLifeline = (org.eclipse.gmf.runtime.notation.Node) lifelineCompartment.getChildren().get(lifelineCompartment.getChildren().size() - 1);
+    	Bounds bounds = (Bounds) lastLifeline.getLayoutConstraint();
+    	return bounds.getX() + 50;
     }
-
-    private View getLifelineView(String lifelineName) {
-        View compartment = (View) getLifelineCompartment();
-        for (Object obj : compartment.getChildren()) {
-            logger.debug(obj.toString());
-            View view = (View) obj;
-            Lifeline lifeline = (Lifeline) view.getElement();
-            logger.debug(lifeline.toString());
-            if (((Lifeline) view.getElement()).getName().equals(lifelineName)) {
-                return view;
-            }
-        }
-        return null;
-    }
-
-    private View addLifeline(Lifeline lifeline) {
-        Object compartment = getLifelineCompartment();
-        final String nodeType = UMLVisualIDRegistry.getType(org.eclipse.papyrus.uml.diagram.sequence.edit.parts.LifelineEditPart.VISUAL_ID);
-        org.eclipse.gmf.runtime.notation.Node lifelineView = ViewService.createNode((View) compartment, lifeline, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
-        Bounds location = NotationFactory.eINSTANCE.createBounds();
-        location.setX(750); //lastlifeline + 100
-        location.setY(10);
-        location.setHeight(650);
-        location.setWidth(78);
-        lifelineView.setLayoutConstraint(location);
-        return lifelineView;
-    }
-
-    private org.eclipse.gmf.runtime.notation.Node addActionExecution(View lifelineView, ActionExecutionSpecification specification) {
-        final String nodeType = UMLVisualIDRegistry.getType(org.eclipse.papyrus.uml.diagram.sequence.edit.parts.ActionExecutionSpecificationEditPart.VISUAL_ID);
-        org.eclipse.gmf.runtime.notation.Node executionView = ViewService.createNode(lifelineView, specification, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
-        return executionView;
-    }
-
 }
