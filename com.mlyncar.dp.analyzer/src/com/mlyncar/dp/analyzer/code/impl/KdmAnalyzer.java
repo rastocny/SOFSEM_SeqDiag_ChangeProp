@@ -109,7 +109,11 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                         if (object instanceof Calls) {
                             Calls call = (Calls) object;
                             MethodUnit newMethod = (MethodUnit) call.getTo();
-                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
+                            MessageType type = MessageType.SYNCH;
+                            if(((ClassUnit)newMethod.eContainer()).getName().equals(((ClassUnit)method.eContainer()).getName())) {
+                            	type = MessageType.SELF;
+                            }
+                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
                                     new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName()),
                                     new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());

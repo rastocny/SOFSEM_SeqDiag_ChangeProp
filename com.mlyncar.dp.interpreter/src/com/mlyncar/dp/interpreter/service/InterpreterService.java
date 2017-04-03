@@ -28,7 +28,6 @@ public class InterpreterService {
     public void interpretChanges(ChangeLog changeLog) throws InterpreterException {
         this.fileInterpreter = new ChangeLogInterpreter(changeLogFilePath);
         this.umlInterpreter = new UmlModelInterpreter(changeLog);
-
         interpretChangeBasedOnType(ChangeType.MESSAGE_REMOVE, changeLog, true);
         interpretChangeBasedOnType(ChangeType.LIFELINE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_ADD, changeLog, false);
@@ -40,22 +39,23 @@ public class InterpreterService {
     }
 
     private void interpretChangeBasedOnType(ChangeType changeType, ChangeLog changeLog, boolean isReversed) throws InterpreterException {
-        if (isReversed) {
+        logger.debug("Interpreting {} changes", changeType.getCode());
+    	if (isReversed) {
             ListIterator<Change> listIterator = changeLog.changes().listIterator(changeLog.changes().size());
             while (listIterator.hasPrevious()) {
                 Change change = listIterator.previous();
                 if (changeType.equals(change.getChangeType())) {
                     logger.debug("Interpreting change " + change.getNewValue().getName());
-                    umlInterpreter.interpretChange(change);
                     fileInterpreter.interpretChange(change);
+                    umlInterpreter.interpretChange(change);
                 }
             }
         } else {
             for (Change change : changeLog.changes()) {
                 if (changeType.equals(change.getChangeType())) {
                     logger.debug("Interpreting change " + change.getNewValue().getName());
-                    umlInterpreter.interpretChange(change);
                     fileInterpreter.interpretChange(change);
+                    umlInterpreter.interpretChange(change);
                 }
             }
         }

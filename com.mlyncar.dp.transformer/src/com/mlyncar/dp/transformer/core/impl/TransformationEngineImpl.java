@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.analyzer.entity.Message;
+import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 import com.mlyncar.dp.transformer.core.TransformationEngine;
 import com.mlyncar.dp.transformer.entity.Edge;
@@ -46,6 +47,10 @@ public class TransformationEngineImpl implements TransformationEngine {
             }
 
             if (lastInsertedNode.getName().equals(message.getSourceLifeline().getName()) && !lastInsertedNode.isReply()) {
+            	if(!message.getType().equals(MessageType.RETURN) && lastInsertedNode.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
+            		logger.debug("Found self message, moving to parent");
+                    return storeMessageIntoGraph(graph, message, lastInsertedNode.getParentNode());
+            	}
                 Node node = new NodeImpl(edge, lastInsertedNode, message.getTargetLifeline().getName());
                 lastInsertedNode.addChildNode(node);
                 logger.debug("Found place for node " + node.getName() + " with message " + node.getCreateEdge().getName());

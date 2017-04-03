@@ -22,7 +22,7 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     private final Logger logger = LoggerFactory.getLogger(UmlModelInterpreter.class);
     private final NotationManager notationManager;
     private final ModelManager modelManager;
-
+    
     public UmlModelInterpreter(ChangeLog changeLog) throws InterpreterException {
         logger.debug("Interpreter diagram " + changeLog.getReferenceGraph().getSeqDiagram().getName());
         this.notationManager = new NotationManager(changeLog);
@@ -45,7 +45,6 @@ public class UmlModelInterpreter extends AbstractInterpreter {
         if (nodeToAddReturn == null) {
             throw new InterpreterException("Unable to interpret message " + nodeToAdd.getCreateEdge().getName() + " because it does not contain return message");
         }
-
         MessageAddModelSet modelSet = modelManager.addMessageToModel(nodeToAdd, nodeToAddReturn);
         notationManager.addMessageToNotation(nodeToAdd, modelSet.getNewMessage(), modelSet.getNewReplyMessage(), modelSet.getActionSpecStart(), modelSet.getActionSpecEnd());
         storeModelResource();

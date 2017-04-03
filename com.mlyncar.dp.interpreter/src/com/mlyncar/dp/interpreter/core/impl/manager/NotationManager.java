@@ -1,7 +1,5 @@
 package com.mlyncar.dp.interpreter.core.impl.manager;
 
-import java.util.List;
-
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.gmf.runtime.diagram.core.services.ViewService;
@@ -27,6 +25,7 @@ import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.interpreter.core.impl.EclipseUmlComponentAccessor;
 import com.mlyncar.dp.interpreter.core.modelset.MessageRemoveModelSet;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
+import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Node;
 
 public class NotationManager {
@@ -69,11 +68,22 @@ public class NotationManager {
 
         Bounds location1 = NotationFactory.eINSTANCE.createBounds();
         location1.setX(31);
+        location1.setHeight(30);
         location1.setY(calculateMessagePossition(nodeToAdd));
 
-        Bounds location2 = NotationFactory.eINSTANCE.createBounds();
-        location2.setX(31);
-        location2.setY(calculateMessagePossition(nodeToAdd));
+        Bounds location2 = NotationFactory.eINSTANCE.createBounds();     
+        location2.setHeight(30);
+        if(nodeToAdd.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
+            location2.setX(36);
+            location2.setY(calculateMessagePossition(nodeToAdd)+5);
+            location2.setHeight(20);
+        } else {
+            location2.setX(31);
+            location2.setY(calculateMessagePossition(nodeToAdd));
+            location2.setHeight(30);
+        }       
+
+
 
         executionViewInit.setLayoutConstraint(location1);
         executionViewEnd.setLayoutConstraint(location2);
@@ -228,6 +238,7 @@ public class NotationManager {
             return 30;
         }
         View lifelineView = getLifelineView(newValue.getParentNode().getName());
+        logger.debug("Sibling to found: {}", newValue.getLeftSibling().getCreateEdge().getName());
         for (Object viewObj : lifelineView.getChildren()) {
             View view = (View) viewObj;
             if (view.getElement() != null && view.getElement() instanceof ActionExecutionSpecification) {

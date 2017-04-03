@@ -49,12 +49,12 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
         }
         logger.debug("Child comparison finished, number of equal nodes: {}", numberOfEqualChilds);
 
-        if (numberOfEqualChilds <= 1) {
+        if (numberOfEqualChilds < 1) {
             return false;
         }
         Double comparisonIndex = numberOfEqualChilds / (double) root.childNodes().size();
         logger.debug("Comparison index: {}", comparisonIndex);
-        if (comparisonIndex > 0.49) {
+        if (comparisonIndex > 0.25) {
             logger.debug("Comparison index match conditions, node {} is suitable for ROOT", possibleRoot.getName());
             return true;
         } else {
