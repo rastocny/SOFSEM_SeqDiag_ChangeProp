@@ -26,6 +26,7 @@ import org.eclipse.gmt.modisco.omg.kdm.action.BlockUnit;
 import org.eclipse.gmt.modisco.omg.kdm.action.Calls;
 import org.eclipse.gmt.modisco.omg.kdm.code.AbstractCodeElement;
 import org.eclipse.gmt.modisco.omg.kdm.code.ClassUnit;
+import org.eclipse.gmt.modisco.omg.kdm.code.InterfaceUnit;
 import org.eclipse.gmt.modisco.omg.kdm.code.MethodUnit;
 import org.eclipse.modisco.infra.discovery.core.exception.DiscoveryException;
 import org.eclipse.modisco.java.discoverer.DiscoverKDMModelFromJavaProject;
@@ -94,13 +95,13 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
         throw new MainMethodNotFoundException("Unable to find main method in KDM structure");
     }
 
-    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method) {
+    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method) throws SourceCodeAnalyzerException {
         for (AbstractCodeElement element : method.getCodeElement()) {
             analyzeCodeElement(element, diagram, method);
         }
     }
 
-    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method) {
+    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method) throws SourceCodeAnalyzerException {
         if (codeElement instanceof ActionElement) {
             ActionElement actionElement = (ActionElement) codeElement;
             for (AbstractCodeElement innerBlockElement : actionElement.getCodeElement()) {
@@ -109,18 +110,21 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                         if (object instanceof Calls) {
                             Calls call = (Calls) object;
                             MethodUnit newMethod = (MethodUnit) call.getTo();
+                            String newMethodClassName = getMethodClassName(newMethod);
+                            String methodClassName = getMethodClassName(method);
                             MessageType type = MessageType.SYNCH;
-                            if(((ClassUnit)newMethod.eContainer()).getName().equals(((ClassUnit)method.eContainer()).getName())) {
+                            if(newMethodClassName.equals(methodClassName)) {
                             	type = MessageType.SELF;
                             }
+                        
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
-                                    new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName()),
-                                    new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
+                                    new LifelineImpl(newMethodClassName),
+                                    new LifelineImpl(methodClassName)));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
                             analyzeMethodUnit(diagram, newMethod);
-                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName(),
-                                    new LifelineImpl(((ClassUnit) method.eContainer()).getName()),
-                                    new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName())));
+                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
+                                    new LifelineImpl(methodClassName),
+                                    new LifelineImpl(newMethodClassName)));
                         }
                     }
                 } else if (innerBlockElement.getName() != null && innerBlockElement.getName().equals("class instance creation")) {
@@ -128,12 +132,12 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                         if (object instanceof Calls) {
                             Calls call = (Calls) object;
                             MethodUnit newMethod = (MethodUnit) call.getTo();
-                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.CREATE, newMethod.getName(),
+                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
                                     new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName()),
                                     new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
                             analyzeMethodUnit(diagram, newMethod);
-                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName(),
+                            diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
                                     new LifelineImpl(((ClassUnit) method.eContainer()).getName()),
                                     new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName())));
                         }
@@ -148,6 +152,15 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                 analyzeCodeElement(blockElement, diagram, method);
             }
         }
+    }
+    
+    private String getMethodClassName(MethodUnit methodUnit) throws SourceCodeAnalyzerException {
+    	if(methodUnit.eContainer() instanceof ClassUnit) {
+    		return ((ClassUnit) methodUnit.eContainer()).getName();
+    	} else if(methodUnit.eContainer() instanceof InterfaceUnit) {
+    		return ((InterfaceUnit) methodUnit.eContainer()).getName();
+    	}
+    	throw new SourceCodeAnalyzerException("Unable to extract class name of method " + methodUnit.getName());
     }
 
 }

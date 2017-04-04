@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.interpreter.core.modelset.MessageAddModelSet;
 import com.mlyncar.dp.interpreter.core.modelset.MessageRemoveModelSet;
+import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.transformer.entity.Node;
 
 public class ModelManager {
@@ -43,29 +44,37 @@ public class ModelManager {
         return newLifeline;
     }
 
-    public MessageAddModelSet addMessageToModel(Node nodeToAdd, Node nodeToAddReturn) {
+    public MessageAddModelSet addMessageToModel(Node nodeToAdd, Node nodeToAddReturn) throws InterpreterException {
         logger.debug("Interpreting message addition to uml model " + interaction.getName());
-
+        String messageName = nodeToAdd.getCreateEdge().getName();
+        logger.debug("Adding message " + messageName);
         Lifeline targetLifeline = interaction.getLifeline(nodeToAdd.getName());
         Lifeline sourceLifeline = interaction.getLifeline(nodeToAdd.getParentNode().getName());
-
+        
+        if (targetLifeline == null) {
+        	throw new InterpreterException("Unable to interpret message " + messageName + ", target lifeline not found " + nodeToAdd.getName());
+        }
+        if (sourceLifeline == null) {
+        	throw new InterpreterException("Unable to interpret message " + messageName + ", source lifeline not found " + nodeToAdd.getParentNode().getName());
+        }
+        
         ActionExecutionSpecification actionSpec = getStartExecutionSpecification(nodeToAdd, sourceLifeline);
         ActionExecutionSpecification newActionSpec = UMLFactory.eINSTANCE.createActionExecutionSpecification();
-        newActionSpec.setName("execSpecNew_" + nodeToAdd.getCreateEdge().getName());
+        newActionSpec.setName("execSpecNew_" + messageName);
         targetLifeline.getCoveredBys().add(newActionSpec);
 
         MessageOccurrenceSpecification messageOccurrenceStart = UMLFactory.eINSTANCE.createMessageOccurrenceSpecification();
-        messageOccurrenceStart.setName("msgOccurrenceStart_" + nodeToAdd.getCreateEdge().getName());
+        messageOccurrenceStart.setName("msgOccurrenceStart_" + messageName);
         messageOccurrenceStart.setCovered(sourceLifeline);
         MessageOccurrenceSpecification messageOccurrenceEnd = UMLFactory.eINSTANCE.createMessageOccurrenceSpecification();
-        messageOccurrenceEnd.setName("msgOccurrenceEnd_" + nodeToAdd.getCreateEdge().getName());
+        messageOccurrenceEnd.setName("msgOccurrenceEnd_" + messageName);
         messageOccurrenceEnd.setCovered(targetLifeline);
 
         MessageOccurrenceSpecification messageOccurrenceReplyStart = UMLFactory.eINSTANCE.createMessageOccurrenceSpecification();
-        messageOccurrenceReplyStart.setName("msgOccurrenceStart_" + nodeToAddReturn.getCreateEdge().getName());
+        messageOccurrenceReplyStart.setName("msgOccurrenceStart_" + messageName);
         messageOccurrenceReplyStart.setCovered(targetLifeline);
         MessageOccurrenceSpecification messageOccurrenceReplyEnd = UMLFactory.eINSTANCE.createMessageOccurrenceSpecification();
-        messageOccurrenceReplyEnd.setName("msgOccurrenceEnd_" + nodeToAddReturn.getCreateEdge().getName());
+        messageOccurrenceReplyEnd.setName("msgOccurrenceEnd_" + messageName);
         messageOccurrenceReplyEnd.setCovered(sourceLifeline);
 
         actionSpec.setStart(messageOccurrenceStart);

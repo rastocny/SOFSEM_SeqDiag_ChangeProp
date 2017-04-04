@@ -14,12 +14,7 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
 
     @Override
     public NodeRelation getNodeRelation(Node referenceNode, Node subNode) {
-        this.logger.debug("Finding relation between Node: {} and Node {}", referenceNode.getName(), subNode.getName());
-        if (referenceNode.getCreateEdge() != null && subNode.getCreateEdge() != null) {
-            this.logger.debug("Finding relation between Node: {} CreateEdge {}, and Node {} CreateEdge {}", referenceNode.getName(), referenceNode.getCreateEdge().getName(), subNode.getName(), subNode.getCreateEdge().getName());
-        }
         NodeRelation relation = getNodeRelationWithoutSignature(referenceNode, subNode);
-
         if (relation == NodeRelation.EQUAL) {
             if (getSignatureType(referenceNode, subNode) == SignatureType.EQUAL) {
                 return NodeRelation.EQUAL;
@@ -48,22 +43,17 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
         if (nodesEqualName(referenceNode, subNode)) {
             if (edgesNotNull(referenceNode, subNode)) {
                 if (edgesEqualType(referenceNode, subNode) && edgesEqualName(referenceNode, subNode)) {
-                    this.logger.debug("Relation is EQUAL");
                     return NodeRelation.EQUAL;
                 } else {
-                    this.logger.debug("Relation is DIFFERENT");
                     return NodeRelation.DIFFERENT;
                 }
             } else {
-                this.logger.debug("Relation is EQUAL");
                 return NodeRelation.EQUAL;
             }
         } else if (edgesNotNull(referenceNode, subNode) && edgesEqualName(referenceNode, subNode) && edgesEqualType(referenceNode, subNode)) {
             //equal name but different node - message was moved from one lifeline to another
-            this.logger.debug("Relation is SIMILAR");
             return NodeRelation.SIMILAR;
         } else {
-            this.logger.debug("Relation is DIFFERENT");
             return NodeRelation.DIFFERENT;
         }
     }

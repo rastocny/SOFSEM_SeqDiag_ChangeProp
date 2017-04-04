@@ -27,7 +27,7 @@ public class TransformationTestHelper {
                     if (node.getCreateEdge() == null) {
                         logger.debug(p.level + ": " + node.getName() + ". Childs: " + node.childNodes().size());
                     } else {
-                        logger.debug(p.level + ": " + node.getParentNode().getName() + " " + node.getCreateEdge().getName() + " " + node.getName() + ". Childs: " + node.childNodes().size());
+                        logger.debug(p.level + ": " + node.getParentNode().getName() + "->" + node.getCreateEdge().getName() + "->" + node.getName() + ". Type: " + node.getCreateEdge().getEdgeType().getCode() + ". Childs: " + node.childNodes().size());
                     }
                 }
             }

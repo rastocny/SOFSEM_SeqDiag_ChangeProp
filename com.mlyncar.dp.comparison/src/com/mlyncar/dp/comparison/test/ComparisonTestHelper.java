@@ -13,7 +13,7 @@ public class ComparisonTestHelper {
     public static void printChanges(ChangeLog log) {
         logger.debug("List of found changes:");
         for (Change change : log.changes()) {
-            logger.debug(change.getChangeType().getCode() + ":" + change.getNewValue());
+            logger.debug(change.getChangeType().getCode() + ":" + change.getNewValue().getName());
         }
     }
 }

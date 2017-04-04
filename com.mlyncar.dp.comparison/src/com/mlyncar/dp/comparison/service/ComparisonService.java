@@ -32,9 +32,10 @@ public class ComparisonService {
             logger.debug("Starting to generate changes between graph structures.");
             //Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
             Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");
-            Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction2");
+            //Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction2");
+            Graph umlGraph2 = service.getGraphStructureFromSourceCode();
             GraphComparator comparator = new GraphComparatorImpl(service);
-            ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
+            ChangeLog log = comparator.compareGraphStructures(umlGraph2, umlGraph1);
             ComparisonTestHelper.printChanges(log);
             return log;
         } catch (GraphTransformationException ex) {

@@ -22,9 +22,11 @@ public class MaximumLifelineRule implements SynchRule {
         int currentNumberLifelines = statsHolder.getDiagramGraphStats().getNumberOfLifelines();
         int addedLifelines = statsHolder.getChangeLogStats().getNumberOfAddedLifelines();
         int removedLifelines = statsHolder.getChangeLogStats().getNumberOfRemovedLifelines();
+        logger.debug("Lifelines to add: {}, Lifelines to delete: {}, Current lifelines: {}, Added lifelines: {}, Removed lifelines: {}", lifelinesToAdd, lifeLinesToDelete, currentNumberLifelines, addedLifelines, removedLifelines);
         int maxLifelines;
         try {
             maxLifelines = Integer.valueOf(PropertyLoader.getInstance().getProperty("lifeline.max"));
+            logger.debug("Max lifelines: {} ", maxLifelines);
         } catch (NumberFormatException ex) {
             throw new SynchRuleException("Unable to execute rule. Configuration directive contains incorrect value.", ex, this.getClass().getName());
         } catch (ConfigurationException ex) {
