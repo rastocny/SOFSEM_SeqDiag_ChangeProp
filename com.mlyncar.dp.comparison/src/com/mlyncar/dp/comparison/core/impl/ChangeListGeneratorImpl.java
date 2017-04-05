@@ -16,15 +16,15 @@ import com.mlyncar.dp.transformer.entity.Node;
 public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
     private final Logger logger = LoggerFactory.getLogger(ChangeListGeneratorImpl.class);
-    
+
     @Override
     public List<Change> createMessageAdditionChange(Node node, List<LeveledNode> additionalNodes) {
-    	logger.debug("Creating message add instance of change " + node.getCreateEdge().getName());
+        logger.debug("Creating message add instance of change " + node.getCreateEdge().getName());
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_ADD);
         change.setNewValue(node);
         if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
-        	logger.debug("Message add also contains lifeline add change, creating one.");
+            logger.debug("Message add also contains lifeline add change, creating one.");
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
@@ -69,15 +69,15 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
     private boolean isLifelinePresent(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
         boolean found = false;
-        boolean shouldCheck= false;
+        boolean shouldCheck = false;
         for (LeveledNode node : leveledNodes) {
-        	if(node.getNode().getId().equals(comparedLifelineId)) {
-        		shouldCheck = true;
-        		continue;
-        	}
-        	if(!shouldCheck) {
-        		continue;
-        	}
+            if (node.getNode().getId().equals(comparedLifelineId)) {
+                shouldCheck = true;
+                continue;
+            }
+            if (!shouldCheck) {
+                continue;
+            }
             if (node.getNode().getName().equals(lifelineName) && node.getNode().getId() != comparedLifelineId) {
                 found = true;
             }

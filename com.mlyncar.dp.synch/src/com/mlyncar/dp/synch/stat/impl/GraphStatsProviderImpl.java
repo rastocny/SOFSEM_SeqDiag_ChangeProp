@@ -25,31 +25,31 @@ public class GraphStatsProviderImpl implements GraphStatsProvider {
         return lifelineNames.size();
     }
 
-	@Override
-	public Integer getNumberOfGetMethods() {
-		int count = 0;
+    @Override
+    public Integer getNumberOfGetMethods() {
+        int count = 0;
         for (LeveledNode leveledNode : graph.getOrderedNodes()) {
-        	Edge createEdge = leveledNode.getNode().getCreateEdge();
-            if(createEdge != null) {
-            	if(createEdge.getName().startsWith("get")) {
-            		count++;
-            	}
+            Edge createEdge = leveledNode.getNode().getCreateEdge();
+            if (createEdge != null) {
+                if (createEdge.getName().startsWith("get")) {
+                    count++;
+                }
             }
         }
-		return count;
-	}
+        return count;
+    }
 
-	@Override
-	public Integer getNumberOfSetMethods() {
-		int count = 0;
+    @Override
+    public Integer getNumberOfSetMethods() {
+        int count = 0;
         for (LeveledNode leveledNode : graph.getOrderedNodes()) {
-        	Edge createEdge = leveledNode.getNode().getCreateEdge();
-            if(createEdge != null) {
-            	if(createEdge.getName().startsWith("set")) {
-            		count++;
-            	}
+            Edge createEdge = leveledNode.getNode().getCreateEdge();
+            if (createEdge != null) {
+                if (createEdge.getName().startsWith("set")) {
+                    count++;
+                }
             }
         }
-		return count;
-	}
+        return count;
+    }
 }

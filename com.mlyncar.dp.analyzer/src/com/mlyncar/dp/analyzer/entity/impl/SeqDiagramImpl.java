@@ -64,34 +64,34 @@ public class SeqDiagramImpl implements SeqDiagram {
         this.messages.add(message);
     }
 
-	@Override
-	public void setInteraction(Object interaction) {
-		this.interaction = interaction;
-	}
+    @Override
+    public void setInteraction(Object interaction) {
+        this.interaction = interaction;
+    }
 
-	@Override
-	public Object getInteraction() {
-		return this.interaction;
-	}
+    @Override
+    public Object getInteraction() {
+        return this.interaction;
+    }
 
-	@Override
-	public Object getResourceInteractionHolder() {
-		return this.interactionResourceHolder;
-	}
+    @Override
+    public Object getResourceInteractionHolder() {
+        return this.interactionResourceHolder;
+    }
 
-	@Override
-	public void setInteractionResourceHolder(Object interactionResourceHolder) {
-		this.interactionResourceHolder = interactionResourceHolder;
-	}
+    @Override
+    public void setInteractionResourceHolder(Object interactionResourceHolder) {
+        this.interactionResourceHolder = interactionResourceHolder;
+    }
 
-	@Override
-	public Object getNotationResource() {
-		return this.notationResource;
-	}
+    @Override
+    public Object getNotationResource() {
+        return this.notationResource;
+    }
 
-	@Override
-	public void setNotationResource(Object notationResource) {
-		this.notationResource = notationResource;
-	}
+    @Override
+    public void setNotationResource(Object notationResource) {
+        this.notationResource = notationResource;
+    }
 
 }

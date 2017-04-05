@@ -48,11 +48,11 @@ import com.mlyncar.dp.analyzer.uml.UmlAnalyzer;
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
 public class XmiUmlAnalyzer implements UmlAnalyzer {
-	
-	private Resource resource;
-	private Resource notationResource;
+
+    private Resource resource;
+    private Resource notationResource;
     private final Logger logger = LoggerFactory.getLogger(XmiUmlAnalyzer.class);
-    
+
     @Override
     public List<SeqDiagram> analyzeUmlModel() throws AnalyzerException {
         return analyzeUmlModel(EclipseProjectNavigatorHelper.getCurrentProjectModel());
@@ -120,16 +120,16 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
             if (object instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification occurrence = (MessageOccurrenceSpecification) object;
                 if (occurrence.getName().contains("Send") || occurrence.getName().contains("Start")) {
-                	if(occurrence.getMessage() == null) {
-                		continue; //in case message occurrence does not contain message == message was removed 
-                		//should be handled differently, TODO - later, or whatever
-                	}
-                	logger.debug("Analyzing message of occurrence {} and message {}", occurrence.getName(), occurrence.getMessage().getName());
+                    if (occurrence.getMessage() == null) {
+                        continue; //in case message occurrence does not contain message == message was removed 
+                        //should be handled differently, TODO - later, or whatever
+                    }
+                    logger.debug("Analyzing message of occurrence {} and message {}", occurrence.getName(), occurrence.getMessage().getName());
                     MessageOccurrenceSpecification receiveOccurence = (MessageOccurrenceSpecification) occurrence.getMessage().getReceiveEvent();
                     if (occurrence.getMessage().getMessageSort().equals(MessageSort.SYNCH_CALL_LITERAL)) {
                         MessageType type = MessageType.SYNCH;
-                        if(receiveOccurence.getCovered().getName().equals(occurrence.getCovered().getName())) {
-                        	type = MessageType.SELF;
+                        if (receiveOccurence.getCovered().getName().equals(occurrence.getCovered().getName())) {
+                            type = MessageType.SELF;
                         }
                         diagram.addMessage(new MessageImpl(counter++, type, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
@@ -158,8 +158,8 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     }
 
     private Resource loadNotationModelResource(String pathToModel) {
-    	String notationModel = pathToModel.substring(0, pathToModel.lastIndexOf('.')) + ".notation";
-        ResourceSet set = new ResourceSetImpl(); 
+        String notationModel = pathToModel.substring(0, pathToModel.lastIndexOf('.')) + ".notation";
+        ResourceSet set = new ResourceSetImpl();
         Resource resource = set.getResource(URI.createFileURI(notationModel), true);
         return resource;
     }

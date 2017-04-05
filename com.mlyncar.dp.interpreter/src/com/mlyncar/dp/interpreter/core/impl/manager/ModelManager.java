@@ -50,14 +50,14 @@ public class ModelManager {
         logger.debug("Adding message " + messageName);
         Lifeline targetLifeline = interaction.getLifeline(nodeToAdd.getName());
         Lifeline sourceLifeline = interaction.getLifeline(nodeToAdd.getParentNode().getName());
-        
+
         if (targetLifeline == null) {
-        	throw new InterpreterException("Unable to interpret message " + messageName + ", target lifeline not found " + nodeToAdd.getName());
+            throw new InterpreterException("Unable to interpret message " + messageName + ", target lifeline not found " + nodeToAdd.getName());
         }
         if (sourceLifeline == null) {
-        	throw new InterpreterException("Unable to interpret message " + messageName + ", source lifeline not found " + nodeToAdd.getParentNode().getName());
+            throw new InterpreterException("Unable to interpret message " + messageName + ", source lifeline not found " + nodeToAdd.getParentNode().getName());
         }
-        
+
         ActionExecutionSpecification actionSpec = getStartExecutionSpecification(nodeToAdd, sourceLifeline);
         ActionExecutionSpecification newActionSpec = UMLFactory.eINSTANCE.createActionExecutionSpecification();
         newActionSpec.setName("execSpecNew_" + messageName);
@@ -117,51 +117,51 @@ public class ModelManager {
         modelSet.getActionToRemoveEnd().destroy();
         modelSet.getActionToRemoveStart().destroy();
     }
-    
+
     public void removeLifelineFromModel(Node nodeToRemove) {
         interaction.getLifeline(nodeToRemove.getName()).destroy();
     }
-   
+
     public ActionExecutionSpecification relocateMessageInModel(Node oldValue, Node newValue) {
-    	Lifeline oldLifeline = interaction.getLifeline(oldValue.getName());
-    	Lifeline newLifeline = interaction.getLifeline(newValue.getName());
-    	Message messageToRelocate = interaction.getMessage(oldValue.getCreateEdge().getName());
-    	
-    	logger.debug("Relocating {} from {} to {}", messageToRelocate.getName(), oldLifeline.getName(), newLifeline.getName());
-    	MessageOccurrenceSpecification msgSpecStart = null;
-    	for (InteractionFragment fragment : interaction.getFragments()) {
-    		if(fragment instanceof MessageOccurrenceSpecification) {
-    			MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
-    			if(spec.getMessage() != null && spec.getMessage().equals(messageToRelocate) && spec.getCovered().equals(oldLifeline)) {
-    				msgSpecStart = spec;
-    				break;
-    			}
-    		}
-    	}
-    	
-    	ActionExecutionSpecification execSpec = null;
-    	MessageOccurrenceSpecification msgSpecEnd = null;
-    	for (InteractionFragment fragment : interaction.getFragments()) {
-    		if(fragment instanceof ActionExecutionSpecification) {
-    			ActionExecutionSpecification spec = (ActionExecutionSpecification) fragment;
-    			if(spec.getStart().equals(msgSpecStart)) {
-    				execSpec = spec;
-    				msgSpecEnd = (MessageOccurrenceSpecification) execSpec.getFinish();
-    			}
-    		}
-    	}
-    	
-    	msgSpecEnd.setCovered(newLifeline);
-    	msgSpecStart.setCovered(newLifeline);
-    	oldLifeline.getCoveredBys().remove(execSpec);
-    	oldLifeline.getCoveredBys().remove(msgSpecEnd);
-    	oldLifeline.getCoveredBys().remove(msgSpecStart);
-    	newLifeline.getCoveredBys().add(execSpec);	
-    	newLifeline.getCoveredBys().add(msgSpecStart);
-    	newLifeline.getCoveredBys().add(msgSpecEnd);
-    	return execSpec;
-	}
-    
+        Lifeline oldLifeline = interaction.getLifeline(oldValue.getName());
+        Lifeline newLifeline = interaction.getLifeline(newValue.getName());
+        Message messageToRelocate = interaction.getMessage(oldValue.getCreateEdge().getName());
+
+        logger.debug("Relocating {} from {} to {}", messageToRelocate.getName(), oldLifeline.getName(), newLifeline.getName());
+        MessageOccurrenceSpecification msgSpecStart = null;
+        for (InteractionFragment fragment : interaction.getFragments()) {
+            if (fragment instanceof MessageOccurrenceSpecification) {
+                MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
+                if (spec.getMessage() != null && spec.getMessage().equals(messageToRelocate) && spec.getCovered().equals(oldLifeline)) {
+                    msgSpecStart = spec;
+                    break;
+                }
+            }
+        }
+
+        ActionExecutionSpecification execSpec = null;
+        MessageOccurrenceSpecification msgSpecEnd = null;
+        for (InteractionFragment fragment : interaction.getFragments()) {
+            if (fragment instanceof ActionExecutionSpecification) {
+                ActionExecutionSpecification spec = (ActionExecutionSpecification) fragment;
+                if (spec.getStart().equals(msgSpecStart)) {
+                    execSpec = spec;
+                    msgSpecEnd = (MessageOccurrenceSpecification) execSpec.getFinish();
+                }
+            }
+        }
+
+        msgSpecEnd.setCovered(newLifeline);
+        msgSpecStart.setCovered(newLifeline);
+        oldLifeline.getCoveredBys().remove(execSpec);
+        oldLifeline.getCoveredBys().remove(msgSpecEnd);
+        oldLifeline.getCoveredBys().remove(msgSpecStart);
+        newLifeline.getCoveredBys().add(execSpec);
+        newLifeline.getCoveredBys().add(msgSpecStart);
+        newLifeline.getCoveredBys().add(msgSpecEnd);
+        return execSpec;
+    }
+
     private ActionExecutionSpecification getStartExecutionSpecification(Node nodeToAdd, Lifeline sourceLifeline) {
         MessageOccurrenceSpecification parentMsgOccurenceSpec = null;
         for (InteractionFragment fragment : interaction.getFragments()) {

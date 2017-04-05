@@ -113,10 +113,10 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             String newMethodClassName = getMethodClassName(newMethod);
                             String methodClassName = getMethodClassName(method);
                             MessageType type = MessageType.SYNCH;
-                            if(newMethodClassName.equals(methodClassName)) {
-                            	type = MessageType.SELF;
+                            if (newMethodClassName.equals(methodClassName)) {
+                                type = MessageType.SELF;
                             }
-                        
+
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
                                     new LifelineImpl(newMethodClassName),
                                     new LifelineImpl(methodClassName)));
@@ -153,14 +153,14 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
             }
         }
     }
-    
+
     private String getMethodClassName(MethodUnit methodUnit) throws SourceCodeAnalyzerException {
-    	if(methodUnit.eContainer() instanceof ClassUnit) {
-    		return ((ClassUnit) methodUnit.eContainer()).getName();
-    	} else if(methodUnit.eContainer() instanceof InterfaceUnit) {
-    		return ((InterfaceUnit) methodUnit.eContainer()).getName();
-    	}
-    	throw new SourceCodeAnalyzerException("Unable to extract class name of method " + methodUnit.getName());
+        if (methodUnit.eContainer() instanceof ClassUnit) {
+            return ((ClassUnit) methodUnit.eContainer()).getName();
+        } else if (methodUnit.eContainer() instanceof InterfaceUnit) {
+            return ((InterfaceUnit) methodUnit.eContainer()).getName();
+        }
+        throw new SourceCodeAnalyzerException("Unable to extract class name of method " + methodUnit.getName());
     }
 
 }

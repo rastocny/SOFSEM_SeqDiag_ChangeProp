@@ -42,15 +42,15 @@ public class SynchronizationEngineImpl implements SynchronizationEngine {
     public void processChangesViaSynchRules(ChangeLog changeLog) throws SynchronizationException {
         try {
             statsHolder = new StatsProviderHolderImpl(changeLog);
-            for(Iterator<Change> iterator = changeLog.changes().iterator(); iterator.hasNext();) {
-        		Change change = iterator.next();
-	        	if (shouldBeInterpreted(change)) {
-	                updateChangeLogStats(change);
-	                logger.debug("Change was processed by synch engine");
-	        	} else {
-	             	iterator.remove();
-	                logger.debug("Change was not processed by synch engine - removed from changelog");
-	        	}
+            for (Iterator<Change> iterator = changeLog.changes().iterator(); iterator.hasNext();) {
+                Change change = iterator.next();
+                if (shouldBeInterpreted(change)) {
+                    updateChangeLogStats(change);
+                    logger.debug("Change was processed by synch engine");
+                } else {
+                    iterator.remove();
+                    logger.debug("Change was not processed by synch engine - removed from changelog");
+                }
             }
         } catch (SynchRuleException ex) {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception throw in Rule: " + ex.getSynchRule(), ex);

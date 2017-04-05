@@ -21,8 +21,8 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
         logger.debug("Starting to find pair for sequence diagram root node " + subGraph.getRootNode().getName());
         for (LeveledNode node : referenceGraph.getOrderedNodes()) {
             if (isNodeSuitableForRoot(node.getNode(), subGraph.getRootNode())) {
-            	Graph graph = transService.createGraphStructure(node.getNode(), referenceGraph);
-            	removeChildReplyMessage(node.getNode()); 
+                Graph graph = transService.createGraphStructure(node.getNode(), referenceGraph);
+                removeChildReplyMessage(node.getNode());
                 return graph;
             }
         }
@@ -62,16 +62,16 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
             return false;
         }
     }
-    
+
     private void removeChildReplyMessage(Node parentNode) {
-    	Node nodeToRemove = null;
-    	for(Node node : parentNode.childNodes()) {
-    		if(node.isReply()) {
-    			nodeToRemove = node;
-    		}
-    	}
-    	if(nodeToRemove!=null) {
-    		parentNode.removeChildNode(nodeToRemove);
-    	}
+        Node nodeToRemove = null;
+        for (Node node : parentNode.childNodes()) {
+            if (node.isReply()) {
+                nodeToRemove = node;
+            }
+        }
+        if (nodeToRemove != null) {
+            parentNode.removeChildNode(nodeToRemove);
+        }
     }
 }

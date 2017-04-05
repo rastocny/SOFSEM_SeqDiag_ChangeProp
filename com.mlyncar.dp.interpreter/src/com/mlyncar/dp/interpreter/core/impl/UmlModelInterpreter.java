@@ -22,7 +22,7 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     private final Logger logger = LoggerFactory.getLogger(UmlModelInterpreter.class);
     private final NotationManager notationManager;
     private final ModelManager modelManager;
-    
+
     public UmlModelInterpreter(ChangeLog changeLog) throws InterpreterException {
         logger.debug("Interpreter diagram " + changeLog.getReferenceGraph().getSeqDiagram().getName());
         this.notationManager = new NotationManager(changeLog);
@@ -85,10 +85,10 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretMessageModify(Change change) throws InterpreterException {
-    	ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel(change.getOldValue(), change.getNewValue());
-    	notationManager.relocateMessage(change.getOldValue(), change.getNewValue(), spec);
-    	storeModelResource();
-    	storeNotationResource();
+        ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel(change.getOldValue(), change.getNewValue());
+        notationManager.relocateMessage(change.getOldValue(), change.getNewValue(), spec);
+        storeModelResource();
+        storeNotationResource();
     }
 
     @Override

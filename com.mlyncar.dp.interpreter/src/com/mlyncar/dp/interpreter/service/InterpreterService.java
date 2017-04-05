@@ -32,14 +32,14 @@ public class InterpreterService {
         interpretChangeBasedOnType(ChangeType.MESSAGE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_MODIFY, changeLog, false);
         interpretChangeBasedOnType(ChangeType.LIFELINE_REMOVE, changeLog, false);
-        
+
         umlInterpreter.finalizeInterpretation();
         fileInterpreter.finalizeInterpretation();
     }
 
     private void interpretChangeBasedOnType(ChangeType changeType, ChangeLog changeLog, boolean isReversed) throws InterpreterException {
         logger.debug("Interpreting {} changes", changeType.getCode());
-    	if (isReversed) {
+        if (isReversed) {
             ListIterator<Change> listIterator = changeLog.changes().listIterator(changeLog.changes().size());
             while (listIterator.hasPrevious()) {
                 Change change = listIterator.previous();

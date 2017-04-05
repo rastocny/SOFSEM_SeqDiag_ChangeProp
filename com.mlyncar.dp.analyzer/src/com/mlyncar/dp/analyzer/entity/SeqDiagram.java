@@ -34,16 +34,16 @@ public interface SeqDiagram {
     public List<Message> getMessages();
 
     public void addMessage(Message message);
-    
+
     public void setInteraction(Object interaction);
-    
+
     public Object getInteraction();
 
     public Object getResourceInteractionHolder();
-    
+
     public void setInteractionResourceHolder(Object interactionResourceHolder);
-    
+
     public Object getNotationResource();
-    
+
     public void setNotationResource(Object object);
 }

@@ -11,13 +11,14 @@ import com.mlyncar.dp.synch.stat.StatsProviderHolder;
 public class IgnoreGetRule implements SynchRule {
 
     private final Logger logger = LoggerFactory.getLogger(IgnoreGetRule.class);
-	@Override
-	public boolean validateChange(Change change, StatsProviderHolder statsHolder) throws SynchRuleException {
+
+    @Override
+    public boolean validateChange(Change change, StatsProviderHolder statsHolder) throws SynchRuleException {
         logger.debug("Validating change with rule {}", this.getClass().getName());
-        if(change.getNewValue().getCreateEdge().getName().startsWith("get") && statsHolder.getDiagramGraphStats().getNumberOfGetMethods() == 0) {
-        	return false;
+        if (change.getNewValue().getCreateEdge().getName().startsWith("get") && statsHolder.getDiagramGraphStats().getNumberOfGetMethods() == 0) {
+            return false;
         }
-		return true;
-	}
+        return true;
+    }
 
 }

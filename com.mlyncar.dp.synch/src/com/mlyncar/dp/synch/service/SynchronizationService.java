@@ -26,7 +26,7 @@ public class SynchronizationService {
         } catch (ConfigurationException ex) {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception configuration part.", ex);
         } catch (InterpreterException ex) {
-        	 throw new SynchronizationException("Unable to synchronize source code and diagrams because of the interpreter module.", ex);
-		}
+            throw new SynchronizationException("Unable to synchronize source code and diagrams because of the interpreter module.", ex);
+        }
     }
 }
