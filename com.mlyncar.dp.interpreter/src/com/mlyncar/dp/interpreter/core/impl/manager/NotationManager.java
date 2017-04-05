@@ -59,32 +59,16 @@ public class NotationManager {
         addLifeline(newLifeline);
     }
 
-    public void addMessageToNotation(Node nodeToAdd, Message newMessage, Message newReplyMessage, ActionExecutionSpecification actionSpecStart, ActionExecutionSpecification actionSpecEnd) {
+    public void addMessageToNotation(Node nodeToAdd, Message newMessage, Message newReplyMessage, ActionExecutionSpecification actionSpecStart, ActionExecutionSpecification actionSpecEnd) throws InterpreterException {
         View sourceLifelineView = getLifelineView(nodeToAdd.getParentNode().getName());
         View targetLifelineView = getLifelineView(nodeToAdd.getName());
-
+        Bounds location1 = createExecBounds(nodeToAdd, false);
+        Bounds location2 = createExecBounds(nodeToAdd, true);
+        int moveReferenceY = location1.getY()-10;
+        logger.debug("Y location of {} is {}", nodeToAdd.getCreateEdge().getName(), moveReferenceY);
+        moveActionSpecs(moveReferenceY, location1.getHeight() + 10);
         org.eclipse.gmf.runtime.notation.Node executionViewInit = addActionExecution(sourceLifelineView, actionSpecStart);
         org.eclipse.gmf.runtime.notation.Node executionViewEnd = addActionExecution(targetLifelineView, actionSpecEnd);
-
-        Bounds location1 = NotationFactory.eINSTANCE.createBounds();
-        Integer xPositionStart = getActionExecutionPositionX(nodeToAdd.getParentNode());
-        Integer xPositionEnd = getActionExecutionPositionX(nodeToAdd);
-        
-        location1.setX(xPositionStart);
-        location1.setHeight(30);
-        location1.setY(calculateMessagePossition(nodeToAdd));
-
-        Bounds location2 = NotationFactory.eINSTANCE.createBounds();     
-        location2.setHeight(30);
-        if(nodeToAdd.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
-            location2.setX(xPositionEnd + 5);
-            location2.setY(calculateMessagePossition(nodeToAdd)+5);
-            location2.setHeight(20);
-        } else {
-            location2.setX(xPositionEnd);
-            location2.setY(calculateMessagePossition(nodeToAdd));
-            location2.setHeight(30);
-        }       
 
         executionViewInit.setLayoutConstraint(location1);
         executionViewEnd.setLayoutConstraint(location2);
@@ -93,6 +77,77 @@ public class NotationManager {
         addMessage(newReplyMessage, executionViewEnd, executionViewInit, true);
     }
 
+    private void moveActionSpecs(int moveReference, int newHeight) {
+    	View lifelineCompartment = (View) getLifelineCompartment();
+    	for(Object lifelineObj : lifelineCompartment.getChildren()) {
+    		View lifelineView = (View) lifelineObj;
+    		for(Object lifelineComponentObj : lifelineView.getChildren()) {
+    			org.eclipse.gmf.runtime.notation.Node lifelineComponent = (org.eclipse.gmf.runtime.notation.Node) lifelineComponentObj;
+    			
+    			if(lifelineComponent.getElement() instanceof ActionExecutionSpecification) {
+    				ActionExecutionSpecification spec = (ActionExecutionSpecification) lifelineComponent.getElement();
+    				Bounds bounds = (Bounds) lifelineComponent.getLayoutConstraint();
+    				logger.debug("Checking if {} is below.", spec.getName());
+    				if(bounds.getY() > moveReference) {
+    					logger.debug("{} is below, new Y: {} ",spec.getName(), bounds.getY() + newHeight);
+    					bounds.setY(bounds.getY() + newHeight);
+    				}
+    			}
+    		}
+    	}
+    }
+    
+    private Bounds createExecBounds(Node newValue, boolean isEnd) throws InterpreterException {
+    	boolean hasParent = newValue.getParentNode() != null;
+    	boolean hasSibling = newValue.getLeftSibling() != null;
+    	
+ 		Bounds bounds = NotationFactory.eINSTANCE.createBounds();
+ 		bounds.setX(getActionExecutionPositionX(newValue, isEnd, hasSibling));
+
+ 		if(!hasSibling && !hasParent) {
+     		bounds.setY(30);
+ 			bounds.setHeight(50);
+     		return bounds;
+     	} 
+     	if(hasSibling) {
+     		Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
+     		bounds.setY(siblingBounds.getY() + siblingBounds.getHeight() + 30);
+     	} else {
+     		Bounds parentBounds = getNodeExecutionOccurrenceStartBounds(newValue.getParentNode());
+     		bounds.setY(parentBounds.getY() + 30);
+     	}
+ 		if(isEnd) {
+ 			bounds.setHeight(40);
+ 			bounds.setY(bounds.getY() + 5);
+ 		} else {
+ 			bounds.setHeight(50);
+ 		}
+     	return bounds;
+    }
+    
+    private Integer getActionExecutionPositionX(Node newValue, boolean isEnd, boolean hasSibling) throws InterpreterException {
+        if(hasSibling && isEnd) {
+    		if(newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
+            	Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
+        		return siblingBounds.getX() + 7;
+    		}
+        	Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
+        	return siblingBounds.getX();
+    	}
+        View lifelineView;
+        if(isEnd) {
+        	lifelineView = getLifelineView(newValue.getName());
+        } else {
+            lifelineView = getLifelineView(newValue.getParentNode().getName());
+        }
+        org.eclipse.gmf.runtime.notation.Node node = (org.eclipse.gmf.runtime.notation.Node) lifelineView;
+        Bounds bounds = (Bounds) node.getLayoutConstraint();
+        if(newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && isEnd) {
+            return bounds.getWidth()/2 + 2;
+        }
+        return bounds.getWidth()/2 - 8;
+    }
+    
     public void removeLifelineFromNotation(Node nodeToRemove) throws InterpreterException {
         View lifelineCompartment = (View) getLifelineCompartment();
         View lifelineToRemove = null;
@@ -221,7 +276,7 @@ public class NotationManager {
         Bounds location = NotationFactory.eINSTANCE.createBounds();
         location.setX(newLifelinePositionX);
         location.setY(10);
-        location.setHeight(650);
+        location.setHeight(1250);
         location.setWidth(78);
         lifelineView.setLayoutConstraint(location);
         return lifelineView;
@@ -233,57 +288,30 @@ public class NotationManager {
         return executionView;
     }
 
-    private Integer calculateMessagePossition(Node newValue) {
-        if (newValue.getLeftSibling() == null) {
-            logger.debug("Sibling not found, finding position of parent");
-            return calculateMessagePositionBasedOnPrevious(newValue, false);
-        }
-        return calculateMessagePositionBasedOnPrevious(newValue, true);
+    private Bounds getNodeExecutionOccurrenceStartBounds(Node refNode) throws InterpreterException {
+    	 View lifelineView = getLifelineView(refNode.getParentNode().getName());
+         for (Object viewObj : lifelineView.getChildren()) {
+             View view = (View) viewObj;
+             if (view.getElement() != null && view.getElement() instanceof ActionExecutionSpecification) {
+                 ActionExecutionSpecification specification = (ActionExecutionSpecification) view.getElement();
+                 if (specification.getStart() instanceof MessageOccurrenceSpecification) {
+                     logger.debug("Checking msg occurence for sibling execution " + specification.getStart().getName());
+                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
+                     logger.debug("Message name " + messageName);
+                     if (messageName.equals(refNode.getCreateEdge().getName())) {
+                         return (Bounds) ((org.eclipse.gmf.runtime.notation.Node) viewObj).getLayoutConstraint();
+                     }
+                 }
+             }
+         }       
+         throw new InterpreterException("Unablet o locate sibling action occurrence specification bounds of message " + refNode.getCreateEdge().getName());
     }
-    
-    private Integer calculateMessagePositionBasedOnPrevious(Node newValue, boolean sibling) {
-    	Node referenceNode;
-    	if(sibling) {
-    		referenceNode = newValue.getLeftSibling();
-    	} else {
-    		referenceNode = newValue.getParentNode();
-    	}
-        View lifelineView = getLifelineView(referenceNode.getParentNode().getName());
-        logger.debug("Parent/Sibling position to found: {}", newValue.getParentNode().getCreateEdge().getName());
-        for (Object viewObj : lifelineView.getChildren()) {
-            View view = (View) viewObj;
-            if (view.getElement() != null && view.getElement() instanceof ActionExecutionSpecification) {
-                ActionExecutionSpecification specification = (ActionExecutionSpecification) view.getElement();
-                if (specification.getStart() instanceof MessageOccurrenceSpecification) {
-                    logger.debug("Checking msg occurence for sibling execution " + specification.getStart().getName());
-                    String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
-                    logger.debug("Message name " + messageName);
-                    if (messageName.equals(referenceNode.getCreateEdge().getName())) {
-                        org.eclipse.gmf.runtime.notation.Node node = (org.eclipse.gmf.runtime.notation.Node) viewObj;
-                        Bounds bound = (Bounds) node.getLayoutConstraint();
-                        logger.debug("Sibling found, calculated following Y value " + (bound.getY() + bound.getHeight() + 10));
-                        if(sibling) {
-                            return bound.getY() + bound.getHeight() + 10;
-                        } else {
-                        	return bound.getY() + 10;
-                        }
-                    }
-                }
-            }
-        }
-    	return 30;
-    }
+   
     private Integer calculateLifelinePosition() {
     	View lifelineCompartment = (View) getLifelineCompartment();
     	org.eclipse.gmf.runtime.notation.Node lastLifeline = (org.eclipse.gmf.runtime.notation.Node) lifelineCompartment.getChildren().get(lifelineCompartment.getChildren().size() - 1);
     	Bounds bounds = (Bounds) lastLifeline.getLayoutConstraint();
     	return bounds.getX() + 150;
     }
-    
-    private Integer getActionExecutionPositionX(Node newValue) {
-        View lifelineView = getLifelineView(newValue.getName());
-        org.eclipse.gmf.runtime.notation.Node node = (org.eclipse.gmf.runtime.notation.Node) lifelineView;
-        Bounds bounds = (Bounds) node.getLayoutConstraint();
-        return bounds.getWidth()/2 - 8;
-    }
+
 }
