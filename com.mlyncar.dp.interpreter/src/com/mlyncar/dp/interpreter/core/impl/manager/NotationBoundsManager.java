@@ -8,6 +8,7 @@ import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mlyncar.dp.interpreter.exception.ExecSpecNotFoundException;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Node;
@@ -30,13 +31,17 @@ public class NotationBoundsManager {
 
     public void adjustParentExecSpecs(Node nodeToAdjust, int newHeight) throws InterpreterException {
         while (nodeToAdjust.getParentNode() != null) {
-            Bounds boundsStart = getNodeExecutionOccurrenceStartBounds(nodeToAdjust);
-            //Bounds boundsEnd = getNodeExecutionOccurrenceEndBounds(nodeToAdjust);
-            if (boundsStart == null) { // || boundsEnd == null) {
-                return;
-            }
-            boundsStart.setHeight(boundsStart.getHeight() + newHeight);
-            //boundsEnd.setHeight(boundsEnd.getHeight() + newHeight);
+			try {
+	            Bounds boundsStart = getNodeExecutionOccurrenceStartBounds(nodeToAdjust);
+				Bounds boundsEnd = getNodeExecutionOccurrenceEndBounds(nodeToAdjust);
+	            if (boundsStart == null || boundsEnd == null) {
+	                return;
+	            }
+	            boundsStart.setHeight(boundsStart.getHeight() + newHeight);
+	            boundsEnd.setHeight(boundsEnd.getHeight() + newHeight);
+			} catch (ExecSpecNotFoundException e) {
+				logger.debug("Error in adjusting exec specs: " + e.getMessage());
+			}
             nodeToAdjust = nodeToAdjust.getParentNode();
         }
     }
@@ -97,7 +102,7 @@ public class NotationBoundsManager {
         return (Bounds) node.getLayoutConstraint();
     }
 
-    private Bounds getNodeExecutionOccurrenceEndBounds(Node refNode) throws InterpreterException {
+    private Bounds getNodeExecutionOccurrenceEndBounds(Node refNode) throws InterpreterException, ExecSpecNotFoundException {
         org.eclipse.gmf.runtime.notation.Node node = getNodeExecutionNotationEnd(refNode);
         if (node == null) {
             return null;
@@ -105,11 +110,13 @@ public class NotationBoundsManager {
         return (Bounds) node.getLayoutConstraint();
     }
 
-    private org.eclipse.gmf.runtime.notation.Node getNodeExecutionNotationEnd(Node node) throws InterpreterException {
+    private org.eclipse.gmf.runtime.notation.Node getNodeExecutionNotationEnd(Node node) throws ExecSpecNotFoundException, InterpreterException {
         View lifelineView = notationManager.getLifelineView(node.getName());
         if (lifelineView == null) {
             return null;
         }
+        logger.debug("Exec spec message to found: {}, on lifeline {} ", node.getCreateEdge().getName(), node.getName());
+        boolean firstSelfFound = false;
         for (Object viewObj : lifelineView.getChildren()) {
             View view = (View) viewObj;
             if (view.getElement() != null && view.getElement() instanceof ActionExecutionSpecification) {
@@ -119,12 +126,16 @@ public class NotationBoundsManager {
                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
                     logger.debug("Message name " + messageName);
                     if (messageName.equals(node.getCreateEdge().getName())) {
+                    	if(node.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && !firstSelfFound) {
+                    		firstSelfFound = true;
+                    		continue;
+                    	}
                         return (org.eclipse.gmf.runtime.notation.Node) viewObj;
                     }
                 }
             }
         }
-        throw new InterpreterException("Unable to locate sibling action occurrence specification bounds of message " + node.getCreateEdge().getName());
+        throw new ExecSpecNotFoundException("Unable to locate sibling action occurrence specification bounds of message " + node.getCreateEdge().getName());
     }
 
     private org.eclipse.gmf.runtime.notation.Node getNodeExecutionNotationStart(Node node) throws InterpreterException {
