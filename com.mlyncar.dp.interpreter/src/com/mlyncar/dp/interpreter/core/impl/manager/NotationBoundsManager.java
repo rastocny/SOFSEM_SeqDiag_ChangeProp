@@ -122,14 +122,13 @@ public class NotationBoundsManager {
             if (view.getElement() != null && view.getElement() instanceof ActionExecutionSpecification) {
                 ActionExecutionSpecification specification = (ActionExecutionSpecification) view.getElement();
                 if (specification.getStart() instanceof MessageOccurrenceSpecification) {
-                    logger.debug("Checking msg occurence for sibling execution " + specification.getStart().getName());
                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
-                    logger.debug("Message name " + messageName);
                     if (messageName.equals(node.getCreateEdge().getName())) {
                     	if(node.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && !firstSelfFound) {
                     		firstSelfFound = true;
                     		continue;
                     	}
+                    	logger.debug("Found spec {}", specification.getName());
                         return (org.eclipse.gmf.runtime.notation.Node) viewObj;
                     }
                 }
@@ -148,10 +147,9 @@ public class NotationBoundsManager {
             if (view.getElement() != null && view.getElement() instanceof ActionExecutionSpecification) {
                 ActionExecutionSpecification specification = (ActionExecutionSpecification) view.getElement();
                 if (specification.getStart() instanceof MessageOccurrenceSpecification) {
-                    logger.debug("Checking msg occurence for sibling execution " + specification.getStart().getName());
                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
-                    logger.debug("Message name " + messageName);
                     if (messageName.equals(node.getCreateEdge().getName())) {
+                    	logger.debug("Found spec {}", specification.getName());
                         return (org.eclipse.gmf.runtime.notation.Node) viewObj;
                     }
                 }

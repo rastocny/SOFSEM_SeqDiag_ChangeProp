@@ -23,8 +23,8 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_ADD);
         change.setNewValue(node);
-        if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
-            logger.debug("Message add also contains lifeline add change, creating one.");
+        if (shouldAddLifeline(additionalNodes, node.getName(), node.getId())) {
+            logger.debug("Message add {} also contains lifeline add change, creating lifeline add of {}.", node.getCreateEdge().getName(), node.getName());
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
@@ -35,10 +35,12 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
     @Override
     public List<Change> createMessageRemovalChange(Node node, List<LeveledNode> additionalNodes) {
-        List<Change> changes = new ArrayList<>();
+        logger.debug("Creating message remove instance of change " + node.getCreateEdge().getName());
+    	List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_REMOVE);
         change.setNewValue(node);
-        if (!isLifelinePresent(additionalNodes, node.getName(), node.getId())) {
+        if (shouldRemoveLifeline(additionalNodes, node.getName(), node.getId())) {
+            logger.debug("Message remove {} also contains lifeline remove change, creating lifeline remove of {}.", node.getCreateEdge().getName(), node.getName());
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_REMOVE);
             lifelineChange.setNewValue(node);
             changes.add(lifelineChange);
@@ -49,16 +51,19 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
     @Override
     public List<Change> createMessageModifyChange(Node newValue, Node oldValue, List<LeveledNode> additionalOldNodes, List<LeveledNode> addiditonalNewNodes) {
+        logger.debug("Creating message modify instance of change " + newValue.getCreateEdge().getName());
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(newValue.getId(), ChangeType.MESSAGE_MODIFY);
         change.setNewValue(newValue);
         change.setOldValue(oldValue);
-        if (!isLifelinePresent(addiditonalNewNodes, newValue.getName(), newValue.getId())) {
+        if (shouldAddLifeline(additionalOldNodes, newValue.getName(), newValue.getId())) {
+            logger.debug("Message modify {} also contains lifeline add change, creating lifeline add of {}.", newValue.getCreateEdge().getName(), newValue.getName());
             Change lifelineChange = new ChangeImpl(newValue.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(newValue);
             changes.add(lifelineChange);
         }
-        if (!isLifelinePresent(additionalOldNodes, oldValue.getName(), oldValue.getId())) {
+        if (shouldRemoveLifeline(addiditonalNewNodes, oldValue.getName(), oldValue.getId())) {
+            logger.debug("Message modify {} also contains lifeline remove change, creating lifeline remove of {}.", newValue.getCreateEdge().getName(), newValue.getName());
             Change lifelineChange = new ChangeImpl(oldValue.getId(), ChangeType.LIFELINE_REMOVE);
             lifelineChange.setNewValue(oldValue);
             changes.add(lifelineChange);
@@ -67,21 +72,30 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         return changes;
     }
 
-    private boolean isLifelinePresent(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
-        boolean found = false;
-        boolean shouldCheck = false;
+    private boolean shouldAddLifeline(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
         for (LeveledNode node : leveledNodes) {
             if (node.getNode().getId().equals(comparedLifelineId)) {
-                shouldCheck = true;
-                continue;
+            	return true;
             }
-            if (!shouldCheck) {
-                continue;
-            }
-            if (node.getNode().getName().equals(lifelineName) && node.getNode().getId() != comparedLifelineId) {
-                found = true;
+            if (node.getNode().getName().equals(lifelineName)) {
+                return false;
             }
         }
-        return found;
+        return true;
+    }
+    
+    private boolean shouldRemoveLifeline(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
+    	logger.debug("Checking for removal of {} ", lifelineName);
+        for (LeveledNode node : leveledNodes) {
+            if (node.getNode().getName().equals(lifelineName) && !node.getNode().getId().equals(comparedLifelineId)) {
+            	if(node.getNode().getCreateEdge() == null) {
+            		logger.debug("Lifeline not removed, still attached with root");
+            	} else {
+            		logger.debug("Lifeline not removed, still attached with message {}", node.getNode().getCreateEdge().getName());	
+            	}
+            	return false;
+            }
+        }
+        return true;
     }
 }
