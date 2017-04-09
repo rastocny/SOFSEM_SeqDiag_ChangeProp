@@ -19,12 +19,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Interaction;
+import org.eclipse.uml2.uml.InteractionFragment;
+import org.eclipse.uml2.uml.InteractionOperand;
+import org.eclipse.uml2.uml.LiteralString;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.eclipse.uml2.uml.MessageSort;
 import org.eclipse.uml2.uml.UMLPackage;
@@ -32,13 +37,17 @@ import org.eclipse.uml2.uml.resource.UMLResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mlyncar.dp.analyzer.entity.CombFragment;
+import com.mlyncar.dp.analyzer.entity.CombFragmentType;
 import com.mlyncar.dp.analyzer.entity.Message;
 import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
+import com.mlyncar.dp.analyzer.entity.impl.CombFragmentImpl;
 import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
 import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
 import com.mlyncar.dp.analyzer.entity.impl.SeqDiagramImpl;
 import com.mlyncar.dp.analyzer.exception.AnalyzerException;
+import com.mlyncar.dp.analyzer.exception.CombFragmentException;
 import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
 import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
 import com.mlyncar.dp.analyzer.test.TestHelper;
@@ -60,7 +69,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     }
 
     @Override
-    public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException {
+    public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException, AnalyzerException {
         this.resource = loadUmlModelResource(pathToDiagram);
         this.notationResource = loadNotationModelResource(pathToDiagram);
         Interaction interaction = findInteraction(diagramName);
@@ -70,7 +79,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     }
 
     @Override
-    public List<SeqDiagram> analyzeUmlModel(String pathToModel) {
+    public List<SeqDiagram> analyzeUmlModel(String pathToModel) throws AnalyzerException {
         this.resource = loadUmlModelResource(pathToModel);
         this.notationResource = loadNotationModelResource(pathToModel);
         List<SeqDiagram> diagrams = new ArrayList<>();
@@ -109,15 +118,18 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
         throw new InteractionNotFoundException("Interaction with name " + interactionName + " not found.");
     }
 
-    private SeqDiagram analyzeInteraction(Interaction interaction) {
+    private SeqDiagram analyzeInteraction(Interaction interaction) throws AnalyzerException {
         SeqDiagram diagram = new SeqDiagramImpl();
         diagram.setInteraction(interaction);
         diagram.setInteractionResourceHolder(resource);
         diagram.setNotationResource(notationResource);
-        Iterator<EObject> objects = interaction.eAllContents();
+        analyzeFragmentSet(interaction.getFragments(), diagram, new ArrayList<>());
+        return diagram;
+    }
+    
+    private void analyzeFragmentSet(EList<InteractionFragment> eList, SeqDiagram diagram, List<CombFragment> fragments) throws AnalyzerException {
         Integer counter = 0;
-        while (objects.hasNext()) {
-            EObject object = objects.next();
+        for(EObject object : eList) {
             if (object instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification occurrence = (MessageOccurrenceSpecification) object;
                 if (occurrence.getName().contains("Send") || occurrence.getName().contains("Start")) {
@@ -135,20 +147,36 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
                         }
                         Message message = new MessageImpl(counter++, type, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurrence.getCovered().getName()), null);
+                                new LifelineImpl(occurrence.getCovered().getName()), fragments);
                         logger.debug("Creating synch/self message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
                         diagram.addMessage(message);
                     } else if (occurrence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
                         Message message = new MessageImpl(counter++, MessageType.RETURN, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurrence.getCovered().getName()), null);
+                                new LifelineImpl(occurrence.getCovered().getName()), fragments);
                         logger.debug("Creating ret message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
                         diagram.addMessage(message);
                     }
                 }
+            } else if(object instanceof CombinedFragment) {
+            	CombinedFragment umlCombFragment = (CombinedFragment) object;
+            	umlCombFragment.getInteractionOperator().getName();
+            	InteractionOperand operand = umlCombFragment.getOperands().get(0);
+            	String guardValue = "";
+            	if(operand.getGuard().getSpecification() instanceof LiteralString) {
+            		guardValue = ((LiteralString) operand.getGuard().getSpecification()).getValue();
+            	}
+            	logger.debug("Operand guard: {}", guardValue);
+            	try {
+					CombFragment fragment = new CombFragmentImpl(guardValue, CombFragmentType.fromCode(umlCombFragment.getInteractionOperator().getName()));
+					List<CombFragment> newFragmentList = new ArrayList<CombFragment>(fragments);
+					newFragmentList.add(fragment);
+					analyzeFragmentSet(operand.getFragments(), diagram, newFragmentList);
+				} catch (CombFragmentException e) {
+					throw new AnalyzerException("Unable to process seq diagram analysis, combined fragment cannot be created.", e);
+				}
             }
         }
-        return diagram;
     }
 
     private Resource loadUmlModelResource(String pathToModel) {

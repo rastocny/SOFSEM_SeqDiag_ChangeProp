@@ -27,9 +27,9 @@ import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
  */
 public interface UmlAnalyzer {
 
-    public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException;
+    public SeqDiagram analyzeSequenceDiagram(String pathToDiagram, String diagramName) throws InteractionNotFoundException, AnalyzerException;
 
-    public List<SeqDiagram> analyzeUmlModel(String pathToModel);
+    public List<SeqDiagram> analyzeUmlModel(String pathToModel) throws AnalyzerException;
 
     public List<SeqDiagram> analyzeUmlModel() throws AnalyzerException;
 
