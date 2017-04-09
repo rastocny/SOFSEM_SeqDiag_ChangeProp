@@ -34,11 +34,11 @@ public interface Node {
 
     public void removeChildNode(String id);
 
-    public List<CombinedFragment> combinedFragments();
+    public List<NodeCombinedFragment> combinedFragments();
 
-    public void addCombinedFragment(CombinedFragment combinedFragment);
+    public void addCombinedFragment(NodeCombinedFragment combinedFragment);
 
-    public void removeCombinedFragment(CombinedFragment combinedFragment);
+    public void removeCombinedFragment(NodeCombinedFragment combinedFragment);
 
     public boolean isLeaf();
 

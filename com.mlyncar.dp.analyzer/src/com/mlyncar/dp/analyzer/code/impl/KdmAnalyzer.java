@@ -110,7 +110,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
     }
 
     private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method, String currentVariableName, int statementPosition, List<CombFragment> fragments) throws SourceCodeAnalyzerException {
-        List<CombFragment> originalStateFragments = new ArrayList<CombFragment>(fragments);
+       // List<CombFragment> originalStateFragments = new ArrayList<CombFragment>(fragments);
     	if (codeElement instanceof ActionElement) {
             ActionElement actionElement = (ActionElement) codeElement;
             int statementIndex = 0;
@@ -131,19 +131,20 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                                 type = MessageType.SELF;
                                 variableName = currentVariableName;
                             }
+                            List<CombFragment> newFragments = new ArrayList<CombFragment>(fragments);//fragments.addAll(output.getFragments());
+                            newFragments.addAll(output.getFragments());
+                            
                             String newPackage = getClassPackage(newMethod.eContainer());
                             String thisPackage = getClassPackage(method.eContainer());
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
                                     new LifelineImpl(variableName + newMethodClassName, newPackage),
-                                    new LifelineImpl(currentVariableName + methodClassName, thisPackage), fragments));
+                                    new LifelineImpl(currentVariableName + methodClassName, thisPackage), newFragments));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
-                            
-                            fragments.addAll(output.getFragments());
-                            analyzeMethodUnit(diagram, newMethod, variableName, fragments);
+                          
+                            analyzeMethodUnit(diagram, newMethod, variableName, newFragments);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
                                     new LifelineImpl(currentVariableName + methodClassName, thisPackage),
-                                    new LifelineImpl(variableName + newMethodClassName, newPackage), fragments));
-                            fragments = originalStateFragments;
+                                    new LifelineImpl(variableName + newMethodClassName, newPackage), newFragments));
                         }
                     }
                 } else if (innerBlockElement.getName() != null && innerBlockElement.getName().equals("class instance creation")) {
@@ -155,15 +156,16 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             String variableName = getInstanceVariableName(actionElement);
                             String newPackage = getClassPackage(newMethod.eContainer());
                             String thisPackage = getClassPackage(method.eContainer());
+                            List<CombFragment> newFragments = new ArrayList<CombFragment>(fragments);
+                            
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
                                     new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage),
-                                    new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage), null));
+                                    new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage), newFragments));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
-                            analyzeMethodUnit(diagram, newMethod, variableName, fragments);
+                            analyzeMethodUnit(diagram, newMethod, variableName, newFragments);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
                                     new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage),
-                                    new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage), null));
-                            fragments = originalStateFragments;
+                                    new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage), newFragments));
                         }
                     }
                 } else {

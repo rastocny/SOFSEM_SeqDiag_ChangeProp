@@ -1,8 +1,11 @@
 package com.mlyncar.dp.transformer.core.impl;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mlyncar.dp.analyzer.entity.CombFragment;
 import com.mlyncar.dp.analyzer.entity.Message;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 import com.mlyncar.dp.transformer.core.TransformationEngine;
@@ -11,6 +14,7 @@ import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.Node;
 import com.mlyncar.dp.transformer.entity.impl.EdgeImpl;
+import com.mlyncar.dp.transformer.entity.impl.NodeCombinedFragmentImpl;
 import com.mlyncar.dp.transformer.entity.impl.NodeImpl;
 import com.mlyncar.dp.transformer.entity.impl.TreeGraph;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
@@ -41,6 +45,7 @@ public class TransformationEngineImpl implements TransformationEngine {
             if (lastInsertedNode.getParentNode() == null) {
                 logger.debug("Adding node to root node");
                 Node node = new NodeImpl(edge, lastInsertedNode, message.getTargetLifeline().getName(), message.getTargetLifeline().getPackageName());
+                fillNodeWithFragments(node, message.getCombFragments());
                 lastInsertedNode.addChildNode(node);
                 return node;
             }
@@ -52,6 +57,7 @@ public class TransformationEngineImpl implements TransformationEngine {
             	}
             	
                 Node node = new NodeImpl(edge, lastInsertedNode, message.getTargetLifeline().getName(), message.getTargetLifeline().getPackageName());
+                fillNodeWithFragments(node, message.getCombFragments());
                 lastInsertedNode.addChildNode(node);
                 logger.debug("Found place for node " + node.getName() + " with message " + node.getCreateEdge().getName());
                 logger.debug("Node inserted to " + lastInsertedNode.getName());
@@ -77,6 +83,12 @@ public class TransformationEngineImpl implements TransformationEngine {
     		}
     	}
     	return false;
+    }
+    
+    private void fillNodeWithFragments(Node node, List<CombFragment> fragments) throws GraphTransformationException {
+    	for(CombFragment fragment : fragments) {
+    		node.addCombinedFragment(new NodeCombinedFragmentImpl(fragment));
+    	}
     }
 
 }

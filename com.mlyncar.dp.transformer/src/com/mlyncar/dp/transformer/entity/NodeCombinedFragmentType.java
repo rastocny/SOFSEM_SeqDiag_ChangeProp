@@ -6,17 +6,17 @@ import com.mlyncar.dp.transformer.exception.CombinedFragmentTypeException;
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
-public enum CombinedFragmentType {
+public enum NodeCombinedFragmentType {
 
-    ALT("alternative"),
-    OPT("option"),
+    ALT("alt"),
+    OPT("opt"),
     LOOP("loop"),
     BREAK("break"),
-    PAR("parallel");
+    PAR("par");
 
     private final String code;
 
-    private CombinedFragmentType(String code) {
+    private NodeCombinedFragmentType(String code) {
         this.code = code;
     }
 
@@ -24,8 +24,8 @@ public enum CombinedFragmentType {
         return this.code;
     }
 
-    public static CombinedFragmentType fromCode(String code) throws CombinedFragmentTypeException {
-        for (CombinedFragmentType type : CombinedFragmentType.values()) {
+    public static NodeCombinedFragmentType fromCode(String code) throws CombinedFragmentTypeException {
+        for (NodeCombinedFragmentType type : NodeCombinedFragmentType.values()) {
             if (type.getCode().equals(code)) {
                 return type;
             }

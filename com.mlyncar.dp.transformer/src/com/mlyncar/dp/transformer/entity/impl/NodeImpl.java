@@ -1,6 +1,6 @@
 package com.mlyncar.dp.transformer.entity.impl;
 
-import com.mlyncar.dp.transformer.entity.CombinedFragment;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Node;
 
@@ -24,7 +24,7 @@ public class NodeImpl implements Node {
     private Node parentNode;
     private Edge createEdge;
     private String id;
-    private final List<CombinedFragment> combinedFragments = new ArrayList<>();
+    private final List<NodeCombinedFragment> combinedFragments = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
     private final String packageName;
 
@@ -111,17 +111,17 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public void addCombinedFragment(CombinedFragment combinedFragment) {
+    public void addCombinedFragment(NodeCombinedFragment combinedFragment) {
         this.combinedFragments.add(combinedFragment);
     }
 
     @Override
-    public void removeCombinedFragment(CombinedFragment combinedFragment) {
+    public void removeCombinedFragment(NodeCombinedFragment combinedFragment) {
         this.combinedFragments.remove(combinedFragment);
     }
 
     @Override
-    public List<CombinedFragment> combinedFragments() {
+    public List<NodeCombinedFragment> combinedFragments() {
         return this.combinedFragments;
     }
 
