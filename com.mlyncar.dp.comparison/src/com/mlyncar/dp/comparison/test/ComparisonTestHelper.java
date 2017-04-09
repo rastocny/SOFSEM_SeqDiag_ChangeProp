@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.comparison.entity.ChangeLog;
+import com.mlyncar.dp.comparison.entity.ChangeType;
 
 public class ComparisonTestHelper {
 
@@ -13,7 +14,11 @@ public class ComparisonTestHelper {
     public static void printChanges(ChangeLog log) {
         logger.debug("List of found changes:");
         for (Change change : log.changes()) {
-            logger.debug(change.getChangeType().getCode() + ":" + change.getNewValue().getName());
+            if (change.getChangeType().equals(ChangeType.MESSAGE_ADD)) {
+                logger.debug(change.getChangeType().getCode() + ":" + change.getNewValue().getName() + ":" + change.getNewValue().getCreateEdge().getName());
+            } else {
+                logger.debug(change.getChangeType().getCode() + ":" + change.getNewValue().getName());
+            }
         }
     }
 }

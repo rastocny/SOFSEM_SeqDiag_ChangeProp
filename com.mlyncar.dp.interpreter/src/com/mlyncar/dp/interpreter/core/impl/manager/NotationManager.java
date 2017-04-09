@@ -189,6 +189,7 @@ public class NotationManager {
 
     View getLifelineView(String lifelineName) throws InterpreterException {
         View compartment = (View) getLifelineCompartment();
+        logger.debug("Lifeline view to get: {}", lifelineName);
         for (Object obj : compartment.getChildren()) {
             View view = (View) obj;
             if (((Lifeline) view.getElement()).getName().equals(lifelineName)) {

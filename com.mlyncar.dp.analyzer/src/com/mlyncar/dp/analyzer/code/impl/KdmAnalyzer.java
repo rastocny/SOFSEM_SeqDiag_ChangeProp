@@ -25,9 +25,11 @@ import org.eclipse.gmt.modisco.omg.kdm.action.ActionElement;
 import org.eclipse.gmt.modisco.omg.kdm.action.BlockUnit;
 import org.eclipse.gmt.modisco.omg.kdm.action.Calls;
 import org.eclipse.gmt.modisco.omg.kdm.code.AbstractCodeElement;
+import org.eclipse.gmt.modisco.omg.kdm.code.Package;
 import org.eclipse.gmt.modisco.omg.kdm.code.ClassUnit;
 import org.eclipse.gmt.modisco.omg.kdm.code.InterfaceUnit;
 import org.eclipse.gmt.modisco.omg.kdm.code.MethodUnit;
+import org.eclipse.gmt.modisco.omg.kdm.code.StorableUnit;
 import org.eclipse.modisco.infra.discovery.core.exception.DiscoveryException;
 import org.eclipse.modisco.java.discoverer.DiscoverKDMModelFromJavaProject;
 import org.slf4j.Logger;
@@ -67,7 +69,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
             Resource kdmResource = discoverer.getTargetModel();
             SeqDiagram diagram = new SeqDiagramImpl();
             MethodUnit mainMethod = findMainMethod(kdmResource, diagram);
-            analyzeMethodUnit(diagram, mainMethod);
+            analyzeMethodUnit(diagram, mainMethod, "main:");
             TestHelper.validateDiagram(diagram);
             return diagram;
         } catch (DiscoveryException | MainMethodNotFoundException ex) {
@@ -85,7 +87,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                 if (methodUnit.getName().equals("main")) {
                     ClassUnit classUnit = (ClassUnit) methodUnit.eContainer();
                     Lifeline actorLifeline = new LifelineImpl("Actor");
-                    Lifeline lifeline = new LifelineImpl(classUnit.getName());
+                    Lifeline lifeline = new LifelineImpl("main:" + classUnit.getName());
                     Message startMessage = new MessageImpl(0, MessageType.SYNCH, "main", lifeline, actorLifeline);
                     diagram.addMessage(startMessage);
                     return methodUnit;
@@ -95,63 +97,87 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
         throw new MainMethodNotFoundException("Unable to find main method in KDM structure");
     }
 
-    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method) throws SourceCodeAnalyzerException {
+    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method, String variableName) throws SourceCodeAnalyzerException {
+        int statementIndex = 0;
         for (AbstractCodeElement element : method.getCodeElement()) {
-            analyzeCodeElement(element, diagram, method);
+            statementIndex++;
+            analyzeCodeElement(element, diagram, method, variableName, statementIndex);
         }
     }
 
-    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method) throws SourceCodeAnalyzerException {
+    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method, String currentVariableName, int statementPosition) throws SourceCodeAnalyzerException {
         if (codeElement instanceof ActionElement) {
             ActionElement actionElement = (ActionElement) codeElement;
+            int statementIndex = 0;
             for (AbstractCodeElement innerBlockElement : actionElement.getCodeElement()) {
+                statementIndex++;
                 if (innerBlockElement.getName() != null && innerBlockElement.getName().equals("method invocation")) {
                     for (EObject object : innerBlockElement.eContents()) {
+                        logger.debug("Method invocation element {}", object.toString());
                         if (object instanceof Calls) {
                             Calls call = (Calls) object;
                             MethodUnit newMethod = (MethodUnit) call.getTo();
                             String newMethodClassName = getMethodClassName(newMethod);
                             String methodClassName = getMethodClassName(method);
+                            String variableName = new JavaDiscoveryHelper().getMethodName(methodClassName, method.getName(), statementPosition);
                             MessageType type = MessageType.SYNCH;
                             if (newMethodClassName.equals(methodClassName)) {
                                 type = MessageType.SELF;
+                                variableName = currentVariableName;
                             }
-
+                            String newPackage = getClassPackage(newMethod.eContainer());
+                            String thisPackage = getClassPackage(method.eContainer());
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
-                                    new LifelineImpl(newMethodClassName),
-                                    new LifelineImpl(methodClassName)));
+                                    new LifelineImpl(variableName + newMethodClassName, newPackage),
+                                    new LifelineImpl(currentVariableName + methodClassName, thisPackage)));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
-                            analyzeMethodUnit(diagram, newMethod);
+                            analyzeMethodUnit(diagram, newMethod, variableName);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
-                                    new LifelineImpl(methodClassName),
-                                    new LifelineImpl(newMethodClassName)));
+                                    new LifelineImpl(currentVariableName + methodClassName, thisPackage),
+                                    new LifelineImpl(variableName + newMethodClassName, newPackage)));
                         }
                     }
                 } else if (innerBlockElement.getName() != null && innerBlockElement.getName().equals("class instance creation")) {
                     for (EObject object : innerBlockElement.eContents()) {
+                        logger.debug("Class invocation element {}", object.toString());
                         if (object instanceof Calls) {
                             Calls call = (Calls) object;
                             MethodUnit newMethod = (MethodUnit) call.getTo();
+                            String variableName = getInstanceVariableName(actionElement);
+                            String newPackage = getClassPackage(newMethod.eContainer());
+                            String thisPackage = getClassPackage(method.eContainer());
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
-                                    new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName()),
-                                    new LifelineImpl(((ClassUnit) method.eContainer()).getName())));
+                                    new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage),
+                                    new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage)));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
-                            analyzeMethodUnit(diagram, newMethod);
+                            analyzeMethodUnit(diagram, newMethod, variableName);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
-                                    new LifelineImpl(((ClassUnit) method.eContainer()).getName()),
-                                    new LifelineImpl(((ClassUnit) newMethod.eContainer()).getName())));
+                                    new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage),
+                                    new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage)));
                         }
                     }
                 } else {
-                    analyzeCodeElement(innerBlockElement, diagram, method);
+                    analyzeCodeElement(innerBlockElement, diagram, method, currentVariableName, statementIndex);
                 }
             }
         } else if (codeElement instanceof BlockUnit) {
             BlockUnit unit = (BlockUnit) codeElement;
+            int statementIndex = 0;
             for (AbstractCodeElement blockElement : unit.getCodeElement()) {
-                analyzeCodeElement(blockElement, diagram, method);
+                statementIndex++;
+                analyzeCodeElement(blockElement, diagram, method, currentVariableName, statementIndex);
             }
         }
+    }
+
+    private String getInstanceVariableName(ActionElement actionElement) {
+        for (AbstractCodeElement codeElement : actionElement.getCodeElement()) {
+            if (codeElement instanceof StorableUnit) {
+                StorableUnit storableUnit = (StorableUnit) codeElement;
+                return storableUnit.getName() + ":";
+            }
+        }
+        return "";
     }
 
     private String getMethodClassName(MethodUnit methodUnit) throws SourceCodeAnalyzerException {
@@ -161,6 +187,16 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
             return ((InterfaceUnit) methodUnit.eContainer()).getName();
         }
         throw new SourceCodeAnalyzerException("Unable to extract class name of method " + methodUnit.getName());
+    }
+
+    private String getClassPackage(EObject classUnit) {
+        String packageResult = "";
+        while (classUnit.eContainer() != null && classUnit.eContainer() instanceof Package) {
+            Package pckage = (Package) classUnit.eContainer();
+            packageResult = pckage.getName() + "." + packageResult;
+            classUnit = classUnit.eContainer();
+        }
+        return packageResult;
     }
 
 }

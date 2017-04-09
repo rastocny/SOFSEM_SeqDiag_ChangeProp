@@ -96,7 +96,6 @@ public class GraphComparatorImpl implements GraphComparator {
                     if (subNode.getLevel() != currentLevel) {
                         continue;
                     }
-                    logger.debug("Node relation comparison started");
                     switch (nodeRelationComparator.getNodeRelation(referenceNode.getNode(), subNode.getNode())) {
                         case EQUAL:
                             similarityFound = true;

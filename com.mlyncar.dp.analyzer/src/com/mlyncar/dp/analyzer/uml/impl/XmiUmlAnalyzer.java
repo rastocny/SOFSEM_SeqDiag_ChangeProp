@@ -32,6 +32,7 @@ import org.eclipse.uml2.uml.resource.UMLResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mlyncar.dp.analyzer.entity.Message;
 import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
@@ -127,17 +128,22 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
                     logger.debug("Analyzing message of occurrence {} and message {}", occurrence.getName(), occurrence.getMessage().getName());
                     MessageOccurrenceSpecification receiveOccurence = (MessageOccurrenceSpecification) occurrence.getMessage().getReceiveEvent();
                     if (occurrence.getMessage().getMessageSort().equals(MessageSort.SYNCH_CALL_LITERAL)) {
+
                         MessageType type = MessageType.SYNCH;
                         if (receiveOccurence.getCovered().getName().equals(occurrence.getCovered().getName())) {
                             type = MessageType.SELF;
                         }
-                        diagram.addMessage(new MessageImpl(counter++, type, occurrence.getMessage().getName(),
+                        Message message = new MessageImpl(counter++, type, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurrence.getCovered().getName())));
+                                new LifelineImpl(occurrence.getCovered().getName()));
+                        logger.debug("Creating synch/self message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
+                        diagram.addMessage(message);
                     } else if (occurrence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
-                        diagram.addMessage(new MessageImpl(counter++, MessageType.RETURN, occurrence.getMessage().getName(),
+                        Message message = new MessageImpl(counter++, MessageType.RETURN, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurrence.getCovered().getName())));
+                                new LifelineImpl(occurrence.getCovered().getName()));
+                        logger.debug("Creating ret message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
+                        diagram.addMessage(message);
                     }
                 }
             }

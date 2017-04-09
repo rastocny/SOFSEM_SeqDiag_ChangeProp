@@ -24,9 +24,15 @@ import com.mlyncar.dp.analyzer.entity.Lifeline;
 public class LifelineImpl implements Lifeline {
 
     private String name;
+    private String packageName;
 
     public LifelineImpl(String name) {
         this.name = name;
+    }
+
+    public LifelineImpl(String name, String packageName) {
+        this.name = name;
+        this.packageName = packageName;
     }
 
     @Override
@@ -37,5 +43,13 @@ public class LifelineImpl implements Lifeline {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getPackageName() {
+        if (packageName == null) {
+            return "";
+        }
+        return this.packageName;
     }
 }

@@ -36,7 +36,7 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
     @Override
     public List<Change> createMessageRemovalChange(Node node, List<LeveledNode> additionalNodes) {
         logger.debug("Creating message remove instance of change " + node.getCreateEdge().getName());
-    	List<Change> changes = new ArrayList<>();
+        List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_REMOVE);
         change.setNewValue(node);
         if (shouldRemoveLifeline(additionalNodes, node.getName(), node.getId())) {
@@ -75,7 +75,7 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
     private boolean shouldAddLifeline(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
         for (LeveledNode node : leveledNodes) {
             if (node.getNode().getId().equals(comparedLifelineId)) {
-            	return true;
+                return true;
             }
             if (node.getNode().getName().equals(lifelineName)) {
                 return false;
@@ -83,17 +83,17 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         }
         return true;
     }
-    
+
     private boolean shouldRemoveLifeline(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
-    	logger.debug("Checking for removal of {} ", lifelineName);
+        logger.debug("Checking for removal of {} ", lifelineName);
         for (LeveledNode node : leveledNodes) {
             if (node.getNode().getName().equals(lifelineName) && !node.getNode().getId().equals(comparedLifelineId)) {
-            	if(node.getNode().getCreateEdge() == null) {
-            		logger.debug("Lifeline not removed, still attached with root");
-            	} else {
-            		logger.debug("Lifeline not removed, still attached with message {}", node.getNode().getCreateEdge().getName());	
-            	}
-            	return false;
+                if (node.getNode().getCreateEdge() == null) {
+                    logger.debug("Lifeline not removed, still attached with root");
+                } else {
+                    logger.debug("Lifeline not removed, still attached with message {}", node.getNode().getCreateEdge().getName());
+                }
+                return false;
             }
         }
         return true;

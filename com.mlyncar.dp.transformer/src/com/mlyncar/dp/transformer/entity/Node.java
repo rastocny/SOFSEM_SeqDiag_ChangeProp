@@ -45,4 +45,6 @@ public interface Node {
     public boolean isReply();
 
     public Node getLeftSibling();
+    
+    public String getPackage();
 }

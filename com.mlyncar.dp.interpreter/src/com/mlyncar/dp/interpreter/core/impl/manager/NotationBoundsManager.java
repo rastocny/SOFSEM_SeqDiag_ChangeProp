@@ -31,17 +31,17 @@ public class NotationBoundsManager {
 
     public void adjustParentExecSpecs(Node nodeToAdjust, int newHeight) throws InterpreterException {
         while (nodeToAdjust.getParentNode() != null) {
-			try {
-	            Bounds boundsStart = getNodeExecutionOccurrenceStartBounds(nodeToAdjust);
-				Bounds boundsEnd = getNodeExecutionOccurrenceEndBounds(nodeToAdjust);
-	            if (boundsStart == null || boundsEnd == null) {
-	                return;
-	            }
-	            boundsStart.setHeight(boundsStart.getHeight() + newHeight);
-	            boundsEnd.setHeight(boundsEnd.getHeight() + newHeight);
-			} catch (ExecSpecNotFoundException e) {
-				logger.debug("Error in adjusting exec specs: " + e.getMessage());
-			}
+            try {
+                Bounds boundsStart = getNodeExecutionOccurrenceStartBounds(nodeToAdjust);
+                Bounds boundsEnd = getNodeExecutionOccurrenceEndBounds(nodeToAdjust);
+                if (boundsStart == null || boundsEnd == null) {
+                    return;
+                }
+                boundsStart.setHeight(boundsStart.getHeight() + newHeight);
+                boundsEnd.setHeight(boundsEnd.getHeight() + newHeight);
+            } catch (ExecSpecNotFoundException e) {
+                logger.debug("Error in adjusting exec specs: " + e.getMessage());
+            }
             nodeToAdjust = nodeToAdjust.getParentNode();
         }
     }
@@ -124,11 +124,11 @@ public class NotationBoundsManager {
                 if (specification.getStart() instanceof MessageOccurrenceSpecification) {
                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
                     if (messageName.equals(node.getCreateEdge().getName())) {
-                    	if(node.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && !firstSelfFound) {
-                    		firstSelfFound = true;
-                    		continue;
-                    	}
-                    	logger.debug("Found spec {}", specification.getName());
+                        if (node.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && !firstSelfFound) {
+                            firstSelfFound = true;
+                            continue;
+                        }
+                        logger.debug("Found spec {}", specification.getName());
                         return (org.eclipse.gmf.runtime.notation.Node) viewObj;
                     }
                 }
@@ -149,7 +149,7 @@ public class NotationBoundsManager {
                 if (specification.getStart() instanceof MessageOccurrenceSpecification) {
                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
                     if (messageName.equals(node.getCreateEdge().getName())) {
-                    	logger.debug("Found spec {}", specification.getName());
+                        logger.debug("Found spec {}", specification.getName());
                         return (org.eclipse.gmf.runtime.notation.Node) viewObj;
                     }
                 }

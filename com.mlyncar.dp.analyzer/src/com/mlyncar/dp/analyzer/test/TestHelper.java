@@ -12,7 +12,9 @@ public class TestHelper {
 
     public static void validateDiagram(SeqDiagram diagram) {
         for (Message message : diagram.getMessages()) {
-            logger.debug("\nTYPE:" + message.getType().getCode() + ";\nNAME: " + message.getName() + ";\nNUMBER: " + message.getSeqNumber() + ";\nSOURCE: " + message.getSourceLifeline().getName() + ";\nTARGET " + message.getTargetLifeline().getName());
+            logger.debug("\nTYPE:" + message.getType().getCode() + ";\nNAME: " + message.getName() + ";\nNUMBER: " + message.getSeqNumber()
+                    + ";\nSOURCE: " + message.getSourceLifeline().getName() + ":" + message.getSourceLifeline().getPackageName()
+                    + ";\nTARGET; " + message.getTargetLifeline().getName() + ":" + message.getTargetLifeline().getPackageName());
             logger.debug("---------------------------");
         }
     }

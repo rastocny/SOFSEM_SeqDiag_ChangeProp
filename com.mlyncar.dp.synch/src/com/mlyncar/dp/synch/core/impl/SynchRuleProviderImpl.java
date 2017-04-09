@@ -6,9 +6,11 @@ import java.util.List;
 import com.mlyncar.dp.comparison.entity.ChangeType;
 import com.mlyncar.dp.synch.core.SynchRuleProvider;
 import com.mlyncar.dp.synch.rule.SynchRule;
+import com.mlyncar.dp.synch.rule.lifeline.IgnoreNativeObjectRule;
 import com.mlyncar.dp.synch.rule.lifeline.MaximumLifelineRule;
 import com.mlyncar.dp.synch.rule.lifeline.TestLifelineRule;
 import com.mlyncar.dp.synch.rule.message.IgnoreGetRule;
+import com.mlyncar.dp.synch.rule.message.IgnoreNativeCallRule;
 import com.mlyncar.dp.synch.rule.message.IgnoreSetRule;
 import com.mlyncar.dp.synch.rule.message.TestMessageRule;
 
@@ -21,8 +23,10 @@ public class SynchRuleProviderImpl implements SynchRuleProvider {
         messageAddRules.add(new TestMessageRule());
         messageAddRules.add(new IgnoreGetRule());
         messageAddRules.add(new IgnoreSetRule());
+        messageAddRules.add(new IgnoreNativeCallRule());
         lifelineAddRules.add(new TestLifelineRule());
         lifelineAddRules.add(new MaximumLifelineRule());
+        lifelineAddRules.add(new IgnoreNativeObjectRule());
     }
 
     @Override

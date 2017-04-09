@@ -26,8 +26,9 @@ public class NodeImpl implements Node {
     private String id;
     private final List<CombinedFragment> combinedFragments = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
+    private final String packageName;
 
-    public NodeImpl(Edge createEdge, Node parentNode, String name) {
+    public NodeImpl(Edge createEdge, Node parentNode, String name, String packageName) {
         if (createEdge != null) {
             logger.debug("Creating instance of NodeImpl with name: {} and createEdge: {}", name, createEdge.getName());
         } else {
@@ -37,6 +38,7 @@ public class NodeImpl implements Node {
         this.createEdge = createEdge;
         this.parentNode = parentNode;
         this.name = name;
+        this.packageName = packageName;
     }
 
     @Override
@@ -148,4 +150,9 @@ public class NodeImpl implements Node {
             return null;
         }
     }
+
+	@Override
+	public String getPackage() {
+		return this.packageName;
+	}
 }
