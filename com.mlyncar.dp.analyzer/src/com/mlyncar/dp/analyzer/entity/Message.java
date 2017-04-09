@@ -15,6 +15,8 @@
  */
 package com.mlyncar.dp.analyzer.entity;
 
+import java.util.List;
+
 import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
 
 /**
@@ -40,4 +42,9 @@ public interface Message {
     public void setTargetLifeline(LifelineImpl targetLifeline);
 
     public void setSourceLifeline(LifelineImpl sourceLifeline);
+    
+    public List<CombFragment> getCombFragments();
+    
+    public void addCombinedFragments(List<CombFragment> fragments);
+    
 }

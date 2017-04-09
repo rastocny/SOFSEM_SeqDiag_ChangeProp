@@ -200,10 +200,7 @@ public class ModelManager {
         } else {
             return 0;
         }
-        //int index = interaction.getFragments().size() - 1;
         int index = 0;
-        //ListIterator<InteractionFragment> listIterator = interaction.getFragments().listIterator(interaction.getFragments().size());
-        //while (listIterator.hasPrevious()) {
         boolean firstFound = false;
         for (InteractionFragment fragment : interaction.getFragments()) { //listIterator.previous();
             if (fragment instanceof MessageOccurrenceSpecification) {

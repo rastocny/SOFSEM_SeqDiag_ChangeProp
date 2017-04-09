@@ -135,13 +135,13 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
                         }
                         Message message = new MessageImpl(counter++, type, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurrence.getCovered().getName()));
+                                new LifelineImpl(occurrence.getCovered().getName()), null);
                         logger.debug("Creating synch/self message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
                         diagram.addMessage(message);
                     } else if (occurrence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
                         Message message = new MessageImpl(counter++, MessageType.RETURN, occurrence.getMessage().getName(),
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
-                                new LifelineImpl(occurrence.getCovered().getName()));
+                                new LifelineImpl(occurrence.getCovered().getName()), null);
                         logger.debug("Creating ret message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
                         diagram.addMessage(message);
                     }

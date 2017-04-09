@@ -15,7 +15,9 @@
  */
 package com.mlyncar.dp.analyzer.code.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -36,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.analyzer.code.SourceCodeAnalyzer;
+import com.mlyncar.dp.analyzer.code.impl.JavaDiscoveryHelper.JavaDiscoveryOutput;
+import com.mlyncar.dp.analyzer.entity.CombFragment;
 import com.mlyncar.dp.analyzer.entity.Lifeline;
 import com.mlyncar.dp.analyzer.entity.Message;
 import com.mlyncar.dp.analyzer.entity.MessageType;
@@ -69,7 +73,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
             Resource kdmResource = discoverer.getTargetModel();
             SeqDiagram diagram = new SeqDiagramImpl();
             MethodUnit mainMethod = findMainMethod(kdmResource, diagram);
-            analyzeMethodUnit(diagram, mainMethod, "main:");
+            analyzeMethodUnit(diagram, mainMethod, "main:", new ArrayList<CombFragment>());
             TestHelper.validateDiagram(diagram);
             return diagram;
         } catch (DiscoveryException | MainMethodNotFoundException ex) {
@@ -88,7 +92,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                     ClassUnit classUnit = (ClassUnit) methodUnit.eContainer();
                     Lifeline actorLifeline = new LifelineImpl("Actor");
                     Lifeline lifeline = new LifelineImpl("main:" + classUnit.getName());
-                    Message startMessage = new MessageImpl(0, MessageType.SYNCH, "main", lifeline, actorLifeline);
+                    Message startMessage = new MessageImpl(0, MessageType.SYNCH, "main", lifeline, actorLifeline, null);
                     diagram.addMessage(startMessage);
                     return methodUnit;
                 }
@@ -97,16 +101,17 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
         throw new MainMethodNotFoundException("Unable to find main method in KDM structure");
     }
 
-    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method, String variableName) throws SourceCodeAnalyzerException {
+    private void analyzeMethodUnit(SeqDiagram diagram, MethodUnit method, String variableName, List<CombFragment> fragments) throws SourceCodeAnalyzerException {
         int statementIndex = 0;
         for (AbstractCodeElement element : method.getCodeElement()) {
             statementIndex++;
-            analyzeCodeElement(element, diagram, method, variableName, statementIndex);
+            analyzeCodeElement(element, diagram, method, variableName, statementIndex, fragments);
         }
     }
 
-    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method, String currentVariableName, int statementPosition) throws SourceCodeAnalyzerException {
-        if (codeElement instanceof ActionElement) {
+    private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method, String currentVariableName, int statementPosition, List<CombFragment> fragments) throws SourceCodeAnalyzerException {
+        List<CombFragment> originalStateFragments = new ArrayList<CombFragment>(fragments);
+    	if (codeElement instanceof ActionElement) {
             ActionElement actionElement = (ActionElement) codeElement;
             int statementIndex = 0;
             for (AbstractCodeElement innerBlockElement : actionElement.getCodeElement()) {
@@ -119,7 +124,8 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             MethodUnit newMethod = (MethodUnit) call.getTo();
                             String newMethodClassName = getMethodClassName(newMethod);
                             String methodClassName = getMethodClassName(method);
-                            String variableName = new JavaDiscoveryHelper().getMethodName(methodClassName, method.getName(), statementPosition);
+                            JavaDiscoveryOutput output = new JavaDiscoveryHelper().getMethodName(methodClassName, method.getName(), statementPosition);
+                            String variableName = output.getVariableName();
                             MessageType type = MessageType.SYNCH;
                             if (newMethodClassName.equals(methodClassName)) {
                                 type = MessageType.SELF;
@@ -129,12 +135,15 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             String thisPackage = getClassPackage(method.eContainer());
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
                                     new LifelineImpl(variableName + newMethodClassName, newPackage),
-                                    new LifelineImpl(currentVariableName + methodClassName, thisPackage)));
+                                    new LifelineImpl(currentVariableName + methodClassName, thisPackage), fragments));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
-                            analyzeMethodUnit(diagram, newMethod, variableName);
+                            
+                            fragments.addAll(output.getFragments());
+                            analyzeMethodUnit(diagram, newMethod, variableName, fragments);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
                                     new LifelineImpl(currentVariableName + methodClassName, thisPackage),
-                                    new LifelineImpl(variableName + newMethodClassName, newPackage)));
+                                    new LifelineImpl(variableName + newMethodClassName, newPackage), fragments));
+                            fragments = originalStateFragments;
                         }
                     }
                 } else if (innerBlockElement.getName() != null && innerBlockElement.getName().equals("class instance creation")) {
@@ -148,16 +157,17 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             String thisPackage = getClassPackage(method.eContainer());
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
                                     new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage),
-                                    new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage)));
+                                    new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage), null));
                             logger.debug("Adding new message to diagram: " + newMethod.toString());
-                            analyzeMethodUnit(diagram, newMethod, variableName);
+                            analyzeMethodUnit(diagram, newMethod, variableName, fragments);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
                                     new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage),
-                                    new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage)));
+                                    new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage), null));
+                            fragments = originalStateFragments;
                         }
                     }
                 } else {
-                    analyzeCodeElement(innerBlockElement, diagram, method, currentVariableName, statementIndex);
+                    analyzeCodeElement(innerBlockElement, diagram, method, currentVariableName, statementIndex, fragments);
                 }
             }
         } else if (codeElement instanceof BlockUnit) {
@@ -165,7 +175,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
             int statementIndex = 0;
             for (AbstractCodeElement blockElement : unit.getCodeElement()) {
                 statementIndex++;
-                analyzeCodeElement(blockElement, diagram, method, currentVariableName, statementIndex);
+                analyzeCodeElement(blockElement, diagram, method, currentVariableName, statementIndex, fragments);
             }
         }
     }

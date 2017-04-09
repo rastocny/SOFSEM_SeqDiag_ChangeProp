@@ -15,9 +15,13 @@
  */
 package com.mlyncar.dp.analyzer.entity.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.mlyncar.dp.analyzer.entity.CombFragment;
 import com.mlyncar.dp.analyzer.entity.Lifeline;
-import com.mlyncar.dp.analyzer.entity.MessageType;
 import com.mlyncar.dp.analyzer.entity.Message;
+import com.mlyncar.dp.analyzer.entity.MessageType;
 
 /**
  *
@@ -30,13 +34,19 @@ public class MessageImpl implements Message {
     private Lifeline targetLifeline;
     private Lifeline sourceLifeline;
     private final Integer seqNumber;
+    private final List<CombFragment> combFragments;
 
-    public MessageImpl(Integer seqNumber, MessageType type, String name, Lifeline targetLifeline, Lifeline sourceLifeline) {
+    public MessageImpl(Integer seqNumber, MessageType type, String name, Lifeline targetLifeline, Lifeline sourceLifeline, List<CombFragment> combFragments) {
         this.type = type;
         this.name = name;
         this.targetLifeline = targetLifeline;
         this.sourceLifeline = sourceLifeline;
         this.seqNumber = seqNumber;
+        if(combFragments == null) {
+        	this.combFragments = new ArrayList<CombFragment>();
+        } else {
+            this.combFragments = combFragments;
+        }
     }
 
     @Override
@@ -83,4 +93,14 @@ public class MessageImpl implements Message {
     public void setSourceLifeline(LifelineImpl sourceLifeline) {
         this.sourceLifeline = sourceLifeline;
     }
+
+	@Override
+	public List<CombFragment> getCombFragments() {
+		return this.combFragments;
+	}
+
+	@Override
+	public void addCombinedFragments(List<CombFragment> fragments) {
+        this.combFragments.addAll(fragments);
+	}
 }
