@@ -1,9 +1,13 @@
 package com.mlyncar.dp.interpreter.core.impl.manager;
 
+import java.util.ListIterator;
+
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.Bounds;
 import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
+import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +28,17 @@ public class NotationBoundsManager {
 
     public Integer calculateLifelinePosition() {
         View lifelineCompartment = (View) notationManager.getLifelineCompartment();
-        org.eclipse.gmf.runtime.notation.Node lastLifeline = (org.eclipse.gmf.runtime.notation.Node) lifelineCompartment.getChildren().get(lifelineCompartment.getChildren().size() - 1);
-        Bounds bounds = (Bounds) lastLifeline.getLayoutConstraint();
-        return bounds.getX() + 150;
+        
+        ListIterator<View> listIter = lifelineCompartment.getChildren().listIterator(lifelineCompartment.getChildren().size());
+        while (listIter.hasPrevious()) {
+            View prev = listIter.previous();
+            if(prev.getElement() instanceof Lifeline) {
+            	Bounds bounds = (Bounds) ((org.eclipse.gmf.runtime.notation.Node) prev).getLayoutConstraint();
+            	return bounds.getX() + 150;
+            }
+        }
+        logger.debug("Last lifeline not found, new placement for lifeline is 0");
+        return 0;
     }
 
     public void adjustParentExecSpecs(Node nodeToAdjust, int newHeight) throws InterpreterException {

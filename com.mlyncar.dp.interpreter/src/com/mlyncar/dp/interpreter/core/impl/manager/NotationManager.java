@@ -192,8 +192,10 @@ public class NotationManager {
         logger.debug("Lifeline view to get: {}", lifelineName);
         for (Object obj : compartment.getChildren()) {
             View view = (View) obj;
-            if (((Lifeline) view.getElement()).getName().equals(lifelineName)) {
-                return view;
+            if(view.getElement() instanceof Lifeline) {
+                if (((Lifeline) view.getElement()).getName().equals(lifelineName)) {
+                    return view;
+                }	
             }
         }
         return null;
