@@ -13,7 +13,6 @@ import com.mlyncar.dp.comparison.exception.ComparisonException;
 import com.mlyncar.dp.comparison.exception.GraphBindingException;
 import com.mlyncar.dp.comparison.test.ComparisonTestHelper;
 import com.mlyncar.dp.transformer.entity.Graph;
-import com.mlyncar.dp.transformer.entity.Node;
 import com.mlyncar.dp.transformer.exception.GraphTransformationException;
 import com.mlyncar.dp.transformer.service.TransformationService;
 
@@ -47,13 +46,6 @@ public class ComparisonService {
 
     public List<Change> findChangesInGraph(Graph referenceTree, Graph subTree) {
         throw new UnsupportedOperationException("Not supported yet");
-    }
-
-    public boolean isGraphSubgraph(Graph referenceTree, Graph subTree) {
-        Node rootReferenceNode = referenceTree.getRootNode();
-        Node rootSubTreeNode = subTree.getRootNode();
-        GraphComparatorImpl comparator = new GraphComparatorImpl(new TransformationService());
-        return comparator.isSubTree(rootReferenceNode, rootSubTreeNode);
     }
 
 }

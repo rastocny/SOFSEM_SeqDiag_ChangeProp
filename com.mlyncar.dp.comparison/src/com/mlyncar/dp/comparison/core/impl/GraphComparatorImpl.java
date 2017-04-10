@@ -34,38 +34,6 @@ public class GraphComparatorImpl implements GraphComparator {
         generator = new ChangeListGeneratorImpl();
     }
 
-    public boolean isSubTree(Node rootReferenceNode, Node rootSubTreeNode) {
-
-        if (rootSubTreeNode == null) {
-            return true;
-        }
-        if (rootReferenceNode == null) {
-            return false;
-        }
-        logger.debug("Starting to compare nodes {} {} ", rootReferenceNode.getName(), rootSubTreeNode.getName());
-
-        NodeRelationComparator comparator = new NodeRelationComparatorImpl();
-
-        if (comparator.getNodeRelation(rootReferenceNode, rootSubTreeNode) == NodeRelation.SIMILAR) {
-            logger.debug("Nodes {} {} and {} {} are equal", rootReferenceNode.getId(), rootReferenceNode.getName(), rootSubTreeNode.getId(), rootSubTreeNode.getName());
-            if (rootReferenceNode.isLeaf()) {
-                logger.debug("Node {} is leaf", rootReferenceNode.getName());
-                return true;
-            } else {
-                logger.debug("Starting comparing children of {}", rootReferenceNode.getName());
-                int childIndex = 0;
-                boolean comparisonResult = true;
-                for (Node referenceGraphChild : rootReferenceNode.childNodes()) {
-                    comparisonResult = comparisonResult && isSubTree(referenceGraphChild, rootSubTreeNode.childNodes().get(childIndex));
-                    childIndex++;
-                }
-                logger.debug("Comparison Result of childrens of {} is {}", rootReferenceNode.getName(), comparisonResult);
-                return comparisonResult;
-            }
-        }
-        return rootReferenceNode.childNodes().stream().anyMatch((referenceGraphChild) -> (isSubTree(referenceGraphChild, rootSubTreeNode)));
-    }
-
     @Override
     public ChangeLog compareGraphStructures(Graph referenceGraph, Graph subGraph) throws GraphBindingException {
         GraphBindingEngine graphBindingEngine = new GraphBindingEngineImpl();
