@@ -44,7 +44,6 @@ public class InterpreterService {
             while (listIterator.hasPrevious()) {
                 Change change = listIterator.previous();
                 if (changeType.equals(change.getChangeType())) {
-                    logger.debug("Interpreting change " + change.getNewValue().getName());
                     fileInterpreter.interpretChange(change);
                     umlInterpreter.interpretChange(change);
                 }
@@ -52,7 +51,6 @@ public class InterpreterService {
         } else {
             for (Change change : changeLog.changes()) {
                 if (changeType.equals(change.getChangeType())) {
-                    logger.debug("Interpreting change " + change.getNewValue().getName());
                     fileInterpreter.interpretChange(change);
                     umlInterpreter.interpretChange(change);
                 }

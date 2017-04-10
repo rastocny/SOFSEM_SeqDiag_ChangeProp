@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
+import com.mlyncar.dp.transformer.entity.Node;
 
 public class ChangeLogInterpreter extends AbstractInterpreter {
 
@@ -32,10 +33,11 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
     @Override
     protected void interpretMessageAdd(Change change) {
         String outputLine;
-        if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
-            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName() + "; " + change.getNewValue().getCreateEdge().getName();
+        Node newValue = (Node) change.getNewValue();
+        if (newValue.getLeftSibling() != null && newValue.getLeftSibling().getCreateEdge() != null) {
+            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + newValue.getLeftSibling().getCreateEdge().getName() + "; " + newValue.getCreateEdge().getName();
         } else {
-            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getCreateEdge().getName();
+            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + newValue.getCreateEdge().getName();
         }
         logger.debug(outputLine);
         fileWriter.println(outputLine);
@@ -43,7 +45,7 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretLifelineAdd(Change change) {
-        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getName();
+        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + ((Node) change.getNewValue()).getName();
         logger.debug(outputLine);
         fileWriter.println(outputLine);
     }
@@ -51,10 +53,11 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
     @Override
     protected void interpretMessageRemove(Change change) {
         String outputLine;
-        if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
-            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName() + "; " + change.getNewValue().getCreateEdge().getName();
+        Node newValue = (Node) change.getNewValue();
+        if (newValue.getLeftSibling() != null && newValue.getLeftSibling().getCreateEdge() != null) {
+            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + newValue.getLeftSibling().getCreateEdge().getName() + "; " + newValue.getCreateEdge().getName();
         } else {
-            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getCreateEdge().getName();
+            outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + newValue.getCreateEdge().getName();
         }
         logger.debug(outputLine);
         fileWriter.println(outputLine);
@@ -62,16 +65,17 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretMessageModify(Change change) {
+        Node newValue = (Node) change.getNewValue();
         String outputLine;
-        if (change.getNewValue().getLeftSibling() != null && change.getNewValue().getLeftSibling().getCreateEdge() != null) {
+        if (newValue.getLeftSibling() != null && newValue.getLeftSibling().getCreateEdge() != null) {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode()
-                    + " = After:" + change.getNewValue().getLeftSibling().getCreateEdge().getName()
-                    + "; New Value: " + change.getNewValue().getCreateEdge().getName()
-                    + "; Old Value: " + change.getOldValue().getCreateEdge().getName();
+                    + " = After:" + newValue.getLeftSibling().getCreateEdge().getName()
+                    + "; New Value: " + newValue.getCreateEdge().getName()
+                    + "; Old Value: " + ((Node) change.getOldValue()).getCreateEdge().getName();
         } else {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode()
-                    + " = New Value: " + change.getNewValue().getCreateEdge().getName()
-                    + "; Old Value: " + change.getOldValue().getCreateEdge().getName();
+                    + " = New Value: " + newValue.getCreateEdge().getName()
+                    + "; Old Value: " + ((Node) change.getOldValue()).getCreateEdge().getName();
         }
         logger.debug(outputLine);
         fileWriter.println(outputLine);
@@ -79,7 +83,7 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretLifelineRemove(Change change) {
-        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + change.getNewValue().getName();
+        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + ((Node) change.getNewValue()).getName();
         logger.debug(outputLine);
         fileWriter.println(outputLine);
     }

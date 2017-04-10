@@ -2,7 +2,7 @@ package com.mlyncar.dp.comparison.entity.impl;
 
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.comparison.entity.ChangeType;
-import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.ChangeComponent;
 
 /**
  *
@@ -12,10 +12,10 @@ public class ChangeImpl implements Change {
 
     private String elementId;
     private ChangeType changeType;
-    private Node newValue;
-    private Node oldValue;
+    private ChangeComponent newValue;
+    private ChangeComponent oldValue;
 
-    public ChangeImpl(String elementId, ChangeType changeType, Node newValue, Node oldValue) {
+    public ChangeImpl(String elementId, ChangeType changeType, ChangeComponent newValue, ChangeComponent oldValue) {
         this.elementId = elementId;
         this.changeType = changeType;
         this.newValue = newValue;
@@ -48,22 +48,22 @@ public class ChangeImpl implements Change {
     }
 
     @Override
-    public Node getNewValue() {
+    public ChangeComponent getNewValue() {
         return this.newValue;
     }
 
     @Override
-    public void setNewValue(Node newValue) {
+    public void setNewValue(ChangeComponent newValue) {
         this.newValue = newValue;
     }
 
     @Override
-    public Node getOldValue() {
+    public ChangeComponent getOldValue() {
         return this.oldValue;
     }
 
     @Override
-    public void setOldValue(Node oldValue) {
+    public void setOldValue(ChangeComponent oldValue) {
         this.oldValue = oldValue;
     }
 

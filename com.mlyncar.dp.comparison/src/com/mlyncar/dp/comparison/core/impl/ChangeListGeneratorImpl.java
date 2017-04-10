@@ -2,6 +2,7 @@ package com.mlyncar.dp.comparison.core.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +11,10 @@ import com.mlyncar.dp.comparison.core.ChangeListGenerator;
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.comparison.entity.ChangeType;
 import com.mlyncar.dp.comparison.entity.impl.ChangeImpl;
+import com.mlyncar.dp.transformer.entity.ChangeComponent;
 import com.mlyncar.dp.transformer.entity.LeveledNode;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 
 public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
@@ -30,6 +33,9 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
             changes.add(lifelineChange);
         }
         changes.add(change);
+        for(NodeCombinedFragment fragment : node.combinedFragments()) {
+        	changes.add(new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, fragment, null));
+        }
         return changes;
     }
 
@@ -98,4 +104,14 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         }
         return true;
     }
+
+	@Override
+	public Change createFragmentAddChange(ChangeComponent newValue) {
+		return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
+	}
+
+	@Override
+	public Change createFragmentRemoveChange(ChangeComponent newValue) {
+		return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
+	}
 }

@@ -1,6 +1,6 @@
 package com.mlyncar.dp.comparison.entity;
 
-import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.ChangeComponent;
 
 /**
  *
@@ -16,12 +16,12 @@ public interface Change {
 
     public void setElementId(String elementId);
 
-    public Node getNewValue();
+    public ChangeComponent getNewValue();
 
-    public void setNewValue(Node value);
+    public void setNewValue(ChangeComponent value);
 
-    public Node getOldValue();
+    public ChangeComponent getOldValue();
 
-    public void setOldValue(Node oldValue);
+    public void setOldValue(ChangeComponent oldValue);
 
 }

@@ -155,4 +155,9 @@ public class NodeImpl implements Node {
 	public String getPackage() {
 		return this.packageName;
 	}
+
+	@Override
+	public String getChangeComponentType() {
+		return "Node";
+	}
 }

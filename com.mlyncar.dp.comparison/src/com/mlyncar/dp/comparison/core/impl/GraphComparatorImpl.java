@@ -14,6 +14,8 @@ import com.mlyncar.dp.comparison.entity.impl.ChangeLogImpl;
 import com.mlyncar.dp.comparison.exception.GraphBindingException;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.LeveledNode;
+import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 import com.mlyncar.dp.transformer.helper.TreeOrderGenerator;
 import com.mlyncar.dp.transformer.service.TransformationService;
 
@@ -64,6 +66,9 @@ public class GraphComparatorImpl implements GraphComparator {
                     }
                     switch (nodeRelationComparator.getNodeRelation(referenceNode.getNode(), subNode.getNode())) {
                         case EQUAL:
+                        	if(!similarityFound) {
+                        		generateFragmentChanges(referenceNode.getNode(), subNode.getNode(), changeLog);
+                        	}
                             similarityFound = true;
                             break;
                         case DIFFERENT:
@@ -119,4 +124,24 @@ public class GraphComparatorImpl implements GraphComparator {
         return changeLog;
     }
 
+    private void generateFragmentChanges(Node node1, Node node2, ChangeLog changeLog) {
+    	int lastNode2Index = node2.combinedFragments().size() - 1;
+    	for(int i = 0; i<node1.combinedFragments().size(); i++) {
+    		NodeCombinedFragment fragment1 = node1.combinedFragments().get(i);
+    		if(i > lastNode2Index){ 
+    			changeLog.addChange(generator.createFragmentAddChange(fragment1));
+    		} else {
+        		NodeCombinedFragment fragment2 = node2.combinedFragments().get(i);
+        		if(!(fragment1.getCombinedFragmentType().equals(fragment2.getCombinedFragmentType()) && fragment1.getFragmentBody().equals(fragment2.getFragmentBody()))) {
+        			changeLog.addChange(generator.createFragmentAddChange(fragment1));
+        			changeLog.addChange(generator.createFragmentRemoveChange(fragment2));
+        		} 
+    		}
+    	}
+    	if(lastNode2Index > node1.combinedFragments().size() - 1) {
+    		for(int i = node1.combinedFragments().size(); i <= lastNode2Index; i++) {
+    			changeLog.addChange(generator.createFragmentRemoveChange(node2.combinedFragments().get(i)));
+    		}
+    	}
+    }
 }

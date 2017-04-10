@@ -87,7 +87,7 @@ public class TransformationEngineImpl implements TransformationEngine {
     
     private void fillNodeWithFragments(Node node, List<CombFragment> fragments) throws GraphTransformationException {
     	for(CombFragment fragment : fragments) {
-    		node.addCombinedFragment(new NodeCombinedFragmentImpl(fragment));
+    		node.addCombinedFragment(new NodeCombinedFragmentImpl(fragment, node));
     	}
     }
 

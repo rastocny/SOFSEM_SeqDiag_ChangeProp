@@ -4,7 +4,7 @@ package com.mlyncar.dp.transformer.entity;
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
-public interface NodeCombinedFragment {
+public interface NodeCombinedFragment extends ChangeComponent {
 
     public NodeCombinedFragmentType getCombinedFragmentType();
 
@@ -13,4 +13,6 @@ public interface NodeCombinedFragment {
     public String getFragmentBody();
 
     public void setFragmentBody(String condition);
+    
+    public Node getNode();
 }

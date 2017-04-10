@@ -6,7 +6,7 @@ import java.util.List;
  *
  * @author Andrej Mlyncar <a.mlyncar@gmail.com>
  */
-public interface Node {
+public interface Node extends ChangeComponent {
 
     public Edge getCreateEdge();
 

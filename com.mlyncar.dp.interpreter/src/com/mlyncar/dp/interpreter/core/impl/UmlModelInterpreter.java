@@ -31,11 +31,11 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretMessageAdd(Change change) throws InterpreterException {
-        if (change.getNewValue().getCreateEdge().getEdgeType().equals(EdgeType.RETURN)) {
+        if (((Node) change.getNewValue()).getCreateEdge().getEdgeType().equals(EdgeType.RETURN)) {
             return;
         }
 
-        Node nodeToAdd = change.getNewValue();
+        Node nodeToAdd = (Node) change.getNewValue();
         Node nodeToAddReturn = null;
         for (Node node : nodeToAdd.childNodes()) {
             if (node.isReply()) {
@@ -54,8 +54,8 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretLifelineAdd(Change change) throws InterpreterException {
-        Lifeline newLifeline = modelManager.addLifelineToModel(change.getNewValue());
-        notationManager.addLifelineToNotation(change.getNewValue(), newLifeline);
+        Lifeline newLifeline = modelManager.addLifelineToModel((Node) change.getNewValue());
+        notationManager.addLifelineToNotation((Node) change.getNewValue(), newLifeline);
         storeModelResource();
         storeNotationResource();
         logger.debug("Lifeline add interpreted to uml model");
@@ -63,10 +63,10 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretMessageRemove(Change change) throws InterpreterException {
-        if (change.getNewValue().getCreateEdge().getEdgeType().equals(EdgeType.RETURN)) {
+        if (((Node) change.getNewValue()).getCreateEdge().getEdgeType().equals(EdgeType.RETURN)) {
             return;
         }
-        Node nodeToRemove = change.getNewValue();
+        Node nodeToRemove = (Node) change.getNewValue();
         Node nodeToRemoveReturn = null;
         for (Node node : nodeToRemove.childNodes()) {
             if (node.isReply()) {
@@ -85,16 +85,16 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretMessageModify(Change change) throws InterpreterException {
-        ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel(change.getOldValue(), change.getNewValue());
-        notationManager.relocateMessage(change.getOldValue(), change.getNewValue(), spec);
+        ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel((Node) change.getOldValue(), (Node) change.getNewValue());
+        notationManager.relocateMessage((Node) change.getOldValue(), (Node) change.getNewValue(), spec);
         storeModelResource();
         storeNotationResource();
     }
 
     @Override
     protected void interpretLifelineRemove(Change change) throws InterpreterException {
-        notationManager.removeLifelineFromNotation(change.getNewValue());
-        modelManager.removeLifelineFromModel(change.getNewValue());
+        notationManager.removeLifelineFromNotation((Node) change.getNewValue());
+        modelManager.removeLifelineFromModel((Node) change.getNewValue());
         storeNotationResource();
         storeModelResource();
     }
