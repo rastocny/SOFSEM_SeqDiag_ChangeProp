@@ -11,11 +11,9 @@ import com.mlyncar.dp.comparison.core.GraphComparator;
 import com.mlyncar.dp.comparison.core.NodeRelationComparator;
 import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.comparison.entity.impl.ChangeLogImpl;
-import com.mlyncar.dp.comparison.enums.NodeRelation;
 import com.mlyncar.dp.comparison.exception.GraphBindingException;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.LeveledNode;
-import com.mlyncar.dp.transformer.entity.Node;
 import com.mlyncar.dp.transformer.helper.TreeOrderGenerator;
 import com.mlyncar.dp.transformer.service.TransformationService;
 
