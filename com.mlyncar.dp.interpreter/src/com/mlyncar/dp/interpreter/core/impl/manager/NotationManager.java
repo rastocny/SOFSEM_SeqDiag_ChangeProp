@@ -10,10 +10,12 @@ import org.eclipse.gmf.runtime.notation.IdentityAnchor;
 import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.papyrus.infra.gmfdiag.css.notation.CSSDiagram;
+import org.eclipse.papyrus.uml.diagram.sequence.edit.parts.CombinedFragmentEditPart;
 import org.eclipse.papyrus.uml.diagram.sequence.part.UMLDiagramEditorPlugin;
 import org.eclipse.papyrus.uml.diagram.sequence.part.UMLVisualIDRegistry;
 import org.eclipse.papyrus.uml.diagram.sequence.providers.UMLViewProvider;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
+import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Interaction;
 import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.Message;
@@ -26,6 +28,7 @@ import com.mlyncar.dp.interpreter.core.impl.EclipseUmlComponentAccessor;
 import com.mlyncar.dp.interpreter.core.modelset.MessageRemoveModelSet;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 
 public class NotationManager {
 
@@ -151,6 +154,25 @@ public class NotationManager {
         }
         newLifelineView.insertChild(viewToMove);
         oldLifelineView.removeChild(viewToMove);
+    }
+    
+    public void addFragmentToNotation(NodeCombinedFragment fragment, CombinedFragment newCombinedFragment) throws InterpreterException {
+    	View startLifeline = getLifelineView(fragment.getNode().getParentNode().getName());	
+        Object compartment = getLifelineCompartment();
+        NotationBoundsManager boundsManager = new NotationBoundsManager(this);
+    	Bounds bounds = boundsManager.extractFragmentBounds(fragment.getNode(), (org.eclipse.gmf.runtime.notation.Node) startLifeline);
+        final String nodeType = UMLVisualIDRegistry.getType(CombinedFragmentEditPart.VISUAL_ID);
+        org.eclipse.gmf.runtime.notation.Node fragmentView = ViewService.createNode((View) compartment, newCombinedFragment, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+        if(fragmentView == null) {
+        	throw new InterpreterException("Combined fragment notation node not successfully created");
+        }
+        fragmentView.setLayoutConstraint(bounds);
+    	
+    }
+    
+
+    public void removeFragmentFromNotation(NodeCombinedFragment fragment) {
+    	
     }
 
     private void addMessage(Message message, View lifelineSrcV, View lifelineDstV, boolean isReply) {

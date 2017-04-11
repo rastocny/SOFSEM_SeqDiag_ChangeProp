@@ -47,4 +47,6 @@ public interface Node extends ChangeComponent {
     public Node getLeftSibling();
     
     public String getPackage();
+
+    public boolean containsFragment(NodeCombinedFragment fragment);
 }

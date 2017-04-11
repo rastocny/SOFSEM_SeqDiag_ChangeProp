@@ -3,6 +3,7 @@ package com.mlyncar.dp.interpreter.core.impl;
 import java.io.IOException;
 
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
+import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Lifeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import com.mlyncar.dp.interpreter.core.modelset.MessageRemoveModelSet;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 
 public class UmlModelInterpreter extends AbstractInterpreter {
 
@@ -120,5 +122,31 @@ public class UmlModelInterpreter extends AbstractInterpreter {
             throw new InterpreterException("Unable to update model resource", e);
         }
     }
+
+	@Override
+	protected void interpretFragmentAdd(Change change)
+			throws InterpreterException {		
+		NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+    	if((fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment)) || 
+    			(fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment))) {
+    		//just stretch, do not add; --- obtain combined fragment and add fragments to existing fragment
+    	} else {
+    		CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment)change.getNewValue());
+    		this.notationManager.addFragmentToNotation((NodeCombinedFragment)change.getNewValue(), newFragment);
+            storeNotationResource();
+            storeModelResource();
+    	}
+    	
+	}
+
+	@Override
+	protected void interpretFragmentRemove(Change change)
+			throws InterpreterException {
+		
+		this.modelManager.removeFragmentFromModel((NodeCombinedFragment)change.getNewValue());
+		this.notationManager.removeFragmentFromNotation((NodeCombinedFragment)change.getNewValue());
+        storeNotationResource();
+        storeModelResource();
+	}
 
 }

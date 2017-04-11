@@ -2,7 +2,6 @@ package com.mlyncar.dp.interpreter.core.impl.manager;
 
 import java.util.ListIterator;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.Bounds;
 import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
@@ -106,6 +105,22 @@ public class NotationBoundsManager {
         return bounds;
     }
 
+    public Bounds extractFragmentBounds(Node node, org.eclipse.gmf.runtime.notation.Node lifelineNode) throws InterpreterException {
+    	Bounds bounds = NotationFactory.eINSTANCE.createBounds();
+    	org.eclipse.gmf.runtime.notation.Node actionNode = getNodeExecutionNotationStart(node);
+    	Bounds actionBounds = (Bounds) actionNode.getLayoutConstraint();
+    	Bounds lifelineBounds = (Bounds) lifelineNode.getLayoutConstraint();
+    	bounds.setHeight(actionBounds.getHeight() + 20);
+    	logger.debug("Setting fragment height {}", bounds.getHeight());
+    	bounds.setY(actionBounds.getY() + lifelineBounds.getY() + 10); //position to be investigated
+    	logger.debug("Setting fragment y {}", bounds.getY());
+    	bounds.setX(lifelineBounds.getX() - 50);
+    	logger.debug("Setting fragment x {}", bounds.getX());
+    	bounds.setWidth(calculateLifelinePosition() - lifelineBounds.getX());
+    	logger.debug("Setting fragment width {}", bounds.getWidth());
+    	return bounds;
+    }
+    
     private Bounds getNodeExecutionOccurrenceStartBounds(Node refNode) throws InterpreterException {
         org.eclipse.gmf.runtime.notation.Node node = getNodeExecutionNotationStart(refNode);
         if (node == null) {

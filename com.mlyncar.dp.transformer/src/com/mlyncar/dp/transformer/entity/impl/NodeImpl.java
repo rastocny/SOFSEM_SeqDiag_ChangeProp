@@ -160,4 +160,14 @@ public class NodeImpl implements Node {
 	public String getChangeComponentType() {
 		return "Node";
 	}
+
+	@Override
+	public boolean containsFragment(NodeCombinedFragment fragment) {
+		for(NodeCombinedFragment combFragment : combinedFragments) {
+			if(fragment.getCombinedFragmentType().equals(combFragment.getCombinedFragmentType()) && fragment.getFragmentBody().equals(combFragment.getFragmentBody())) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

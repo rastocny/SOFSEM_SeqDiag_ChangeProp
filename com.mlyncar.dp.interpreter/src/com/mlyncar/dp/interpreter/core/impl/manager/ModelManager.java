@@ -1,10 +1,19 @@
 package com.mlyncar.dp.interpreter.core.impl.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
+import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Interaction;
+import org.eclipse.uml2.uml.InteractionConstraint;
 import org.eclipse.uml2.uml.InteractionFragment;
+import org.eclipse.uml2.uml.InteractionOperand;
+import org.eclipse.uml2.uml.InteractionOperatorKind;
 import org.eclipse.uml2.uml.Lifeline;
+import org.eclipse.uml2.uml.LiteralString;
 import org.eclipse.uml2.uml.Message;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.eclipse.uml2.uml.MessageSort;
@@ -17,6 +26,7 @@ import com.mlyncar.dp.interpreter.core.modelset.MessageAddModelSet;
 import com.mlyncar.dp.interpreter.core.modelset.MessageRemoveModelSet;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 
 public class ModelManager {
 
@@ -163,6 +173,66 @@ public class ModelManager {
         return execSpec;
     }
 
+    public void removeFragmentFromModel(NodeCombinedFragment fragment) {
+    	
+    }
+    
+    public CombinedFragment addFragmentToModel(NodeCombinedFragment fragment) {
+        CombinedFragment newFragment = UMLFactory.eINSTANCE.createCombinedFragment();
+        switch(fragment.getCombinedFragmentType()) {
+        	case OPT:
+        		newFragment.setInteractionOperator(InteractionOperatorKind.OPT_LITERAL);
+        	break;
+        	default:
+        		break;
+        }
+        InteractionOperand operand = UMLFactory.eINSTANCE.createInteractionOperand();
+        List<InteractionFragment> fragmentsToRelocate = new ArrayList<InteractionFragment>();
+        for (ListIterator<InteractionFragment> iter = interaction.getFragments().listIterator(); iter.hasNext();) {
+        	InteractionFragment interactionFragment = iter.next();
+            if (isLocatedInNodeBranch(interactionFragment, fragment.getNode())) {
+            	fragmentsToRelocate.add(interactionFragment);
+            }
+        }	
+        
+        for(InteractionFragment interFragment : fragmentsToRelocate) {
+        	operand.getFragments().add(interFragment);
+        	interaction.getFragments().remove(interFragment);
+        }
+        InteractionConstraint guard = operand.createGuard("guard");
+        LiteralString string = UMLFactory.eINSTANCE.createLiteralString();
+        string.setValue(fragment.getFragmentBody());
+        guard.setSpecification(string);
+        newFragment.getOperands().add(operand);
+        interaction.getFragments().add(newFragment);
+        return newFragment;
+    }
+    
+    private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, Node node) { 	
+    	if (interactionFragment instanceof MessageOccurrenceSpecification) {
+    		MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) interactionFragment;
+    		return isMessageInBranch(spec.getMessage().getName(), node);
+    	} else if (interactionFragment instanceof ActionExecutionSpecification) {
+    		ActionExecutionSpecification spec = (ActionExecutionSpecification) interactionFragment;
+    		return isMessageInBranch(((MessageOccurrenceSpecification)spec.getStart()).getMessage().getName(), node);
+    	} else if (interactionFragment instanceof CombinedFragment) {
+    		//CombinedFragment combFragment = (CombinedFragment) interactionFragment;	
+    		//todo - nesting of com fragments;
+    		return false;
+    	}
+    	return false;
+    }
+    
+    private boolean isMessageInBranch(String message, Node node) {
+    	while(node != null) {
+    		if(node.getCreateEdge() != null && node.getCreateEdge().getName().equals(message)) {
+    			return true;
+    		}
+    		node = node.getParentNode();
+    	}
+    	return false;
+    }
+    
     private ActionExecutionSpecification getStartExecutionSpecification(int placementIndex, Node nodeToAdd, Lifeline sourceLifeline) {
         MessageOccurrenceSpecification parentMsgOccurenceSpec = null;
         for (InteractionFragment fragment : interaction.getFragments()) {

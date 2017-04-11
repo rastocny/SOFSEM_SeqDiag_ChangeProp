@@ -15,6 +15,10 @@ public abstract class AbstractInterpreter implements ChangeInterpreter {
     protected abstract void interpretMessageModify(Change change) throws InterpreterException;
 
     protected abstract void interpretLifelineRemove(Change change) throws InterpreterException;
+    
+    protected abstract void interpretFragmentAdd(Change change) throws InterpreterException;
+    
+    protected abstract void interpretFragmentRemove(Change change) throws InterpreterException;
 
     @Override
     public void interpretChange(Change change) throws InterpreterException {
@@ -34,6 +38,12 @@ public abstract class AbstractInterpreter implements ChangeInterpreter {
             case MESSAGE_MODIFY:
                 interpretMessageModify(change);
                 break;
+            case FRAGMENT_ADD:
+            	interpretFragmentAdd(change);
+            	break;
+            case FRAGMENT_REMOVE:
+            	interpretFragmentRemove(change);
+            	break;
             default:
                 break;
         }

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.mlyncar.dp.comparison.entity.Change;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
 import com.mlyncar.dp.transformer.entity.Node;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 
 public class ChangeLogInterpreter extends AbstractInterpreter {
 
@@ -92,5 +93,23 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
     public void finalizeInterpretation() throws InterpreterException {
         fileWriter.close();
     }
+
+	@Override
+	protected void interpretFragmentAdd(Change change)
+			throws InterpreterException {
+		NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + fragment.getCombinedFragmentType().getCode() + ":" + fragment.getFragmentBody();
+        logger.debug(outputLine);
+        fileWriter.println(outputLine);
+	}
+
+	@Override
+	protected void interpretFragmentRemove(Change change)
+			throws InterpreterException {
+		NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + fragment.getCombinedFragmentType().getCode() + ":" + fragment.getFragmentBody();
+        logger.debug(outputLine);
+        fileWriter.println(outputLine);
+	}
 
 }

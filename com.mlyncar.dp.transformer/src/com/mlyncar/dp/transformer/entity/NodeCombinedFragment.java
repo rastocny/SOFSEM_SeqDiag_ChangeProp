@@ -15,4 +15,5 @@ public interface NodeCombinedFragment extends ChangeComponent {
     public void setFragmentBody(String condition);
     
     public Node getNode();
+    
 }
