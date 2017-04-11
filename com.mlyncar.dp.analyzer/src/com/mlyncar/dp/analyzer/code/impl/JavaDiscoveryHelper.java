@@ -80,7 +80,7 @@ public class JavaDiscoveryHelper {
                         SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
                         if (statementNum == statementPosition) {
 
-                        	return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
+                            return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                         }
                     }
                 } else if (exprStatement.getExpression() instanceof Assignment) {
@@ -91,7 +91,7 @@ public class JavaDiscoveryHelper {
                             SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
                             if (statementNum == statementPosition) {
                                 logger.debug("Variable from methodName {} found: {}", methodName, access.getVariable().getName());
-                            	return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
+                                return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                             }
                         }
                     }
@@ -104,7 +104,7 @@ public class JavaDiscoveryHelper {
                         SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
                         if (statementNum == statementPosition) {
                             logger.debug("Variable from methodName {} found: {}", methodName, access.getVariable().getName());
-                        	return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
+                            return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                         }
                     }
                 }
@@ -116,8 +116,8 @@ public class JavaDiscoveryHelper {
                     block = (Block) exprStatement.getElseStatement();
                     result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName);
                 }
-                if(result.getVariableName().isEmpty()) {
-                	continue;
+                if (result.getVariableName().isEmpty()) {
+                    continue;
                 }
                 return result;
             }
@@ -125,60 +125,60 @@ public class JavaDiscoveryHelper {
         logger.debug("Variable in method name {} not found. Index: {}", methodName, statementPosition);
         return new JavaDiscoveryOutput(new ArrayList<CombFragment>(), "");
     }
-    
+
     private List<CombFragment> getMethodCombinedFragments(EObject statement) {
-    	logger.debug("Checking if method {} call contains combined fragments", statement.toString());
-    	List<CombFragment> fragments = new ArrayList<CombFragment>();
-    	EObject container = (EObject) statement;
-    	while(container.eContainer() != null && !(container.eContainer() instanceof MethodDeclaration)) {
-    		container = container.eContainer();
-    		logger.debug("Iterating via container {}", container.toString());
-    		if(container instanceof IfStatement) {
-    			logger.debug("Found ifstatement in container {}", container.toString());
-    			IfStatement ifStatement = (IfStatement) container;
-    			if(ifStatement.getExpression() instanceof InfixExpression) {
-    				InfixExpression expression = (InfixExpression) ifStatement.getExpression();
-    				String operand = analyzeOperand(expression.getLeftOperand()) + expression.getOperator().getLiteral() + analyzeOperand(expression.getRightOperand());
-    				fragments.add(new CombFragmentImpl(operand, CombFragmentType.OPT));
-    				logger.debug("Created combined Fragment intance with condition {} and type {}", operand, CombFragmentType.OPT.getCode());
-    			} else {
-    				logger.debug("Unknown ifstatement expression");
-    			}
-    		}
-    	}
-    	logger.debug("Search finished, total found fragments {}", fragments.size());
-    	return fragments;
+        logger.debug("Checking if method {} call contains combined fragments", statement.toString());
+        List<CombFragment> fragments = new ArrayList<CombFragment>();
+        EObject container = (EObject) statement;
+        while (container.eContainer() != null && !(container.eContainer() instanceof MethodDeclaration)) {
+            container = container.eContainer();
+            logger.debug("Iterating via container {}", container.toString());
+            if (container instanceof IfStatement) {
+                logger.debug("Found ifstatement in container {}", container.toString());
+                IfStatement ifStatement = (IfStatement) container;
+                if (ifStatement.getExpression() instanceof InfixExpression) {
+                    InfixExpression expression = (InfixExpression) ifStatement.getExpression();
+                    String operand = analyzeOperand(expression.getLeftOperand()) + expression.getOperator().getLiteral() + analyzeOperand(expression.getRightOperand());
+                    fragments.add(new CombFragmentImpl(operand, CombFragmentType.OPT));
+                    logger.debug("Created combined Fragment intance with condition {} and type {}", operand, CombFragmentType.OPT.getCode());
+                } else {
+                    logger.debug("Unknown ifstatement expression");
+                }
+            }
+        }
+        logger.debug("Search finished, total found fragments {}", fragments.size());
+        return fragments;
     }
-    
+
     private String analyzeOperand(Expression operand) {
-    	if(operand instanceof NullLiteral) {
-    		return "null";
-    	} else if(operand instanceof SingleVariableAccess) {
-    		SingleVariableAccess access = (SingleVariableAccess) operand;
-    		return access.getVariable().getName();
-    	} else {
-    		logger.debug("Unable to analyze condition operand {}", operand.toString());
-    		return "[Unknown]";
-    	}
-	}
-    
+        if (operand instanceof NullLiteral) {
+            return "null";
+        } else if (operand instanceof SingleVariableAccess) {
+            SingleVariableAccess access = (SingleVariableAccess) operand;
+            return access.getVariable().getName();
+        } else {
+            logger.debug("Unable to analyze condition operand {}", operand.toString());
+            return "[Unknown]";
+        }
+    }
+
     class JavaDiscoveryOutput {
-    	
-    	private final List<CombFragment> fragments;
-    	private final String variableName;
-    	
-    	private JavaDiscoveryOutput(List<CombFragment> fragments, String variableName) {
-    		this.fragments = fragments;
-    		this.variableName = variableName;
-    	}
-    	
-    	public List<CombFragment> getFragments() {
-    		return this.fragments;
-    	}
-    	
-    	public String getVariableName(){
-    		return this.variableName;
-    	}
-    } 
-    
+
+        private final List<CombFragment> fragments;
+        private final String variableName;
+
+        private JavaDiscoveryOutput(List<CombFragment> fragments, String variableName) {
+            this.fragments = fragments;
+            this.variableName = variableName;
+        }
+
+        public List<CombFragment> getFragments() {
+            return this.fragments;
+        }
+
+        public String getVariableName() {
+            return this.variableName;
+        }
+    }
+
 }

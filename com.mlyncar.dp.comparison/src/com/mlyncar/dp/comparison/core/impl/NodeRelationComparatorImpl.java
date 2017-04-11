@@ -73,5 +73,5 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
     private boolean edgesEqualType(Node node1, Node node2) {
         return node1.getCreateEdge().getEdgeType().equals(node2.getCreateEdge().getEdgeType());
     }
-    
+
 }

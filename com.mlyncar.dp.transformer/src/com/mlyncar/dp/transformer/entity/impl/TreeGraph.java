@@ -25,7 +25,7 @@ public class TreeGraph implements Graph {
         this.treeGraphId = UUID.randomUUID().toString();
         this.diagram = diagram;
     }
-    
+
     public TreeGraph(Node rootNode, Graph oldGraph) {
         this.rootNode = rootNode;
         this.treeGraphId = UUID.randomUUID().toString();
@@ -52,14 +52,14 @@ public class TreeGraph implements Graph {
         return this.treeGraphId;
     }
 
-	@Override
-	public List<LeveledNode> getOrderedNodes() {
-		return new TreeOrderGeneratorImpl().createTreeTravesralOrder(this);
-	}
+    @Override
+    public List<LeveledNode> getOrderedNodes() {
+        return new TreeOrderGeneratorImpl().createTreeTravesralOrder(this);
+    }
 
-	@Override
-	public SeqDiagram getSeqDiagram() {
-		return this.diagram;
-	}
+    @Override
+    public SeqDiagram getSeqDiagram() {
+        return this.diagram;
+    }
 
 }

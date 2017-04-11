@@ -126,10 +126,10 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
         analyzeFragmentSet(interaction.getFragments(), diagram, new ArrayList<>());
         return diagram;
     }
-    
+
     private void analyzeFragmentSet(EList<InteractionFragment> eList, SeqDiagram diagram, List<CombFragment> fragments) throws AnalyzerException {
         Integer counter = 0;
-        for(EObject object : eList) {
+        for (EObject object : eList) {
             if (object instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification occurrence = (MessageOccurrenceSpecification) object;
                 if (occurrence.getName().contains("Send") || occurrence.getName().contains("Start")) {
@@ -158,23 +158,23 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
                         diagram.addMessage(message);
                     }
                 }
-            } else if(object instanceof CombinedFragment) {
-            	CombinedFragment umlCombFragment = (CombinedFragment) object;
-            	umlCombFragment.getInteractionOperator().getName();
-            	InteractionOperand operand = umlCombFragment.getOperands().get(0);
-            	String guardValue = "";
-            	if(operand.getGuard().getSpecification() instanceof LiteralString) {
-            		guardValue = ((LiteralString) operand.getGuard().getSpecification()).getValue();
-            	}
-            	logger.debug("Operand guard: {}", guardValue);
-            	try {
-					CombFragment fragment = new CombFragmentImpl(guardValue, CombFragmentType.fromCode(umlCombFragment.getInteractionOperator().getName()));
-					List<CombFragment> newFragmentList = new ArrayList<CombFragment>(fragments);
-					newFragmentList.add(fragment);
-					analyzeFragmentSet(operand.getFragments(), diagram, newFragmentList);
-				} catch (CombFragmentException e) {
-					throw new AnalyzerException("Unable to process seq diagram analysis, combined fragment cannot be created.", e);
-				}
+            } else if (object instanceof CombinedFragment) {
+                CombinedFragment umlCombFragment = (CombinedFragment) object;
+                umlCombFragment.getInteractionOperator().getName();
+                InteractionOperand operand = umlCombFragment.getOperands().get(0);
+                String guardValue = "";
+                if (operand.getGuard().getSpecification() instanceof LiteralString) {
+                    guardValue = ((LiteralString) operand.getGuard().getSpecification()).getValue();
+                }
+                logger.debug("Operand guard: {}", guardValue);
+                try {
+                    CombFragment fragment = new CombFragmentImpl(guardValue, CombFragmentType.fromCode(umlCombFragment.getInteractionOperator().getName()));
+                    List<CombFragment> newFragmentList = new ArrayList<CombFragment>(fragments);
+                    newFragmentList.add(fragment);
+                    analyzeFragmentSet(operand.getFragments(), diagram, newFragmentList);
+                } catch (CombFragmentException e) {
+                    throw new AnalyzerException("Unable to process seq diagram analysis, combined fragment cannot be created.", e);
+                }
             }
         }
     }

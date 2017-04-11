@@ -33,8 +33,8 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
             changes.add(lifelineChange);
         }
         changes.add(change);
-        for(NodeCombinedFragment fragment : node.combinedFragments()) {
-        	changes.add(new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, fragment, null));
+        for (NodeCombinedFragment fragment : node.combinedFragments()) {
+            changes.add(new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, fragment, null));
         }
         return changes;
     }
@@ -105,13 +105,13 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         return true;
     }
 
-	@Override
-	public Change createFragmentAddChange(ChangeComponent newValue) {
-		return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
-	}
+    @Override
+    public Change createFragmentAddChange(ChangeComponent newValue) {
+        return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
+    }
 
-	@Override
-	public Change createFragmentRemoveChange(ChangeComponent newValue) {
-		return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
-	}
+    @Override
+    public Change createFragmentRemoveChange(ChangeComponent newValue) {
+        return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
+    }
 }

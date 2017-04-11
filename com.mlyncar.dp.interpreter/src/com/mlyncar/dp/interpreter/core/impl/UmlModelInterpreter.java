@@ -123,30 +123,30 @@ public class UmlModelInterpreter extends AbstractInterpreter {
         }
     }
 
-	@Override
-	protected void interpretFragmentAdd(Change change)
-			throws InterpreterException {		
-		NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
-    	if((fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment)) || 
-    			(fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment))) {
-    		//just stretch, do not add; --- obtain combined fragment and add fragments to existing fragment
-    	} else {
-    		CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment)change.getNewValue());
-    		this.notationManager.addFragmentToNotation((NodeCombinedFragment)change.getNewValue(), newFragment);
+    @Override
+    protected void interpretFragmentAdd(Change change)
+            throws InterpreterException {
+        NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+        if ((fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment))
+                || (fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment))) {
+            //just stretch, do not add; --- obtain combined fragment and add fragments to existing fragment
+        } else {
+            CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment) change.getNewValue());
+            this.notationManager.addFragmentToNotation((NodeCombinedFragment) change.getNewValue(), newFragment);
             storeNotationResource();
             storeModelResource();
-    	}
-    	
-	}
+        }
 
-	@Override
-	protected void interpretFragmentRemove(Change change)
-			throws InterpreterException {
-		
-		this.modelManager.removeFragmentFromModel((NodeCombinedFragment)change.getNewValue());
-		this.notationManager.removeFragmentFromNotation((NodeCombinedFragment)change.getNewValue());
+    }
+
+    @Override
+    protected void interpretFragmentRemove(Change change)
+            throws InterpreterException {
+
+        this.modelManager.removeFragmentFromModel((NodeCombinedFragment) change.getNewValue());
+        this.notationManager.removeFragmentFromNotation((NodeCombinedFragment) change.getNewValue());
         storeNotationResource();
         storeModelResource();
-	}
+    }
 
 }

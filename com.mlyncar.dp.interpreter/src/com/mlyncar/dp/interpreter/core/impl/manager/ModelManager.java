@@ -174,30 +174,30 @@ public class ModelManager {
     }
 
     public void removeFragmentFromModel(NodeCombinedFragment fragment) {
-    	
+
     }
-    
+
     public CombinedFragment addFragmentToModel(NodeCombinedFragment fragment) {
         CombinedFragment newFragment = UMLFactory.eINSTANCE.createCombinedFragment();
-        switch(fragment.getCombinedFragmentType()) {
-        	case OPT:
-        		newFragment.setInteractionOperator(InteractionOperatorKind.OPT_LITERAL);
-        	break;
-        	default:
-        		break;
+        switch (fragment.getCombinedFragmentType()) {
+            case OPT:
+                newFragment.setInteractionOperator(InteractionOperatorKind.OPT_LITERAL);
+                break;
+            default:
+                break;
         }
         InteractionOperand operand = UMLFactory.eINSTANCE.createInteractionOperand();
         List<InteractionFragment> fragmentsToRelocate = new ArrayList<InteractionFragment>();
         for (ListIterator<InteractionFragment> iter = interaction.getFragments().listIterator(); iter.hasNext();) {
-        	InteractionFragment interactionFragment = iter.next();
+            InteractionFragment interactionFragment = iter.next();
             if (isLocatedInNodeBranch(interactionFragment, fragment.getNode())) {
-            	fragmentsToRelocate.add(interactionFragment);
+                fragmentsToRelocate.add(interactionFragment);
             }
-        }	
-        
-        for(InteractionFragment interFragment : fragmentsToRelocate) {
-        	operand.getFragments().add(interFragment);
-        	interaction.getFragments().remove(interFragment);
+        }
+
+        for (InteractionFragment interFragment : fragmentsToRelocate) {
+            operand.getFragments().add(interFragment);
+            interaction.getFragments().remove(interFragment);
         }
         InteractionConstraint guard = operand.createGuard("guard");
         LiteralString string = UMLFactory.eINSTANCE.createLiteralString();
@@ -207,32 +207,32 @@ public class ModelManager {
         interaction.getFragments().add(newFragment);
         return newFragment;
     }
-    
-    private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, Node node) { 	
-    	if (interactionFragment instanceof MessageOccurrenceSpecification) {
-    		MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) interactionFragment;
-    		return isMessageInBranch(spec.getMessage().getName(), node);
-    	} else if (interactionFragment instanceof ActionExecutionSpecification) {
-    		ActionExecutionSpecification spec = (ActionExecutionSpecification) interactionFragment;
-    		return isMessageInBranch(((MessageOccurrenceSpecification)spec.getStart()).getMessage().getName(), node);
-    	} else if (interactionFragment instanceof CombinedFragment) {
-    		//CombinedFragment combFragment = (CombinedFragment) interactionFragment;	
-    		//todo - nesting of com fragments;
-    		return false;
-    	}
-    	return false;
+
+    private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, Node node) {
+        if (interactionFragment instanceof MessageOccurrenceSpecification) {
+            MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) interactionFragment;
+            return isMessageInBranch(spec.getMessage().getName(), node);
+        } else if (interactionFragment instanceof ActionExecutionSpecification) {
+            ActionExecutionSpecification spec = (ActionExecutionSpecification) interactionFragment;
+            return isMessageInBranch(((MessageOccurrenceSpecification) spec.getStart()).getMessage().getName(), node);
+        } else if (interactionFragment instanceof CombinedFragment) {
+            //CombinedFragment combFragment = (CombinedFragment) interactionFragment;	
+            //todo - nesting of com fragments;
+            return false;
+        }
+        return false;
     }
-    
+
     private boolean isMessageInBranch(String message, Node node) {
-    	while(node != null) {
-    		if(node.getCreateEdge() != null && node.getCreateEdge().getName().equals(message)) {
-    			return true;
-    		}
-    		node = node.getParentNode();
-    	}
-    	return false;
+        while (node != null) {
+            if (node.getCreateEdge() != null && node.getCreateEdge().getName().equals(message)) {
+                return true;
+            }
+            node = node.getParentNode();
+        }
+        return false;
     }
-    
+
     private ActionExecutionSpecification getStartExecutionSpecification(int placementIndex, Node nodeToAdd, Lifeline sourceLifeline) {
         MessageOccurrenceSpecification parentMsgOccurenceSpec = null;
         for (InteractionFragment fragment : interaction.getFragments()) {

@@ -42,8 +42,8 @@ public class MessageImpl implements Message {
         this.targetLifeline = targetLifeline;
         this.sourceLifeline = sourceLifeline;
         this.seqNumber = seqNumber;
-        if(combFragments == null) {
-        	this.combFragments = new ArrayList<CombFragment>();
+        if (combFragments == null) {
+            this.combFragments = new ArrayList<CombFragment>();
         } else {
             this.combFragments = combFragments;
         }
@@ -94,13 +94,13 @@ public class MessageImpl implements Message {
         this.sourceLifeline = sourceLifeline;
     }
 
-	@Override
-	public List<CombFragment> getCombFragments() {
-		return this.combFragments;
-	}
+    @Override
+    public List<CombFragment> getCombFragments() {
+        return this.combFragments;
+    }
 
-	@Override
-	public void addCombinedFragments(List<CombFragment> fragments) {
+    @Override
+    public void addCombinedFragments(List<CombFragment> fragments) {
         this.combFragments.addAll(fragments);
-	}
+    }
 }

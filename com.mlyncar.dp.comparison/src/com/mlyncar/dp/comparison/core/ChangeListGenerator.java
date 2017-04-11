@@ -14,8 +14,8 @@ public interface ChangeListGenerator {
     public List<Change> createMessageRemovalChange(Node node, List<LeveledNode> additionalNodes);
 
     public List<Change> createMessageModifyChange(Node newValue, Node oldValue, List<LeveledNode> addidionalOldNodes, List<LeveledNode> addidionalNewNodes);
-    
+
     public Change createFragmentAddChange(ChangeComponent newValue);
-    
+
     public Change createFragmentRemoveChange(ChangeComponent newValue);
 }

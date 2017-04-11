@@ -16,7 +16,7 @@ public class NodeCombinedFragmentImpl implements NodeCombinedFragment {
     private NodeCombinedFragmentType combinedFragmentType;
     private String fragmentBody;
     private final Node node;
-   //private final Logger logger = LoggerFactory.getLogger(NodeCombinedFragmentImpl.class);
+    //private final Logger logger = LoggerFactory.getLogger(NodeCombinedFragmentImpl.class);
 
     public NodeCombinedFragmentImpl(NodeCombinedFragmentType combinedFragmentType, String fragmentBody, Node node) {
         this.combinedFragmentType = combinedFragmentType;
@@ -25,15 +25,15 @@ public class NodeCombinedFragmentImpl implements NodeCombinedFragment {
     }
 
     public NodeCombinedFragmentImpl(CombFragment fragment, Node node) throws GraphTransformationException {
-    	this.fragmentBody = fragment.getInteractionFragment();
-    	this.node = node;
-    	try {
-			this.combinedFragmentType = NodeCombinedFragmentType.fromCode(fragment.getCombFragmentType().getCode());
-		} catch (CombinedFragmentTypeException e) {
-			throw new GraphTransformationException("Error transforming combined fragment", e);
-		}
-	}
-    
+        this.fragmentBody = fragment.getInteractionFragment();
+        this.node = node;
+        try {
+            this.combinedFragmentType = NodeCombinedFragmentType.fromCode(fragment.getCombFragmentType().getCode());
+        } catch (CombinedFragmentTypeException e) {
+            throw new GraphTransformationException("Error transforming combined fragment", e);
+        }
+    }
+
     @Override
     public NodeCombinedFragmentType getCombinedFragmentType() {
         return this.combinedFragmentType;
@@ -54,14 +54,14 @@ public class NodeCombinedFragmentImpl implements NodeCombinedFragment {
         this.fragmentBody = fragmentBody;
     }
 
-	@Override
-	public Node getNode() {
-		return this.node;
-	}
+    @Override
+    public Node getNode() {
+        return this.node;
+    }
 
-	@Override
-	public String getChangeComponentType() {
-		return "Fragment";
-	}
+    @Override
+    public String getChangeComponentType() {
+        return "Fragment";
+    }
 
 }

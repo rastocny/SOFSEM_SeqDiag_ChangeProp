@@ -17,7 +17,7 @@ public interface Graph {
     public Integer getTreeDepth();
 
     public void incrementTreeDepth();
-    
+
     public List<LeveledNode> getOrderedNodes();
 
     public SeqDiagram getSeqDiagram();

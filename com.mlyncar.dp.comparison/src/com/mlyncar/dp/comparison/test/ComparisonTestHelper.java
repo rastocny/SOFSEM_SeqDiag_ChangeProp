@@ -16,22 +16,22 @@ public class ComparisonTestHelper {
     public static void printChanges(ChangeLog log) {
         logger.debug("List of found changes:");
         for (Change change : log.changes()) {
-        	if(change.getChangeType().equals(ChangeType.FRAGMENT_ADD) || change.getChangeType().equals(ChangeType.FRAGMENT_REMOVE)) {
-        		NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
-        		if(fragment.getNode().getCreateEdge() == null) {
-            		logger.debug(change.getChangeType().getCode() + "; On Node: " + fragment.getNode().getName() + " Body: " + fragment.getFragmentBody());
-        		} else {
-            		logger.debug(change.getChangeType().getCode() + "; On Node: " + fragment.getNode().getName() + ";" + fragment.getNode().getCreateEdge().getName() + " Body: " + fragment.getFragmentBody());
-        		}
+            if (change.getChangeType().equals(ChangeType.FRAGMENT_ADD) || change.getChangeType().equals(ChangeType.FRAGMENT_REMOVE)) {
+                NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+                if (fragment.getNode().getCreateEdge() == null) {
+                    logger.debug(change.getChangeType().getCode() + "; On Node: " + fragment.getNode().getName() + " Body: " + fragment.getFragmentBody());
+                } else {
+                    logger.debug(change.getChangeType().getCode() + "; On Node: " + fragment.getNode().getName() + ";" + fragment.getNode().getCreateEdge().getName() + " Body: " + fragment.getFragmentBody());
+                }
 
-        	} else {
-            	Node newValue = (Node) change.getNewValue();
+            } else {
+                Node newValue = (Node) change.getNewValue();
                 if (change.getChangeType().equals(ChangeType.MESSAGE_ADD)) {
                     logger.debug(change.getChangeType().getCode() + ":" + newValue.getName() + ":" + newValue.getCreateEdge().getName());
                 } else {
                     logger.debug(change.getChangeType().getCode() + ":" + newValue.getName());
                 }
-        	}
+            }
 
         }
     }

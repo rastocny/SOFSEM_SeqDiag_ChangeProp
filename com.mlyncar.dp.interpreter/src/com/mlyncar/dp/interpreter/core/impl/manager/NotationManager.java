@@ -155,24 +155,23 @@ public class NotationManager {
         newLifelineView.insertChild(viewToMove);
         oldLifelineView.removeChild(viewToMove);
     }
-    
+
     public void addFragmentToNotation(NodeCombinedFragment fragment, CombinedFragment newCombinedFragment) throws InterpreterException {
-    	View startLifeline = getLifelineView(fragment.getNode().getParentNode().getName());	
+        View startLifeline = getLifelineView(fragment.getNode().getParentNode().getName());
         Object compartment = getLifelineCompartment();
         NotationBoundsManager boundsManager = new NotationBoundsManager(this);
-    	Bounds bounds = boundsManager.extractFragmentBounds(fragment.getNode(), (org.eclipse.gmf.runtime.notation.Node) startLifeline);
+        Bounds bounds = boundsManager.extractFragmentBounds(fragment.getNode(), (org.eclipse.gmf.runtime.notation.Node) startLifeline);
         final String nodeType = UMLVisualIDRegistry.getType(CombinedFragmentEditPart.VISUAL_ID);
         org.eclipse.gmf.runtime.notation.Node fragmentView = ViewService.createNode((View) compartment, newCombinedFragment, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
-        if(fragmentView == null) {
-        	throw new InterpreterException("Combined fragment notation node not successfully created");
+        if (fragmentView == null) {
+            throw new InterpreterException("Combined fragment notation node not successfully created");
         }
         fragmentView.setLayoutConstraint(bounds);
-    	
+
     }
-    
 
     public void removeFragmentFromNotation(NodeCombinedFragment fragment) {
-    	
+
     }
 
     private void addMessage(Message message, View lifelineSrcV, View lifelineDstV, boolean isReply) {
@@ -214,10 +213,10 @@ public class NotationManager {
         logger.debug("Lifeline view to get: {}", lifelineName);
         for (Object obj : compartment.getChildren()) {
             View view = (View) obj;
-            if(view.getElement() instanceof Lifeline) {
+            if (view.getElement() instanceof Lifeline) {
                 if (((Lifeline) view.getElement()).getName().equals(lifelineName)) {
                     return view;
-                }	
+                }
             }
         }
         return null;

@@ -7,7 +7,7 @@ public enum CombFragmentType {
     ALT("alt"),
     OPT("opt"),
     LOOP("loop");
-    
+
     private final String code;
 
     private CombFragmentType(String code) {

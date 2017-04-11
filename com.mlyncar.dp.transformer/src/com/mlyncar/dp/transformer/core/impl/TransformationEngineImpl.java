@@ -51,11 +51,11 @@ public class TransformationEngineImpl implements TransformationEngine {
             }
 
             if (lastInsertedNode.getName().equals(message.getSourceLifeline().getName()) && !lastInsertedNode.isReply()) {
-            	if(lastInsertedNode.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && hasReply(lastInsertedNode)) {
-            		logger.debug("Found self message, moving to parent");
+                if (lastInsertedNode.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && hasReply(lastInsertedNode)) {
+                    logger.debug("Found self message, moving to parent");
                     return storeMessageIntoGraph(graph, message, lastInsertedNode.getParentNode());
-            	}
-            	
+                }
+
                 Node node = new NodeImpl(edge, lastInsertedNode, message.getTargetLifeline().getName(), message.getTargetLifeline().getPackageName());
                 fillNodeWithFragments(node, message.getCombFragments());
                 lastInsertedNode.addChildNode(node);
@@ -75,20 +75,20 @@ public class TransformationEngineImpl implements TransformationEngine {
         Graph graph = new TreeGraph(rootNode, diagram);
         return graph;
     }
-    
+
     private boolean hasReply(Node parentNode) {
-    	for(Node node : parentNode.childNodes()) {
-    		if(node.isReply()) {
-    			return true;
-    		}
-    	}
-    	return false;
+        for (Node node : parentNode.childNodes()) {
+            if (node.isReply()) {
+                return true;
+            }
+        }
+        return false;
     }
-    
+
     private void fillNodeWithFragments(Node node, List<CombFragment> fragments) throws GraphTransformationException {
-    	for(CombFragment fragment : fragments) {
-    		node.addCombinedFragment(new NodeCombinedFragmentImpl(fragment, node));
-    	}
+        for (CombFragment fragment : fragments) {
+            node.addCombinedFragment(new NodeCombinedFragmentImpl(fragment, node));
+        }
     }
 
 }

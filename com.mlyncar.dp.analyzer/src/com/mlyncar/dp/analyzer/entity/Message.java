@@ -42,9 +42,9 @@ public interface Message {
     public void setTargetLifeline(LifelineImpl targetLifeline);
 
     public void setSourceLifeline(LifelineImpl sourceLifeline);
-    
+
     public List<CombFragment> getCombFragments();
-    
+
     public void addCombinedFragments(List<CombFragment> fragments);
-    
+
 }

@@ -17,8 +17,8 @@ public class TestHelper {
                     + ";\nSOURCE: " + message.getSourceLifeline().getName() + ":" + message.getSourceLifeline().getPackageName()
                     + ";\nTARGET; " + message.getTargetLifeline().getName() + ":" + message.getTargetLifeline().getPackageName());
             logger.debug("Number of fragments {}", message.getCombFragments().size());
-            for(CombFragment fragment : message.getCombFragments()) {
-            	logger.debug("Fragment: {} {}", fragment.getCombFragmentType().getCode(), fragment.getInteractionFragment());
+            for (CombFragment fragment : message.getCombFragments()) {
+                logger.debug("Fragment: {} {}", fragment.getCombFragmentType().getCode(), fragment.getInteractionFragment());
             }
             logger.debug("---------------------------");
         }
