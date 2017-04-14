@@ -173,8 +173,53 @@ public class ModelManager {
         return execSpec;
     }
 
-    public void removeFragmentFromModel(NodeCombinedFragment fragment) {
-
+    public void removeFragmentFromModel(CombinedFragment combFragment, NodeCombinedFragment nodeCombinedFragment) {
+    	int index = 0;
+    	if(combFragment.eContainer() instanceof InteractionOperand) {
+    		InteractionOperand operand = (InteractionOperand) combFragment.eContainer();
+        	for(InteractionFragment intFragment : operand.getFragments()) {
+        		if(intFragment instanceof CombinedFragment) {
+        			CombinedFragment fr = (CombinedFragment) intFragment;
+            		if(fr.equals(combFragment)) {
+            			logger.debug("Found match in fragment comparison, returning index {}", index);
+            			break;
+            		}
+        		}
+    			index++;
+        	}
+        	int iterator = 1;
+        	for(InteractionFragment intFragment : combFragment.getOperands().get(0).getFragments()) {
+        		if(index + iterator >= operand.getFragments().size()) {
+        			operand.getFragments().add(intFragment);
+        		} else {
+        			operand.getFragments().add(index + iterator, intFragment);
+        		}
+           		iterator++;
+        	}
+        	
+    	} else if(combFragment.eContainer() instanceof Interaction) {
+        	for(InteractionFragment intFragment : ((Interaction) combFragment.eContainer()).getFragments()) {
+        		if(intFragment instanceof CombinedFragment) {
+        			CombinedFragment fr = (CombinedFragment) intFragment;
+            		if(fr.equals(combFragment)) {
+            			logger.debug("Found match in fragment comparison, returning index {}", index);
+            			break;
+            		}
+        		}
+    			index++;
+        	}
+        	int iterator = 1;
+        	List<InteractionFragment> intFragments = new ArrayList<InteractionFragment>(combFragment.getOperands().get(0).getFragments());
+        	for(InteractionFragment intFragment : intFragments) {
+        		if(index+iterator >= interaction.getFragments().size()) {
+        			interaction.getFragments().add(intFragment);
+        		} else {
+            		interaction.getFragments().add(index + iterator, intFragment);
+        		}
+           		iterator++;
+        	}
+    	}
+    	getCombinedFragment(nodeCombinedFragment).destroy();
     }
 
     public CombinedFragment addFragmentToModel(NodeCombinedFragment fragment) {
@@ -289,6 +334,51 @@ public class ModelManager {
         }
         logger.debug("Placement not found: {}", nodeToFound.getCreateEdge().getName());
         return 0;
+    }
+    
+    private InteractionFragment getCombinedFragment(NodeCombinedFragment fragment) {
+    	for(InteractionFragment intFra : interaction.getFragments()) {
+    		if(intFra instanceof CombinedFragment) {
+    			CombinedFragment combFragment = (CombinedFragment) intFra;
+    			if(fragmentsMatch(combFragment, fragment)) {
+					return combFragment;
+				} else {
+					InteractionFragment nestedFragment =  getNestedCombFragment(fragment, combFragment.getOperands().get(0));
+					if(nestedFragment != null) {
+						return nestedFragment;
+					}
+    			}
+    		}
+    	}
+    	return null;
+    }
+    
+    private InteractionFragment getNestedCombFragment(NodeCombinedFragment fragment, InteractionOperand operand) {
+    	for(InteractionFragment interactionFragment : operand.getFragments()) {
+    		if(interactionFragment instanceof CombinedFragment) {
+    			CombinedFragment combFragment = (CombinedFragment) interactionFragment;
+    			if(fragmentsMatch(combFragment, fragment)) {
+    				return interactionFragment;
+    			} else {
+    				InteractionFragment nestedFragment = getNestedCombFragment(fragment, combFragment.getOperands().get(0));
+    				if(nestedFragment != null) {
+    					return nestedFragment;
+    				}
+    			}
+    		} 
+    	}
+    	return null;
+    }
+    
+    private boolean fragmentsMatch(CombinedFragment combFragment, NodeCombinedFragment fragment) {
+		if(combFragment.getInteractionOperator().getName().equals(fragment.getCombinedFragmentType().getCode()) 
+				&& combFragment.getOperands().get(0).getGuard().getSpecification() instanceof LiteralString) {
+			LiteralString string = (LiteralString) combFragment.getOperands().get(0).getGuard().getSpecification();
+			if(string.getValue().equals(fragment.getFragmentBody())) {
+				return true;
+			}	
+		}
+		return false;
     }
 
 }

@@ -112,6 +112,6 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
 
     @Override
     public Change createFragmentRemoveChange(ChangeComponent newValue) {
-        return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_ADD, newValue, null);
+        return new ChangeImpl(UUID.randomUUID().toString(), ChangeType.FRAGMENT_REMOVE, newValue, null);
     }
 }

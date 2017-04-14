@@ -32,9 +32,8 @@ public class InterpreterService {
         interpretChangeBasedOnType(ChangeType.MESSAGE_ADD, changeLog, false);
         interpretChangeBasedOnType(ChangeType.MESSAGE_MODIFY, changeLog, false);
         interpretChangeBasedOnType(ChangeType.LIFELINE_REMOVE, changeLog, false);
+        interpretChangeBasedOnType(ChangeType.FRAGMENT_REMOVE, changeLog, false);
         interpretChangeBasedOnType(ChangeType.FRAGMENT_ADD, changeLog, false);
-
-        umlInterpreter.finalizeInterpretation();
         fileInterpreter.finalizeInterpretation();
     }
 

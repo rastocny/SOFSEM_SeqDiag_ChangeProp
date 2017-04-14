@@ -18,6 +18,7 @@ import org.eclipse.uml2.uml.ActionExecutionSpecification;
 import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Interaction;
 import org.eclipse.uml2.uml.Lifeline;
+import org.eclipse.uml2.uml.LiteralString;
 import org.eclipse.uml2.uml.Message;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.slf4j.Logger;
@@ -167,11 +168,24 @@ public class NotationManager {
             throw new InterpreterException("Combined fragment notation node not successfully created");
         }
         fragmentView.setLayoutConstraint(bounds);
-
     }
 
-    public void removeFragmentFromNotation(NodeCombinedFragment fragment) {
-
+    public CombinedFragment removeFragmentFromNotation(NodeCombinedFragment fragment) throws InterpreterException {
+    	for(Object objView : ((View) getLifelineCompartment()).getChildren()) {
+    		View view = (View) objView;
+    		if(view.getElement() instanceof CombinedFragment) {
+    			CombinedFragment combFragment = (CombinedFragment) view.getElement();		
+    			if(combFragment.getInteractionOperator().getName().equals(fragment.getCombinedFragmentType().getCode()) 
+    					&& combFragment.getOperands().get(0).getGuard().getSpecification() instanceof LiteralString) {
+					LiteralString string = (LiteralString) combFragment.getOperands().get(0).getGuard().getSpecification();
+					if(string.getValue().equals(fragment.getFragmentBody())) {
+				    	((View) getLifelineCompartment()).removeChild(view);
+						return combFragment;
+					}	
+    			}
+    		}
+    	}
+		throw new InterpreterException("Unable to remove combined fragment from notation, no match in diagram child list found");
     }
 
     private void addMessage(Message message, View lifelineSrcV, View lifelineDstV, boolean isReply) {

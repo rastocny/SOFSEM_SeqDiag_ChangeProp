@@ -15,6 +15,7 @@ import com.mlyncar.dp.interpreter.core.impl.manager.NotationManager;
 import com.mlyncar.dp.interpreter.core.modelset.MessageAddModelSet;
 import com.mlyncar.dp.interpreter.core.modelset.MessageRemoveModelSet;
 import com.mlyncar.dp.interpreter.exception.InterpreterException;
+import com.mlyncar.dp.interpreter.exception.ResourceStoreException;
 import com.mlyncar.dp.transformer.entity.EdgeType;
 import com.mlyncar.dp.transformer.entity.Node;
 import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
@@ -49,8 +50,12 @@ public class UmlModelInterpreter extends AbstractInterpreter {
         }
         MessageAddModelSet modelSet = modelManager.addMessageToModel(nodeToAdd, nodeToAddReturn);
         notationManager.addMessageToNotation(nodeToAdd, modelSet.getNewMessage(), modelSet.getNewReplyMessage(), modelSet.getActionSpecStart(), modelSet.getActionSpecEnd());
-        storeModelResource();
-        storeNotationResource();
+        try {
+            storeModelResource();
+            storeNotationResource();
+		} catch (ResourceStoreException e) {
+			logger.error("Error storing resource: ", e);
+		}
         logger.debug("Message add interpreted to uml and notation model");
     }
 
@@ -58,8 +63,12 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     protected void interpretLifelineAdd(Change change) throws InterpreterException {
         Lifeline newLifeline = modelManager.addLifelineToModel((Node) change.getNewValue());
         notationManager.addLifelineToNotation((Node) change.getNewValue(), newLifeline);
-        storeModelResource();
-        storeNotationResource();
+        try {
+            storeModelResource();
+            storeNotationResource();
+		} catch (ResourceStoreException e) {
+			logger.error("Error storing resource: ", e);
+		}
         logger.debug("Lifeline add interpreted to uml model");
     }
 
@@ -81,45 +90,52 @@ public class UmlModelInterpreter extends AbstractInterpreter {
 
         MessageRemoveModelSet modelSet = notationManager.removeMessageFromNotation(nodeToRemove, nodeToRemoveReturn, modelManager.getInteraction());
         modelManager.removeMessageFromModel(nodeToRemove, nodeToRemoveReturn, modelSet);
-        storeNotationResource();
-        storeModelResource();
+        try {
+            storeNotationResource();
+            storeModelResource();
+		} catch (ResourceStoreException e) {
+			logger.error("Error storing resource: ", e);
+		}
     }
 
     @Override
     protected void interpretMessageModify(Change change) throws InterpreterException {
         ActionExecutionSpecification spec = this.modelManager.relocateMessageInModel((Node) change.getOldValue(), (Node) change.getNewValue());
         notationManager.relocateMessage((Node) change.getOldValue(), (Node) change.getNewValue(), spec);
-        storeModelResource();
-        storeNotationResource();
+        try {
+            storeModelResource();
+            storeNotationResource();
+		} catch (ResourceStoreException e) {
+			logger.error("Error storing resource: ", e);
+		}
     }
 
     @Override
     protected void interpretLifelineRemove(Change change) throws InterpreterException {
         notationManager.removeLifelineFromNotation((Node) change.getNewValue());
         modelManager.removeLifelineFromModel((Node) change.getNewValue());
-        storeNotationResource();
-        storeModelResource();
+        try {
+			storeNotationResource();
+	        storeModelResource();
+		} catch (ResourceStoreException e) {
+			logger.error("Error storing resource: ", e);
+		}
+
     }
 
-    @Override
-    public void finalizeInterpretation() throws InterpreterException {
-        storeModelResource();
-        storeNotationResource();
-    }
-
-    private void storeNotationResource() throws InterpreterException {
+    private void storeNotationResource() throws ResourceStoreException {
         try {
             this.notationManager.getResource().save(null);
         } catch (IOException e) {
-            throw new InterpreterException("Unable to update notation resource", e);
+            throw new ResourceStoreException("Unable to update notation resource", e);
         }
     }
 
-    private void storeModelResource() throws InterpreterException {
+    private void storeModelResource() throws ResourceStoreException {
         try {
             this.modelManager.getResource().save(null);
         } catch (IOException e) {
-            throw new InterpreterException("Unable to update model resource", e);
+            throw new ResourceStoreException("Unable to update model resource", e);
         }
     }
 
@@ -133,8 +149,12 @@ public class UmlModelInterpreter extends AbstractInterpreter {
         } else {
             CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment) change.getNewValue());
             this.notationManager.addFragmentToNotation((NodeCombinedFragment) change.getNewValue(), newFragment);
-            storeNotationResource();
-            storeModelResource();
+            try {
+                storeModelResource();
+                storeNotationResource();
+    		} catch (ResourceStoreException e) {
+    			logger.error("Error storing resource: ", e);
+    		}
         }
 
     }
@@ -142,11 +162,24 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     @Override
     protected void interpretFragmentRemove(Change change)
             throws InterpreterException {
-
-        this.modelManager.removeFragmentFromModel((NodeCombinedFragment) change.getNewValue());
-        this.notationManager.removeFragmentFromNotation((NodeCombinedFragment) change.getNewValue());
-        storeNotationResource();
-        storeModelResource();
+        NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+        if ((fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment))
+                || (fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment))) {
+        	//just stretch up
+        } else {
+            CombinedFragment fr = this.notationManager.removeFragmentFromNotation((NodeCombinedFragment) change.getNewValue());
+            this.modelManager.removeFragmentFromModel(fr, fragment);
+            try {
+                storeNotationResource();
+                storeModelResource();
+    		} catch (ResourceStoreException e) {
+    			logger.error("Error storing resource: ", e);
+    		}
+        }
     }
+
+	@Override
+	public void finalizeInterpretation() throws InterpreterException {
+	}
 
 }
