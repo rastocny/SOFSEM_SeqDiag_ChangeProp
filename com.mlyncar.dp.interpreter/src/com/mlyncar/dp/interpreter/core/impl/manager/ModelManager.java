@@ -15,6 +15,7 @@ import org.eclipse.uml2.uml.InteractionOperatorKind;
 import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.LiteralString;
 import org.eclipse.uml2.uml.Message;
+import org.eclipse.uml2.uml.MessageEnd;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.eclipse.uml2.uml.MessageSort;
 import org.eclipse.uml2.uml.UMLFactory;
@@ -67,7 +68,7 @@ public class ModelManager {
         if (sourceLifeline == null) {
             throw new InterpreterException("Unable to interpret message " + messageName + ", source lifeline not found " + nodeToAdd.getParentNode().getName());
         }
-        int placementIndex = getPlacementIndex(nodeToAdd);
+        MessagePlacementHolder placementIndex = getPlacementIndex(nodeToAdd, interaction, null);
         ActionExecutionSpecification actionSpec = getStartExecutionSpecification(placementIndex, nodeToAdd, sourceLifeline);
         ActionExecutionSpecification newActionSpec = UMLFactory.eINSTANCE.createActionExecutionSpecification();
         newActionSpec.setName("execSpecNew_" + messageName);
@@ -93,12 +94,18 @@ public class ModelManager {
         newActionSpec.setFinish(messageOccurrenceReplyStart);
 
         //placement should be done to order - if hassibling after sibling, else after parent
-        interaction.getFragments().add(placementIndex + 2, newActionSpec);
-        interaction.getFragments().add(placementIndex + 3, messageOccurrenceStart);
-        interaction.getFragments().add(placementIndex + 4, messageOccurrenceEnd);
-        interaction.getFragments().add(placementIndex + 5, messageOccurrenceReplyStart);
-        interaction.getFragments().add(placementIndex + 6, messageOccurrenceReplyEnd);
+        List<InteractionFragment> fragments = placementIndex.getContainer();
+        fragments.add(placementIndex.getIndex() + 2, newActionSpec);
+        fragments.add(placementIndex.getIndex() + 3, messageOccurrenceStart);
+        fragments.add(placementIndex.getIndex() + 4, messageOccurrenceEnd);
+        fragments.add(placementIndex.getIndex() + 5, messageOccurrenceReplyStart);
+        fragments.add(placementIndex.getIndex() + 6, messageOccurrenceReplyEnd);
 
+        if(placementIndex.getFragment() != null) {
+            logger.debug("Message {} added to Fragment {}, current size of elements {}", messageName, placementIndex.getFragment(), placementIndex.getFragment().getOperands().get(0).getFragments().size());
+            logger.debug("Size within interaction {}", ((CombinedFragment )interaction.getFragment(placementIndex.getFragment().getName())).getOperands().get(0).getFragments().size());
+        }
+ 
         Message newMessage = UMLFactory.eINSTANCE.createMessage();
         newMessage.setInteraction(this.interaction);
         newMessage.setName(nodeToAdd.getCreateEdge().getName());
@@ -116,7 +123,7 @@ public class ModelManager {
         messageOccurrenceReplyStart.setMessage(newReplyMessage);
         messageOccurrenceReplyEnd.setMessage(newReplyMessage);
 
-        MessageAddModelSet modelSet = new MessageAddModelSet(newMessage, newReplyMessage, actionSpec, newActionSpec);
+        MessageAddModelSet modelSet = new MessageAddModelSet(newMessage, newReplyMessage, actionSpec, newActionSpec, placementIndex.getFragment());
         return modelSet;
     }
 
@@ -175,6 +182,8 @@ public class ModelManager {
 
     public void removeFragmentFromModel(CombinedFragment combFragment, NodeCombinedFragment nodeCombinedFragment) {
     	int index = 0;
+    	int iterator = 0;
+    	List<InteractionFragment> containerList = null;
     	if(combFragment.eContainer() instanceof InteractionOperand) {
     		InteractionOperand operand = (InteractionOperand) combFragment.eContainer();
         	for(InteractionFragment intFragment : operand.getFragments()) {
@@ -187,16 +196,7 @@ public class ModelManager {
         		}
     			index++;
         	}
-        	int iterator = 1;
-        	for(InteractionFragment intFragment : combFragment.getOperands().get(0).getFragments()) {
-        		if(index + iterator >= operand.getFragments().size()) {
-        			operand.getFragments().add(intFragment);
-        		} else {
-        			operand.getFragments().add(index + iterator, intFragment);
-        		}
-           		iterator++;
-        	}
-        	
+        	containerList = operand.getFragments();
     	} else if(combFragment.eContainer() instanceof Interaction) {
         	for(InteractionFragment intFragment : ((Interaction) combFragment.eContainer()).getFragments()) {
         		if(intFragment instanceof CombinedFragment) {
@@ -208,18 +208,34 @@ public class ModelManager {
         		}
     			index++;
         	}
-        	int iterator = 1;
-        	List<InteractionFragment> intFragments = new ArrayList<InteractionFragment>(combFragment.getOperands().get(0).getFragments());
-        	for(InteractionFragment intFragment : intFragments) {
-        		if(index+iterator >= interaction.getFragments().size()) {
-        			interaction.getFragments().add(intFragment);
-        		} else {
-            		interaction.getFragments().add(index + iterator, intFragment);
-        		}
-           		iterator++;
-        	}
+        	containerList = interaction.getFragments();
     	}
+    	List<InteractionFragment> intFragments = new ArrayList<InteractionFragment>(((CombinedFragment)getCombinedFragment(nodeCombinedFragment)).getOperands().get(0).getFragments());
+    	String lastMessageName = "";
+    	logger.debug("Number of fragments to relocate from comb fragment: {}", intFragments.size());
+    	for(InteractionFragment intFragment : intFragments) {
+    		int placementIndex = containerList.size() - 1;
+    		if(index+iterator >= containerList.size()) {
+    			containerList.add(intFragment);
+    		} else {
+    			placementIndex = index + iterator;
+    			containerList.add(placementIndex, intFragment);
+    		}
+    		if(intFragment instanceof MessageOccurrenceSpecification) {
+    			Message msg = interaction.getMessage(((MessageOccurrenceSpecification) intFragment).getMessage().getName());
+    			logger.debug("Updating references of newly relocated fragment {}", intFragment.toString());
+    			if(lastMessageName.equals(((MessageOccurrenceSpecification) intFragment).getMessage().getName())) {
+          			msg.setReceiveEvent((MessageEnd) intFragment);
+    			} else {
+          			msg.setSendEvent((MessageEnd) intFragment);
+    			}
+    			lastMessageName = ((MessageOccurrenceSpecification) intFragment).getMessage().getName();
+    		}
+       		iterator++;
+    	}
+	
     	getCombinedFragment(nodeCombinedFragment).destroy();
+    	logger.debug("Number of lifelines: {}", interaction.getLifelines().size());
     }
 
     public CombinedFragment addFragmentToModel(NodeCombinedFragment fragment) {
@@ -239,7 +255,6 @@ public class ModelManager {
                 fragmentsToRelocate.add(interactionFragment);
             }
         }
-
         for (InteractionFragment interFragment : fragmentsToRelocate) {
             operand.getFragments().add(interFragment);
             interaction.getFragments().remove(interFragment);
@@ -278,9 +293,9 @@ public class ModelManager {
         return false;
     }
 
-    private ActionExecutionSpecification getStartExecutionSpecification(int placementIndex, Node nodeToAdd, Lifeline sourceLifeline) {
+    private ActionExecutionSpecification getStartExecutionSpecification(MessagePlacementHolder placementIndex, Node nodeToAdd, Lifeline sourceLifeline) {
         MessageOccurrenceSpecification parentMsgOccurenceSpec = null;
-        for (InteractionFragment fragment : interaction.getFragments()) {
+        for (InteractionFragment fragment : placementIndex.getContainer()) {
             if (fragment instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
                 if (spec.getMessage() != null && spec.getMessage().getName().equals(nodeToAdd.getCreateEdge().getName())) {
@@ -302,38 +317,53 @@ public class ModelManager {
         ActionExecutionSpecification newSpec = UMLFactory.eINSTANCE.createActionExecutionSpecification();
         newSpec.setName("execSpec_" + nodeToAdd.getCreateEdge().getName());
         sourceLifeline.getCoveredBys().add(newSpec);
-        interaction.getFragments().add(placementIndex + 1, newSpec);
+        placementIndex.getContainer().add(placementIndex.getIndex() + 1, newSpec);
         return newSpec;
     }
 
-    private int getPlacementIndex(Node nodeToAdd) {
+    private MessagePlacementHolder getPlacementIndex(Node nodeToAdd, Object fragmentSet, CombinedFragment fr) {
         Node nodeToFound;
         if (nodeToAdd.getLeftSibling() != null) {
             nodeToFound = nodeToAdd.getLeftSibling();
         } else if (nodeToAdd.getParentNode() != null) {
             nodeToFound = nodeToAdd.getParentNode();
         } else {
-            return 0;
+        	return new MessagePlacementHolder(null, 0, fr);
         }
         int index = 0;
         boolean firstFound = false;
-        for (InteractionFragment fragment : interaction.getFragments()) { //listIterator.previous();
+        List<InteractionFragment> fragments;
+        if(fragmentSet instanceof Interaction) {
+        	fragments = ((Interaction) fragmentSet).getFragments();
+        	logger.debug("Iterating over main interaction component");
+        } else {
+        	fragments = ((InteractionOperand) fragmentSet).getFragments();
+        	logger.debug("Iterating over interaction operand fragments");
+        }
+        for (InteractionFragment fragment : fragments) { //listIterator.previous();
             if (fragment instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
                 if (nodeToFound.getCreateEdge() != null) {
                     String messageName = spec.getMessage().getName();
-                    logger.debug("Checking if placement of {} should be after {}", nodeToFound.getCreateEdge().getName(), messageName);
+                    logger.debug("Checking if placement of {} should be after {}", nodeToAdd.getCreateEdge().getName(), messageName);
                     if (messageName.contains(nodeToFound.getCreateEdge().getName()) && !firstFound) {
                         firstFound = true;
                     } else if (messageName.contains(nodeToFound.getCreateEdge().getName()) && firstFound) {
-                        return index;
+                        return new MessagePlacementHolder(fragments, index, fr);
                     }
                 }
+            } else if (fragment instanceof CombinedFragment) {
+            	logger.debug("Found fragment - starting to check nested fragments {}", fragment.toString());
+            	MessagePlacementHolder nestedPlacement = getPlacementIndex(nodeToAdd, ((CombinedFragment) fragment).getOperands().get(0), (CombinedFragment) fragment);
+            	if(nestedPlacement.getIndex() != -1) {
+            		logger.debug("Index found, returning {}", nestedPlacement.getIndex());
+            		return nestedPlacement;
+            	}
             }
             index++;
         }
         logger.debug("Placement not found: {}", nodeToFound.getCreateEdge().getName());
-        return 0;
+        return new MessagePlacementHolder(null, -1, fr);
     }
     
     private InteractionFragment getCombinedFragment(NodeCombinedFragment fragment) {
@@ -379,6 +409,33 @@ public class ModelManager {
 			}	
 		}
 		return false;
+    }
+    
+    class MessagePlacementHolder {
+    	
+    	public MessagePlacementHolder(List<InteractionFragment> container, int index, CombinedFragment fragment) {
+    		this.index = index;
+    		this.container = container;
+    		this.fragment = fragment;
+    	}
+    	private final int index;
+    	
+    	public int getIndex() {
+    		return this.index;
+    	}
+    	
+    	private final List<InteractionFragment> container;
+    	
+    	public List<InteractionFragment>  getContainer() {
+    		return this.container;
+    	}
+    	
+    	private CombinedFragment fragment;
+    	
+    	public CombinedFragment getFragment() {
+    		return this.fragment;
+    	}
+    	
     }
 
 }

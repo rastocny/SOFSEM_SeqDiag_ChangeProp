@@ -62,7 +62,7 @@ public class NotationManager {
         addLifeline(newLifeline);
     }
 
-    public void addMessageToNotation(Node nodeToAdd, Message newMessage, Message newReplyMessage, ActionExecutionSpecification actionSpecStart, ActionExecutionSpecification actionSpecEnd) throws InterpreterException {
+    public void addMessageToNotation(Node nodeToAdd, Message newMessage, Message newReplyMessage, ActionExecutionSpecification actionSpecStart, ActionExecutionSpecification actionSpecEnd, CombinedFragment fragment) throws InterpreterException {
         NotationBoundsManager notationBoundsManager = new NotationBoundsManager(this);
         View sourceLifelineView = getLifelineView(nodeToAdd.getParentNode().getName());
         View targetLifelineView = getLifelineView(nodeToAdd.getName());
@@ -76,7 +76,15 @@ public class NotationManager {
         notationBoundsManager.adjustParentExecSpecs(nodeToAdd, location1.getHeight() + 10);
         executionViewInit.setLayoutConstraint(location1);
         executionViewEnd.setLayoutConstraint(location2);
-
+        if(fragment != null) {
+        	for(Object obj : getLifelineCompartment().getChildren()) {
+        		View view = (View) obj;
+        		if(view.getElement() instanceof CombinedFragment && ((CombinedFragment) view.getElement()).getName().equals(fragment.getName())) {
+        			logger.debug("Stretching combined fragment {}", fragment.toString());
+        			notationBoundsManager.updateFragmentSize((org.eclipse.gmf.runtime.notation.Node)view, location1);
+        		}
+        	}
+        }
         addMessage(newMessage, executionViewInit, executionViewEnd, false);
         addMessage(newReplyMessage, executionViewEnd, executionViewInit, true);
     }
@@ -217,9 +225,9 @@ public class NotationManager {
         }
     }
 
-    Object getLifelineCompartment() {
+    View getLifelineCompartment() {
         View compartment1 = (View) diagram.getChildren().get(0);
-        return compartment1.getChildren().get(1);
+        return (View) compartment1.getChildren().get(1);
     }
 
     View getLifelineView(String lifelineName) throws InterpreterException {

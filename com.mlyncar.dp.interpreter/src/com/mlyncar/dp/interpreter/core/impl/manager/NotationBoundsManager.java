@@ -6,6 +6,7 @@ import org.eclipse.gmf.runtime.notation.Bounds;
 import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
+import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.slf4j.Logger;
@@ -121,6 +122,13 @@ public class NotationBoundsManager {
         return bounds;
     }
 
+    public void updateFragmentSize(org.eclipse.gmf.runtime.notation.Node fragment, Bounds actionBounds) {
+    	Bounds bounds = (Bounds) fragment.getLayoutConstraint();
+    	bounds.setWidth(calculateLifelinePosition() - bounds.getX());
+    	bounds.setHeight(bounds.getHeight() + actionBounds.getHeight());
+    	fragment.setLayoutConstraint(bounds);
+    }
+    
     private Bounds getNodeExecutionOccurrenceStartBounds(Node refNode) throws InterpreterException {
         org.eclipse.gmf.runtime.notation.Node node = getNodeExecutionNotationStart(refNode);
         if (node == null) {
@@ -175,6 +183,7 @@ public class NotationBoundsManager {
                 ActionExecutionSpecification specification = (ActionExecutionSpecification) view.getElement();
                 if (specification.getStart() instanceof MessageOccurrenceSpecification) {
                     String messageName = ((MessageOccurrenceSpecification) specification.getStart()).getMessage().getName();
+                    logger.debug("Comparing spec {}", specification.getName());
                     if (messageName.equals(node.getCreateEdge().getName())) {
                         logger.debug("Found spec {}", specification.getName());
                         return (org.eclipse.gmf.runtime.notation.Node) viewObj;
@@ -207,4 +216,5 @@ public class NotationBoundsManager {
         }
         return bounds.getWidth() / 2 - 8;
     }
+   
 }

@@ -49,7 +49,7 @@ public class UmlModelInterpreter extends AbstractInterpreter {
             throw new InterpreterException("Unable to interpret message " + nodeToAdd.getCreateEdge().getName() + " because it does not contain return message");
         }
         MessageAddModelSet modelSet = modelManager.addMessageToModel(nodeToAdd, nodeToAddReturn);
-        notationManager.addMessageToNotation(nodeToAdd, modelSet.getNewMessage(), modelSet.getNewReplyMessage(), modelSet.getActionSpecStart(), modelSet.getActionSpecEnd());
+        notationManager.addMessageToNotation(nodeToAdd, modelSet.getNewMessage(), modelSet.getNewReplyMessage(), modelSet.getActionSpecStart(), modelSet.getActionSpecEnd(), modelSet.getFragment());
         try {
             storeModelResource();
             storeNotationResource();
@@ -143,9 +143,10 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     protected void interpretFragmentAdd(Change change)
             throws InterpreterException {
         NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
-        if ((fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment))
-                || (fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment))) {
-            //just stretch, do not add; --- obtain combined fragment and add fragments to existing fragment
+        if (fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment)) {
+        	return;
+        } else if(fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment)) {
+        	
         } else {
             CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment) change.getNewValue());
             this.notationManager.addFragmentToNotation((NodeCombinedFragment) change.getNewValue(), newFragment);
