@@ -344,6 +344,7 @@ public class ModelManager {
             if (fragment instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
                 if (nodeToFound.getCreateEdge() != null) {
+                	logger.debug("Checked specification: {}", spec.toString());
                     String messageName = spec.getMessage().getName();
                     logger.debug("Checking if placement of {} should be after {}", nodeToAdd.getCreateEdge().getName(), messageName);
                     if (messageName.contains(nodeToFound.getCreateEdge().getName()) && !firstFound) {

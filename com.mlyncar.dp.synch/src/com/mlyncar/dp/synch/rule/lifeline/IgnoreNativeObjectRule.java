@@ -12,7 +12,7 @@ public class IgnoreNativeObjectRule implements SynchRule {
     public boolean validateChange(Change change, StatsProviderHolder statsHolder)
             throws SynchRuleException {
         Node node = (Node) change.getNewValue();
-        if (node.getPackage().contains("java.io") || node.getPackage().contains("java.util") || node.getPackage().contains("java.lang")) {
+        if (node.getPackage().contains("java.io") || node.getPackage().contains("java.util") || node.getPackage().contains("java.lang") || node.getPackage().equals("")) {
             return false;
         }
         return true;

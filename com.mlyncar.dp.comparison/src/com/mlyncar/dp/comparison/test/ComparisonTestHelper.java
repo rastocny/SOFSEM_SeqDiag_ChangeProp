@@ -26,7 +26,7 @@ public class ComparisonTestHelper {
 
             } else {
                 Node newValue = (Node) change.getNewValue();
-                if (change.getChangeType().equals(ChangeType.MESSAGE_ADD)) {
+                if (change.getChangeType().equals(ChangeType.MESSAGE_ADD) || change.getChangeType().equals(ChangeType.MESSAGE_REMOVE)) {
                     logger.debug(change.getChangeType().getCode() + ":" + newValue.getName() + ":" + newValue.getCreateEdge().getName());
                 } else {
                     logger.debug(change.getChangeType().getCode() + ":" + newValue.getName());
