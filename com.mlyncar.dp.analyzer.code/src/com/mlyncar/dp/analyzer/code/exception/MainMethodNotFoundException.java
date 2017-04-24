@@ -1,4 +1,4 @@
-package com.mlyncar.dp.analyzer.exception;
+package com.mlyncar.dp.analyzer.code.exception;
 
 public class MainMethodNotFoundException extends Exception {
 

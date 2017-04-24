@@ -11,7 +11,10 @@ Require-Bundle: org.eclipse.ui,
  slf4j.api;bundle-version="1.6.6"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: com.mlyncar.dp.analyzer.code
+Import-Package: com.mlyncar.dp.analyzer.code,
+ com.mlyncar.dp.analyzer.code.exception,
+ com.mlyncar.dp.analyzer.code.service,
+ com.mlyncar.dp.analyzer.uml.service
 Export-Package: com.mlyncar.dp.transformer.entity,
  com.mlyncar.dp.transformer.exception,
  com.mlyncar.dp.transformer.helper,

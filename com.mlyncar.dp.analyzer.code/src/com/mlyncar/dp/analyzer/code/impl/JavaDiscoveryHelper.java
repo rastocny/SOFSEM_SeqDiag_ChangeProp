@@ -28,10 +28,10 @@ import org.eclipse.modisco.java.discoverer.DiscoverJavaModelFromJavaProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mlyncar.dp.analyzer.code.exception.SourceCodeAnalyzerException;
 import com.mlyncar.dp.analyzer.entity.CombFragment;
 import com.mlyncar.dp.analyzer.entity.CombFragmentType;
 import com.mlyncar.dp.analyzer.entity.impl.CombFragmentImpl;
-import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
 import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
 
 public class JavaDiscoveryHelper {

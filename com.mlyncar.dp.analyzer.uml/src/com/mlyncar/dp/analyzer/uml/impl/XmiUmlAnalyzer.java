@@ -48,10 +48,10 @@ import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
 import com.mlyncar.dp.analyzer.entity.impl.SeqDiagramImpl;
 import com.mlyncar.dp.analyzer.exception.AnalyzerException;
 import com.mlyncar.dp.analyzer.exception.CombFragmentException;
-import com.mlyncar.dp.analyzer.exception.InteractionNotFoundException;
 import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
 import com.mlyncar.dp.analyzer.test.TestHelper;
 import com.mlyncar.dp.analyzer.uml.UmlAnalyzer;
+import com.mlyncar.dp.analyzer.uml.exception.InteractionNotFoundException;
 
 /**
  *
@@ -95,13 +95,17 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
     }
 
     @Override
-    public SeqDiagram analyzeSequenceDiagram(String diagramName) throws InteractionNotFoundException, AnalyzerException {
+    public SeqDiagram analyzeSequenceDiagram(String diagramName) throws AnalyzerException {
         this.resource = loadUmlModelResource(EclipseProjectNavigatorHelper.getCurrentProjectModel());
         this.notationResource = loadNotationModelResource(EclipseProjectNavigatorHelper.getCurrentProjectModel());
-        Interaction interaction = findInteraction(diagramName);
-        SeqDiagram diagram = analyzeInteraction(interaction);
-        TestHelper.validateDiagram(diagram);
-        return diagram;
+        try {
+            Interaction interaction = findInteraction(diagramName);
+            SeqDiagram diagram = analyzeInteraction(interaction);
+            TestHelper.validateDiagram(diagram);
+            return diagram;
+        } catch(InteractionNotFoundException ex) {
+        	throw new AnalyzerException("Unable to analyze sequence diagram: ", ex);
+        }
     }
 
     private Interaction findInteraction(String interactionName) throws InteractionNotFoundException {

@@ -2,7 +2,12 @@ package com.mlyncar.dp.interpreter.exception;
 
 public class ExecSpecNotFoundException extends Exception {
 
-    public ExecSpecNotFoundException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6394821809250312701L;
+
+	public ExecSpecNotFoundException(String message) {
         super(message);
     }
 

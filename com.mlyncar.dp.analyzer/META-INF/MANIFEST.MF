@@ -10,17 +10,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.9.1",
  org.eclipse.jdt.ui;bundle-version="3.10.2",
  org.eclipse.jdt.core;bundle-version="3.10.2",
- org.eclipse.gmt.modisco.java;bundle-version="0.12.2",
- org.eclipse.modisco.java.discoverer;bundle-version="0.12.2",
- org.eclipse.modisco.infra.discovery.core;bundle-version="0.12.2",
- org.apache.commons.io;bundle-version="2.0.1",
- org.eclipse.emf.ecore.xmi;bundle-version="2.10.2",
- org.eclipse.uml2.uml.resources;bundle-version="5.0.2",
  slf4j.api;bundle-version="1.6.6"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Export-Package: com.mlyncar.dp.analyzer.code,
- com.mlyncar.dp.analyzer.entity,
+Export-Package: com.mlyncar.dp.analyzer.entity,
+ com.mlyncar.dp.analyzer.entity.impl,
  com.mlyncar.dp.analyzer.exception,
- com.mlyncar.dp.analyzer.service,
- com.mlyncar.dp.analyzer.uml
+ com.mlyncar.dp.analyzer.helper,
+ com.mlyncar.dp.analyzer.test

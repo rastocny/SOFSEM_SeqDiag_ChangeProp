@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.analyzer.code.SourceCodeAnalyzer;
+import com.mlyncar.dp.analyzer.code.exception.MainMethodNotFoundException;
+import com.mlyncar.dp.analyzer.code.exception.SourceCodeAnalyzerException;
 import com.mlyncar.dp.analyzer.code.impl.JavaDiscoveryHelper.JavaDiscoveryOutput;
 import com.mlyncar.dp.analyzer.entity.CombFragment;
 import com.mlyncar.dp.analyzer.entity.Lifeline;
@@ -47,8 +49,6 @@ import com.mlyncar.dp.analyzer.entity.SeqDiagram;
 import com.mlyncar.dp.analyzer.entity.impl.LifelineImpl;
 import com.mlyncar.dp.analyzer.entity.impl.MessageImpl;
 import com.mlyncar.dp.analyzer.entity.impl.SeqDiagramImpl;
-import com.mlyncar.dp.analyzer.exception.MainMethodNotFoundException;
-import com.mlyncar.dp.analyzer.exception.SourceCodeAnalyzerException;
 import com.mlyncar.dp.analyzer.helper.EclipseProjectNavigatorHelper;
 import com.mlyncar.dp.analyzer.test.TestHelper;
 
