@@ -6,27 +6,29 @@ import java.util.List;
 import com.mlyncar.dp.comparison.entity.ChangeType;
 import com.mlyncar.dp.synch.core.SynchRuleProvider;
 import com.mlyncar.dp.synch.rule.SynchRule;
+import com.mlyncar.dp.synch.rule.combfragment.IgnoreCombinedFragmentRule;
 import com.mlyncar.dp.synch.rule.lifeline.IgnoreNativeObjectRule;
 import com.mlyncar.dp.synch.rule.lifeline.MaximumLifelineRule;
-import com.mlyncar.dp.synch.rule.lifeline.TestLifelineRule;
+import com.mlyncar.dp.synch.rule.message.IgnoreExternalCallRule;
 import com.mlyncar.dp.synch.rule.message.IgnoreGetRule;
 import com.mlyncar.dp.synch.rule.message.IgnoreNativeCallRule;
 import com.mlyncar.dp.synch.rule.message.IgnoreSetRule;
-import com.mlyncar.dp.synch.rule.message.TestMessageRule;
 
 public class SynchRuleProviderImpl implements SynchRuleProvider {
 
     private final List<SynchRule> messageAddRules = new ArrayList<SynchRule>();
     private final List<SynchRule> lifelineAddRules = new ArrayList<SynchRule>();
+    private final List<SynchRule> fragmentAddRules = new ArrayList<SynchRule>();
 
     public SynchRuleProviderImpl() {
-        messageAddRules.add(new TestMessageRule());
         messageAddRules.add(new IgnoreGetRule());
         messageAddRules.add(new IgnoreSetRule());
+        messageAddRules.add(new IgnoreExternalCallRule());
         messageAddRules.add(new IgnoreNativeCallRule());
-        lifelineAddRules.add(new TestLifelineRule());
+        fragmentAddRules.add(new IgnoreCombinedFragmentRule());
         lifelineAddRules.add(new MaximumLifelineRule());
         lifelineAddRules.add(new IgnoreNativeObjectRule());
+        lifelineAddRules.add(new IgnoreExternalCallRule());
     }
 
     @Override
@@ -36,6 +38,8 @@ public class SynchRuleProviderImpl implements SynchRuleProvider {
                 return lifelineAddRules;
             case MESSAGE_ADD:
                 return messageAddRules;
+            case FRAGMENT_ADD:
+            	return fragmentAddRules;
             default:
                 return new ArrayList<SynchRule>();
         }

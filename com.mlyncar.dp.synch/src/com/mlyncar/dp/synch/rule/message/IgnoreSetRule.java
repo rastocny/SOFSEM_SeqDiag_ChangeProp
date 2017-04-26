@@ -17,7 +17,7 @@ public class IgnoreSetRule implements SynchRule {
     public boolean validateChange(Change change, StatsProviderHolder statsHolder) throws SynchRuleException {
         logger.debug("Validating change with rule {}", this.getClass().getName());
         Node node = (Node) change.getNewValue();
-        if (node.getCreateEdge().getName().startsWith("set") && statsHolder.getDiagramGraphStats().getNumberOfSetMethods() == 0) {
+        if (node.getCreateEdge().getName().startsWith("set") && statsHolder.getDiagramGraphStats().getNumberOfSetMethods(node.getCreateEdge().getName()) == 0) {
             return false;
         }
         return true;

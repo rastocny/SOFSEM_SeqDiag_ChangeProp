@@ -1,5 +1,6 @@
 package com.mlyncar.dp.comparison.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -24,19 +25,24 @@ public class ComparisonService {
 
     private final Logger logger = LoggerFactory.getLogger(ComparisonService.class);
 
-    public ChangeLog compareUmlModelWithSourceCode() throws ComparisonException {
-
+    public List<ChangeLog> compareUmlModelWithSourceCode() throws ComparisonException {
+    	List<ChangeLog> logs = new ArrayList<ChangeLog>();
         TransformationService service = new TransformationService();
+        GraphComparator comparator = new GraphComparatorImpl(service);
         try {
+        	
             logger.debug("Starting to generate changes between graph structures.");
             //Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
             Graph umlGraph1 = service.getGraphStructureFromSourceCode();
-            //Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");
-            Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction1");
-            GraphComparator comparator = new GraphComparatorImpl(service);
-            ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
-            ComparisonTestHelper.printChanges(log);
-            return log;
+            //Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");           
+            //Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction1");
+            
+            for(Graph umlGraph2 : service.getGraphStructuresFromUmlModel()) {
+                ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
+                logs.add(log);
+                ComparisonTestHelper.printChanges(log);
+            }     
+            return logs;
         } catch (GraphTransformationException ex) {
             throw new ComparisonException("Comparison Service failed: Error while transforming diagram structure to graph.", ex);
         } catch (GraphBindingException ex) {

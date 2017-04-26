@@ -1,5 +1,7 @@
 package com.mlyncar.dp.synch.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +25,16 @@ public class SynchronizationService {
 
         ComparisonService service = new ComparisonService();
         try {
-            ChangeLog changeLog = service.compareUmlModelWithSourceCode();
+            List<ChangeLog> changeLogs = service.compareUmlModelWithSourceCode();
             InterpreterService interpreterService = new InterpreterService(PropertyLoader.getInstance().getProperty("synch.changelog"));
             SynchronizationEngine ruleEngine = new SynchronizationEngineImpl();
-            ruleEngine.processChangesViaSynchRules(changeLog);
-            logger.debug("List of changes processed by synch engine:");
-            ComparisonTestHelper.printChanges(changeLog);
-            interpreterService.interpretChanges(changeLog);
+            for(ChangeLog changeLog : changeLogs) {
+                ruleEngine.processChangesViaSynchRules(changeLog);
+                logger.debug("List of changes processed by synch engine:");
+                ComparisonTestHelper.printChanges(changeLog);
+                interpreterService.interpretChanges(changeLog);
+            }
+
         } catch (ComparisonException ex) {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the exception thrown in previous module.", ex);
         } catch (ConfigurationException ex) {
@@ -38,4 +43,5 @@ public class SynchronizationService {
             throw new SynchronizationException("Unable to synchronize source code and diagrams because of the interpreter module.", ex);
         }
     }
+
 }

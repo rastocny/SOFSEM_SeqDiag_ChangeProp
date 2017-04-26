@@ -17,7 +17,11 @@ public class IgnoreGetRule implements SynchRule {
     public boolean validateChange(Change change, StatsProviderHolder statsHolder) throws SynchRuleException {
         logger.debug("Validating change with rule {}", this.getClass().getName());
         Node newValue = (Node) change.getNewValue();
-        if (newValue.getCreateEdge().getName().startsWith("get") && statsHolder.getDiagramGraphStats().getNumberOfGetMethods() == 0) {
+        int numberOfGetMethods = statsHolder.getDiagramGraphStats().getNumberOfGetMethods(newValue.getCreateEdge().getName());
+        logger.debug("Number of get methods {}", numberOfGetMethods);
+        
+        if (newValue.getCreateEdge().getName().startsWith("get") && numberOfGetMethods == 0) {
+        	logger.debug("Message addition {} is ignored because sequence diagram does not contain any get messages", newValue.getCreateEdge().getName());
             return false;
         }
         return true;

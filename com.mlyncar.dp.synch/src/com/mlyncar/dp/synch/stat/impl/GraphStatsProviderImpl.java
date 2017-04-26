@@ -7,6 +7,7 @@ import com.mlyncar.dp.synch.stat.GraphStatsProvider;
 import com.mlyncar.dp.transformer.entity.Edge;
 import com.mlyncar.dp.transformer.entity.Graph;
 import com.mlyncar.dp.transformer.entity.LeveledNode;
+import com.mlyncar.dp.transformer.entity.NodeCombinedFragment;
 
 public class GraphStatsProviderImpl implements GraphStatsProvider {
 
@@ -26,12 +27,12 @@ public class GraphStatsProviderImpl implements GraphStatsProvider {
     }
 
     @Override
-    public Integer getNumberOfGetMethods() {
+    public Integer getNumberOfGetMethods(String messageToIgnore) {
         int count = 0;
         for (LeveledNode leveledNode : graph.getOrderedNodes()) {
             Edge createEdge = leveledNode.getNode().getCreateEdge();
             if (createEdge != null) {
-                if (createEdge.getName().startsWith("get")) {
+                if (createEdge.getName().startsWith("get") && !createEdge.getName().contains(messageToIgnore)) {
                     count++;
                 }
             }
@@ -40,16 +41,29 @@ public class GraphStatsProviderImpl implements GraphStatsProvider {
     }
 
     @Override
-    public Integer getNumberOfSetMethods() {
+    public Integer getNumberOfSetMethods(String messageToIgnore) {
         int count = 0;
         for (LeveledNode leveledNode : graph.getOrderedNodes()) {
             Edge createEdge = leveledNode.getNode().getCreateEdge();
             if (createEdge != null) {
-                if (createEdge.getName().startsWith("set")) {
+                if (createEdge.getName().startsWith("set") && !createEdge.getName().contains(messageToIgnore)) {
                     count++;
                 }
             }
         }
         return count;
     }
+
+	@Override
+	public Integer getNumberOfFragments(String fragmentToIgnore) {
+        int count = 0;
+        for (LeveledNode leveledNode : graph.getOrderedNodes()) {
+            for(NodeCombinedFragment fragment : leveledNode.getNode().combinedFragments()) {
+            	if(!fragment.getFragmentBody().equals(fragmentToIgnore)) {
+            		count++;
+            	}
+            }
+        }
+        return count;
+	}
 }

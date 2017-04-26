@@ -9,6 +9,7 @@ import com.mlyncar.dp.synch.exception.ConfigurationException;
 import com.mlyncar.dp.synch.exception.SynchRuleException;
 import com.mlyncar.dp.synch.rule.SynchRule;
 import com.mlyncar.dp.synch.stat.StatsProviderHolder;
+import com.mlyncar.dp.transformer.entity.Node;
 
 public class MaximumLifelineRule implements SynchRule {
 
@@ -34,6 +35,7 @@ public class MaximumLifelineRule implements SynchRule {
         }
 
         if (currentNumberLifelines + addedLifelines + lifelinesToAdd - removedLifelines - lifeLinesToDelete > maxLifelines) {
+        	logger.debug("Sequence diagram contains maximum number of lifelines {}. Addition of lifeline {} is ignored.", maxLifelines, ((Node) change.getNewValue()).getName());
             return false;
         }
         return true;

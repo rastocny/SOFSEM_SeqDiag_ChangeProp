@@ -4,7 +4,9 @@ public interface GraphStatsProvider {
 
     public Integer getNumberOfLifelines();
 
-    public Integer getNumberOfGetMethods();
+    public Integer getNumberOfGetMethods(String messageToIgnore);
 
-    public Integer getNumberOfSetMethods();
+    public Integer getNumberOfSetMethods(String messageToIgnore);
+    
+    public Integer getNumberOfFragments(String messageToIgnore);
 }
