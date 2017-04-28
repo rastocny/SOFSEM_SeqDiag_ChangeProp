@@ -244,6 +244,9 @@ public class ModelManager {
             case OPT:
                 newFragment.setInteractionOperator(InteractionOperatorKind.OPT_LITERAL);
                 break;
+            case LOOP:
+            	newFragment.setInteractionOperator(InteractionOperatorKind.LOOP_LITERAL);
+            	break;
             default:
                 break;
         }

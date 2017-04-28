@@ -25,7 +25,7 @@ public class SynchRuleProviderImpl implements SynchRuleProvider {
         messageAddRules.add(new IgnoreSetRule());
         messageAddRules.add(new IgnoreExternalCallRule());
         messageAddRules.add(new IgnoreNativeCallRule());
-        fragmentAddRules.add(new IgnoreCombinedFragmentRule());
+       // fragmentAddRules.add(new IgnoreCombinedFragmentRule());
         lifelineAddRules.add(new MaximumLifelineRule());
         lifelineAddRules.add(new IgnoreNativeObjectRule());
         lifelineAddRules.add(new IgnoreExternalCallRule());

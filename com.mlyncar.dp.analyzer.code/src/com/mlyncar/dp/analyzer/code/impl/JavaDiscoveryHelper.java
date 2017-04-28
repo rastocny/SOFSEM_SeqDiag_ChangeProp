@@ -15,14 +15,20 @@ import org.eclipse.gmt.modisco.java.BodyDeclaration;
 import org.eclipse.gmt.modisco.java.ClassDeclaration;
 import org.eclipse.gmt.modisco.java.Expression;
 import org.eclipse.gmt.modisco.java.ExpressionStatement;
+import org.eclipse.gmt.modisco.java.ForStatement;
 import org.eclipse.gmt.modisco.java.IfStatement;
 import org.eclipse.gmt.modisco.java.InfixExpression;
 import org.eclipse.gmt.modisco.java.MethodDeclaration;
 import org.eclipse.gmt.modisco.java.MethodInvocation;
 import org.eclipse.gmt.modisco.java.NullLiteral;
+import org.eclipse.gmt.modisco.java.NumberLiteral;
+import org.eclipse.gmt.modisco.java.PostfixExpression;
 import org.eclipse.gmt.modisco.java.ReturnStatement;
 import org.eclipse.gmt.modisco.java.SingleVariableAccess;
 import org.eclipse.gmt.modisco.java.Statement;
+import org.eclipse.gmt.modisco.java.StringLiteral;
+import org.eclipse.gmt.modisco.java.VariableDeclarationExpression;
+import org.eclipse.gmt.modisco.java.VariableDeclarationFragment;
 import org.eclipse.modisco.infra.discovery.core.exception.DiscoveryException;
 import org.eclipse.modisco.java.discoverer.DiscoverJavaModelFromJavaProject;
 import org.slf4j.Logger;
@@ -120,6 +126,14 @@ public class JavaDiscoveryHelper {
                     continue;
                 }
                 return result;
+            } else if (statement instanceof ForStatement) {
+            	ForStatement forStatement = (ForStatement) statement;
+                Block block = (Block) forStatement.getBody();
+                JavaDiscoveryOutput result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName);
+                if (result.getVariableName().isEmpty()) {
+                    continue;
+                }
+                return result;
             }
         }
         logger.debug("Variable in method name {} not found. Index: {}", methodName, statementPosition);
@@ -138,28 +152,62 @@ public class JavaDiscoveryHelper {
                 IfStatement ifStatement = (IfStatement) container;
                 if (ifStatement.getExpression() instanceof InfixExpression) {
                     InfixExpression expression = (InfixExpression) ifStatement.getExpression();
-                    String operand = analyzeOperand(expression.getLeftOperand()) + expression.getOperator().getLiteral() + analyzeOperand(expression.getRightOperand());
+                    String operand = analyzeIfOperand(expression.getLeftOperand()) + expression.getOperator().getLiteral() + analyzeIfOperand(expression.getRightOperand());
                     fragments.add(new CombFragmentImpl(operand, CombFragmentType.OPT));
                     logger.debug("Created combined Fragment intance with condition {} and type {}", operand, CombFragmentType.OPT.getCode());
                 } else {
                     logger.debug("Unknown ifstatement expression");
                 }
+            } else if (container instanceof ForStatement) {
+            	logger.debug("Found forstatement in container {}", container.toString());
+            	ForStatement forStatement = (ForStatement) container;
+            	String body = analyzeForOperand(forStatement);
+            	fragments.add(new CombFragmentImpl(body, CombFragmentType.LOOP));
+            	logger.debug("Created combined Fragment intance with condition {} and type {}", body, CombFragmentType.LOOP.getCode());
             }
         }
         logger.debug("Search finished, total found fragments {}", fragments.size());
         return fragments;
     }
 
-    private String analyzeOperand(Expression operand) {
+    private String analyzeIfOperand(Expression operand) {
         if (operand instanceof NullLiteral) {
             return "null";
         } else if (operand instanceof SingleVariableAccess) {
             SingleVariableAccess access = (SingleVariableAccess) operand;
             return access.getVariable().getName();
+        } else if(operand instanceof NumberLiteral) {
+        	NumberLiteral literal = (NumberLiteral) operand;
+        	return literal.getTokenValue();
+        } else if(operand instanceof StringLiteral) {
+        	StringLiteral literal = (StringLiteral) operand;
+        	return literal.getEscapedValue();
         } else {
             logger.debug("Unable to analyze condition operand {}", operand.toString());
             return "[Unknown]";
         }
+    }
+    
+    private String analyzeForOperand(ForStatement forStatement) {
+    	String result = "";
+    	if(forStatement.getInitializers().get(0) instanceof VariableDeclarationExpression) {
+    		VariableDeclarationExpression varDecl = (VariableDeclarationExpression) forStatement.getInitializers().get(0);
+    		VariableDeclarationFragment declFragment = varDecl.getFragments().get(0);
+    		result +=  declFragment.getName() + "=" + analyzeIfOperand(declFragment.getInitializer());
+    	} else {
+    		logger.debug("Unknown initializer expression");
+    	}
+    	if(forStatement.getExpression() instanceof InfixExpression) {
+            InfixExpression expression = (InfixExpression) forStatement.getExpression();
+          	result += ";" + analyzeIfOperand(expression.getLeftOperand()) + expression.getOperator().getLiteral() + analyzeIfOperand(expression.getRightOperand());       
+    	}
+
+       	if(forStatement.getUpdaters().get(0) instanceof PostfixExpression) {
+    		PostfixExpression infix = (PostfixExpression) forStatement.getUpdaters().get(0);
+    		SingleVariableAccess access = (SingleVariableAccess) infix.getOperand();
+    		result += ";" + access.getVariable().getName() + infix.getOperator().getLiteral();
+    	}
+		return result;
     }
 
     class JavaDiscoveryOutput {
