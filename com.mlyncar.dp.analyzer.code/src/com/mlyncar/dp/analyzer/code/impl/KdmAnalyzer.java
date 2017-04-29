@@ -110,7 +110,6 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
     }
 
     private void analyzeCodeElement(AbstractCodeElement codeElement, SeqDiagram diagram, MethodUnit method, String currentVariableName, int statementPosition, List<CombFragment> fragments) throws SourceCodeAnalyzerException {
-        // List<CombFragment> originalStateFragments = new ArrayList<CombFragment>(fragments);
         if (codeElement instanceof ActionElement) {
             ActionElement actionElement = (ActionElement) codeElement;
             int statementIndex = 0;
@@ -131,7 +130,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                                 type = MessageType.SELF;
                                 variableName = currentVariableName;
                             }
-                            List<CombFragment> newFragments = new ArrayList<CombFragment>(fragments);//fragments.addAll(output.getFragments());
+                            List<CombFragment> newFragments = new ArrayList<CombFragment>(fragments);
                             newFragments.addAll(output.getFragments());
 
                             String newPackage = getClassPackage(newMethod.eContainer());
@@ -168,6 +167,8 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                                     new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage), newFragments));
                         }
                     }
+                } else if(innerBlockElement.getName() != null && innerBlockElement.getName().equals("ASSIGN")) {
+                    analyzeCodeElement(innerBlockElement, diagram, method, currentVariableName, statementPosition, fragments);
                 } else {
                     analyzeCodeElement(innerBlockElement, diagram, method, currentVariableName, statementIndex, fragments);
                 }

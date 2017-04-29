@@ -76,6 +76,7 @@ public class JavaDiscoveryHelper {
 
     private JavaDiscoveryOutput analyzeBodyStatement(int statementPosition, EList<Statement> statements, String methodName) {
         int statementNum = 0;
+        logger.debug("Number of statements in declaration {}", statements.size());
         for (Statement statement : statements) {
             statementNum++;
             if (statement instanceof ExpressionStatement) {
@@ -85,18 +86,21 @@ public class JavaDiscoveryHelper {
                     if (methodInvocation.getExpression() instanceof SingleVariableAccess) {
                         SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
                         if (statementNum == statementPosition) {
-
                             return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                         }
                     }
                 } else if (exprStatement.getExpression() instanceof Assignment) {
                     Assignment assignment = (Assignment) exprStatement.getExpression();
+                    logger.debug("Analyzing assignment {}", assignment.toString());
                     if (assignment.getRightHandSide() instanceof MethodInvocation) {
                         MethodInvocation methodInvocation = (MethodInvocation) assignment.getRightHandSide();
+                    	logger.debug("Analyzing assignment method right hand side {}", methodInvocation.toString());
                         if (methodInvocation.getExpression() instanceof SingleVariableAccess) {
                             SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
+                           	logger.debug("RightHandSide variable access {}", access.toString());
+                           	logger.debug("StatementNum {}, StatementPoistion {}", statementNum, statementPosition);
                             if (statementNum == statementPosition) {
-                                logger.debug("Variable from methodName {} found: {}", methodName, access.getVariable().getName());
+                                logger.debug("Variable from assignment statement methodName {} found: {}", methodName, access.getVariable().getName());
                                 return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                             }
                         }
@@ -109,7 +113,7 @@ public class JavaDiscoveryHelper {
                     if (methodInvocation.getExpression() instanceof SingleVariableAccess) {
                         SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
                         if (statementNum == statementPosition) {
-                            logger.debug("Variable from methodName {} found: {}", methodName, access.getVariable().getName());
+                            logger.debug("Variable from return statement methodName {} found: {}", methodName, access.getVariable().getName());
                             return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                         }
                     }
