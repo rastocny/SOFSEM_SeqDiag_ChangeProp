@@ -40,7 +40,7 @@ public class GraphComparatorImpl implements GraphComparator {
         Graph referenceSubGraph = graphBindingEngine.createSubgraphBasedOnComparedGraph(referenceGraph, subGraph, transformationService);
 
         TreeOrderGenerator orderGenerator = transformationService.getTreeOrderGenerator();
-        ChangeLog changeLog = new ChangeLogImpl(referenceSubGraph, subGraph);
+        ChangeLog changeLog = new ChangeLogImpl(subGraph, referenceSubGraph);
         List<LeveledNode> referenceGraphNodes = orderGenerator.createTreeTravesralOrder(referenceSubGraph);
         List<LeveledNode> subGraphNodes = orderGenerator.createTreeTravesralOrder(subGraph);
         int maximumLevel;

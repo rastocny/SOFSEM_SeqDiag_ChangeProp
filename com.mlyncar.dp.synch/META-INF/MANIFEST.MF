@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.ui,
  com.mlyncar.dp.transformer;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: com.mlyncar.dp.comparison.entity,
+Import-Package: com.mlyncar.dp.analyzer.entity,
+ com.mlyncar.dp.comparison.entity,
  com.mlyncar.dp.comparison.exception,
  com.mlyncar.dp.comparison.service,
  com.mlyncar.dp.comparison.test,

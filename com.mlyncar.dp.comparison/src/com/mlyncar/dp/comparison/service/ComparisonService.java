@@ -32,11 +32,7 @@ public class ComparisonService {
         try {
         	
             logger.debug("Starting to generate changes between graph structures.");
-            //Graph sourceCodeGraph = service.getGraphStructureFromSourceCode();
             Graph umlGraph1 = service.getGraphStructureFromSourceCode();
-            //Graph umlGraph1 = service.getGraphStructureFromConcreteDiagram("Interaction1");           
-            //Graph umlGraph2 = service.getGraphStructureFromConcreteDiagram("Interaction1");
-            
             for(Graph umlGraph2 : service.getGraphStructuresFromUmlModel()) {
                 ChangeLog log = comparator.compareGraphStructures(umlGraph1, umlGraph2);
                 logs.add(log);

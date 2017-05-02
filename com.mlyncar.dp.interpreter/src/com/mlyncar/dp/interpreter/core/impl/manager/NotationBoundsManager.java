@@ -82,7 +82,11 @@ public class NotationBoundsManager {
         boolean hasSibling = newValue.getLeftSibling() != null;
 
         Bounds bounds = NotationFactory.eINSTANCE.createBounds();
-        bounds.setX(getActionExecutionPositionX(newValue, isEnd, hasSibling));
+        try {
+            bounds.setX(getActionExecutionPositionX(newValue, isEnd, hasSibling));
+        } catch(ExecSpecNotFoundException ex) {
+        	throw new InterpreterException("Unable to set x for new exec spec in message add " + newValue.getCreateEdge().getName(), ex);
+        }
 
         if (!hasSibling && !hasParent) {
             bounds.setY(30);
@@ -190,17 +194,33 @@ public class NotationBoundsManager {
                 }
             }
         }
-        throw new InterpreterException("Unable to locate sibling action occurrence specification bounds of message " + node.getCreateEdge().getName());
+        if(node.getLeftSibling()!= null) {
+            return getNodeExecutionNotationStart(node.getLeftSibling());
+        } else {
+            return getNodeExecutionNotationStart(node.getParentNode());
+        }
     }
 
-    private Integer getActionExecutionPositionX(Node newValue, boolean isEnd, boolean hasSibling) throws InterpreterException {
-        if (hasSibling && isEnd) {
+    private Integer getActionExecutionPositionX(Node newValue, boolean isEnd, boolean hasSibling) throws InterpreterException, ExecSpecNotFoundException {
+    	logger.debug("Getting execution position x for new message {}", newValue.getCreateEdge().getName());
+        if (hasSibling) {
+        	int x;
+        	logger.debug("Message has sibling, checking for sibling exec specs");
             if (newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
                 Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
                 return siblingBounds.getX() + 7;
             }
-            Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
-            return siblingBounds.getX();
+            if(isEnd) {
+                Bounds siblingBounds = getNodeExecutionOccurrenceEndBounds(newValue.getLeftSibling());
+                x = siblingBounds.getX();
+                if(newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
+                	x += 7;
+                }
+            } else {
+                Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
+                x = siblingBounds.getX();
+            }
+            return x;
         }
         View lifelineView;
         if (isEnd) {
@@ -211,7 +231,7 @@ public class NotationBoundsManager {
         org.eclipse.gmf.runtime.notation.Node node = (org.eclipse.gmf.runtime.notation.Node) lifelineView;
         Bounds bounds = (Bounds) node.getLayoutConstraint();
         if (newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF) && isEnd) {
-            return bounds.getWidth() / 2 + 2;
+            return bounds.getWidth() / 2;
         }
         return bounds.getWidth() / 2 - 8;
     }

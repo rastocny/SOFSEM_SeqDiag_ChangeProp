@@ -36,8 +36,8 @@ public class ModelManager {
     private final Logger logger = LoggerFactory.getLogger(ModelManager.class);
 
     public ModelManager(ChangeLog changeLog) {
-        this.resource = (Resource) changeLog.getReferenceGraph().getSeqDiagram().getResourceInteractionHolder();
-        this.interaction = (Interaction) changeLog.getReferenceGraph().getSeqDiagram().getInteraction();
+        this.resource = (Resource) changeLog.getSubGraph().getSeqDiagram().getResourceInteractionHolder();
+        this.interaction = (Interaction) changeLog.getSubGraph().getSeqDiagram().getInteraction();
     }
 
     public Resource getResource() {
@@ -132,8 +132,12 @@ public class ModelManager {
         interaction.getMessage(nodeToRemoveReturn.getCreateEdge().getName()).destroy();
         modelSet.getTargetOccurrence().destroy();
         modelSet.getSourceOccurrence().destroy();
-        modelSet.getActionToRemoveEnd().destroy();
-        modelSet.getActionToRemoveStart().destroy();
+        if(modelSet.getActionToRemoveEnd() != null) {
+            modelSet.getActionToRemoveEnd().destroy();
+        }
+        if(modelSet.getActionToRemoveStart() != null) {
+            modelSet.getActionToRemoveStart().destroy();
+        }
     }
 
     public void removeLifelineFromModel(Node nodeToRemove) {
@@ -239,6 +243,15 @@ public class ModelManager {
     }
 
     public CombinedFragment addFragmentToModel(NodeCombinedFragment fragment) {
+    	boolean found = false;
+		for(Message msg : interaction.getMessages()) {
+    		if(msg.getName().equals(fragment.getNode().getCreateEdge().getName())) {
+    			found = true;
+    		}
+    	}
+		if(!found) {
+			return null;
+		}
         CombinedFragment newFragment = UMLFactory.eINSTANCE.createCombinedFragment();
         switch (fragment.getCombinedFragmentType()) {
             case OPT:
@@ -274,6 +287,9 @@ public class ModelManager {
     private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, Node node) {
         if (interactionFragment instanceof MessageOccurrenceSpecification) {
             MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) interactionFragment;
+            if(spec.getMessage() == null) {
+            	return false;
+            }
             return isMessageInBranch(spec.getMessage().getName(), node);
         } else if (interactionFragment instanceof ActionExecutionSpecification) {
             ActionExecutionSpecification spec = (ActionExecutionSpecification) interactionFragment;
@@ -343,18 +359,20 @@ public class ModelManager {
         	fragments = ((InteractionOperand) fragmentSet).getFragments();
         	logger.debug("Iterating over interaction operand fragments");
         }
-        for (InteractionFragment fragment : fragments) { //listIterator.previous();
+        for (InteractionFragment fragment : fragments) { 
             if (fragment instanceof MessageOccurrenceSpecification) {
                 MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) fragment;
                 if (nodeToFound.getCreateEdge() != null) {
                 	logger.debug("Checked specification: {}", spec.toString());
-                    String messageName = spec.getMessage().getName();
-                    logger.debug("Checking if placement of {} should be after {}", nodeToAdd.getCreateEdge().getName(), messageName);
-                    if (messageName.contains(nodeToFound.getCreateEdge().getName()) && !firstFound) {
-                        firstFound = true;
-                    } else if (messageName.contains(nodeToFound.getCreateEdge().getName()) && firstFound) {
-                        return new MessagePlacementHolder(fragments, index, fr);
-                    }
+                	if(spec.getMessage() != null) {
+                        String messageName = spec.getMessage().getName();
+                        logger.debug("Checking if placement of {} should be after {}", nodeToAdd.getCreateEdge().getName(), messageName);
+                        if (messageName.contains(nodeToFound.getCreateEdge().getName()) && !firstFound) {
+                            firstFound = true;
+                        } else if (messageName.contains(nodeToFound.getCreateEdge().getName()) && firstFound) {
+                            return new MessagePlacementHolder(fragments, index, fr);
+                        }
+                	}
                 }
             } else if (fragment instanceof CombinedFragment) {
             	logger.debug("Found fragment - starting to check nested fragments {}", fragment.toString());
@@ -367,7 +385,8 @@ public class ModelManager {
             index++;
         }
         logger.debug("Placement not found: {}", nodeToFound.getCreateEdge().getName());
-        return new MessagePlacementHolder(null, -1, fr);
+        return getPlacementIndex(nodeToFound, fragmentSet, fr);
+        //   return new MessagePlacementHolder(null, -1, fr);
     }
     
     private InteractionFragment getCombinedFragment(NodeCombinedFragment fragment) {

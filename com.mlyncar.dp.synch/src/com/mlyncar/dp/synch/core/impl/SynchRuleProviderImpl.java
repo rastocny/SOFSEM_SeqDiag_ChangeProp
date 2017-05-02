@@ -21,11 +21,11 @@ public class SynchRuleProviderImpl implements SynchRuleProvider {
     private final List<SynchRule> fragmentAddRules = new ArrayList<SynchRule>();
 
     public SynchRuleProviderImpl() {
-        //messageAddRules.add(new IgnoreGetRule());
+        messageAddRules.add(new IgnoreGetRule());
         messageAddRules.add(new IgnoreSetRule());
         messageAddRules.add(new IgnoreExternalCallRule());
         messageAddRules.add(new IgnoreNativeCallRule());
-       // fragmentAddRules.add(new IgnoreCombinedFragmentRule());
+        fragmentAddRules.add(new IgnoreCombinedFragmentRule());
         lifelineAddRules.add(new MaximumLifelineRule());
         lifelineAddRules.add(new IgnoreNativeObjectRule());
         lifelineAddRules.add(new IgnoreExternalCallRule());

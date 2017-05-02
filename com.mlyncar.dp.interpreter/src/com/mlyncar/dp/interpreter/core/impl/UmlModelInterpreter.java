@@ -149,6 +149,9 @@ public class UmlModelInterpreter extends AbstractInterpreter {
         	
         } else {
             CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment) change.getNewValue());
+            if(newFragment == null) {
+            	return;
+            }
             this.notationManager.addFragmentToNotation((NodeCombinedFragment) change.getNewValue(), newFragment);
             try {
                 storeModelResource();

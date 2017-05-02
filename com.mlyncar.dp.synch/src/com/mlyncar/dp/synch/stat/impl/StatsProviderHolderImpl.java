@@ -13,8 +13,8 @@ public class StatsProviderHolderImpl implements StatsProviderHolder {
 
     public StatsProviderHolderImpl(ChangeLog changeLog) {
         this.changeLogStats = new ChangeLogStatsProviderImpl(changeLog);
-        this.diagramGraphStats = new GraphStatsProviderImpl(changeLog.getSubGraph());
-        this.sourceCodeGraphStats = new GraphStatsProviderImpl(changeLog.getReferenceGraph());
+        this.diagramGraphStats = new GraphStatsProviderImpl(changeLog.getSubGraph(), changeLog.getSubGraph().getSeqDiagram());
+        this.sourceCodeGraphStats = new GraphStatsProviderImpl(changeLog.getReferenceGraph(), changeLog.getReferenceGraph().getSeqDiagram());
     }
 
     @Override

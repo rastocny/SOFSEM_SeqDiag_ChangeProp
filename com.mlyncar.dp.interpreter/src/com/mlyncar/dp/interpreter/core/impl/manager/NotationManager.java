@@ -39,12 +39,12 @@ public class NotationManager {
     private Diagram diagram;
 
     public NotationManager(ChangeLog changeLog) throws InterpreterException {
-        this.notationResource = (Resource) changeLog.getReferenceGraph().getSeqDiagram().getNotationResource();
+        this.notationResource = (Resource) changeLog.getSubGraph().getSeqDiagram().getNotationResource();
         for (EObject object : notationResource.getContents()) {
             if (object instanceof CSSDiagram) {
                 Diagram diagram = (Diagram) object;
                 Interaction diagramInteraction = (Interaction) diagram.getElement();
-                if (diagramInteraction.getName().equals(((Interaction) changeLog.getReferenceGraph().getSeqDiagram().getInteraction()).getName())) {
+                if (diagramInteraction.getName().equals(((Interaction) changeLog.getSubGraph().getSeqDiagram().getInteraction()).getName())) {
                     this.diagram = diagram;
                 }
             }
@@ -70,10 +70,10 @@ public class NotationManager {
         Bounds location2 = notationBoundsManager.createExecBounds(nodeToAdd, true);
         int moveReferenceY = location1.getY() - 10;
         logger.debug("Y location of {} is {}", nodeToAdd.getCreateEdge().getName(), moveReferenceY);
-        notationBoundsManager.moveActionSpecs(moveReferenceY, location1.getHeight() + 10);
+        notationBoundsManager.moveActionSpecs(moveReferenceY, location1.getHeight() + 20);
         org.eclipse.gmf.runtime.notation.Node executionViewInit = addActionExecution(sourceLifelineView, actionSpecStart);
         org.eclipse.gmf.runtime.notation.Node executionViewEnd = addActionExecution(targetLifelineView, actionSpecEnd);
-        notationBoundsManager.adjustParentExecSpecs(nodeToAdd, location1.getHeight() + 10);
+        notationBoundsManager.adjustParentExecSpecs(nodeToAdd, location1.getHeight() + 20);
         executionViewInit.setLayoutConstraint(location1);
         executionViewEnd.setLayoutConstraint(location2);
         if(fragment != null) {
@@ -137,12 +137,20 @@ public class NotationManager {
 
         ActionExecutionSpecification actionToRemoveStart = EclipseUmlComponentAccessor.getActionExecutionModelComponent(interaction, sourceOccurrence.getName());
         ActionExecutionSpecification actionToRemoveEnd = EclipseUmlComponentAccessor.getActionExecutionModelComponent(interaction, targetOccurrence.getName());
-        View viewToRemove1 = EclipseUmlComponentAccessor.getActionExecutionNotationView(sourceLifelineView, actionToRemoveStart.getName());
-        View viewToRemove2 = EclipseUmlComponentAccessor.getActionExecutionNotationView(destinationLifelineView, actionToRemoveEnd.getName());
+
+
         diagram.removeEdge(edgeToRemove);
         diagram.removeEdge(edgeToRemoveReturn);
-        sourceLifelineView.removeChild(viewToRemove1);
-        destinationLifelineView.removeChild(viewToRemove2);
+
+        if(actionToRemoveEnd != null) {
+            View viewToRemove2 = EclipseUmlComponentAccessor.getActionExecutionNotationView(destinationLifelineView, actionToRemoveEnd.getName());
+            destinationLifelineView.removeChild(viewToRemove2);
+        }
+
+        if(actionToRemoveStart != null) {
+            View viewToRemove1 = EclipseUmlComponentAccessor.getActionExecutionNotationView(sourceLifelineView, actionToRemoveStart.getName());
+            sourceLifelineView.removeChild(viewToRemove1);
+        }
 
         return new MessageRemoveModelSet(targetOccurrence, sourceOccurrence, actionToRemoveEnd, actionToRemoveStart);
     }
@@ -226,7 +234,7 @@ public class NotationManager {
     }
 
     View getLifelineCompartment() {
-        View compartment1 = (View) diagram.getChildren().get(0);
+		View compartment1 = (View) diagram.getChildren().get(0);
         return (View) compartment1.getChildren().get(1);
     }
 
