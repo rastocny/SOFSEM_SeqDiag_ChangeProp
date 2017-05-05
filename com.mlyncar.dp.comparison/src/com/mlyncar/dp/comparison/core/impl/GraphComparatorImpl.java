@@ -75,7 +75,7 @@ public class GraphComparatorImpl implements GraphComparator {
                             break;
                         case SIMILAR:
                             similarityFound = true;
-                            changeLog.addChanges(generator.createMessageModifyChange(referenceNode.getNode(), subNode.getNode(), referenceGraphNodes, subGraphNodes));
+                            changeLog.addChanges(generator.createMessageModifyChange(referenceNode.getNode(), subNode.getNode(), referenceGraphNodes, subGraphNodes, changeLog));
                             break innerLoop;
                         case SIMILAR_DIFF_BRANCH:
                             break;
@@ -84,7 +84,7 @@ public class GraphComparatorImpl implements GraphComparator {
                     }
                 }
                 if (!similarityFound) {
-                    changeLog.addChanges(generator.createMessageAdditionChange(referenceNode.getNode(), referenceGraphNodes));
+                    changeLog.addChanges(generator.createMessageAdditionChange(referenceNode.getNode(), subGraphNodes, changeLog));
                 }
             }
         }
@@ -117,7 +117,7 @@ public class GraphComparatorImpl implements GraphComparator {
                     }
                 }
                 if (!similarityFound) {
-                    changeLog.addChanges(generator.createMessageRemovalChange(subNode.getNode(), subGraphNodes));
+                    changeLog.addChanges(generator.createMessageRemovalChange(subNode.getNode(), referenceGraphNodes));
                 }
             }
         }

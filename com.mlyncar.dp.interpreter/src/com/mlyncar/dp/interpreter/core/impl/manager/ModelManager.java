@@ -295,8 +295,10 @@ public class ModelManager {
             ActionExecutionSpecification spec = (ActionExecutionSpecification) interactionFragment;
             return isMessageInBranch(((MessageOccurrenceSpecification) spec.getStart()).getMessage().getName(), node);
         } else if (interactionFragment instanceof CombinedFragment) {
-            //CombinedFragment combFragment = (CombinedFragment) interactionFragment;	
-            //todo - nesting of com fragments;
+            for(InteractionFragment intFr : ((CombinedFragment) interactionFragment).getOperands().get(0).getFragments()) {
+            	return isLocatedInNodeBranch(intFr, node);
+            }
+            //return isLocatedInNodeBranch(interactionFragment, node)//todo - nesting of com fragments;
             return false;
         }
         return false;

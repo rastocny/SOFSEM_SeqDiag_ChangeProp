@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mlyncar.dp.comparison.core.ChangeListGenerator;
 import com.mlyncar.dp.comparison.entity.Change;
+import com.mlyncar.dp.comparison.entity.ChangeLog;
 import com.mlyncar.dp.comparison.entity.ChangeType;
 import com.mlyncar.dp.comparison.entity.impl.ChangeImpl;
 import com.mlyncar.dp.transformer.entity.ChangeComponent;
@@ -21,12 +22,12 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
     private final Logger logger = LoggerFactory.getLogger(ChangeListGeneratorImpl.class);
 
     @Override
-    public List<Change> createMessageAdditionChange(Node node, List<LeveledNode> additionalNodes) {
+    public List<Change> createMessageAdditionChange(Node node, List<LeveledNode> additionalNodes, ChangeLog changeLog) {
         logger.debug("Creating message add instance of change " + node.getCreateEdge().getName());
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(node.getId(), ChangeType.MESSAGE_ADD);
         change.setNewValue(node);
-        if (shouldAddLifeline(additionalNodes, node.getName(), node.getId())) {
+        if (shouldAddLifeline(additionalNodes, node.getName(), node.getId(), changeLog)) {
             logger.debug("Message add {} also contains lifeline add change, creating lifeline add of {}.", node.getCreateEdge().getName(), node.getName());
             Change lifelineChange = new ChangeImpl(node.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(node);
@@ -56,13 +57,13 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
     }
 
     @Override
-    public List<Change> createMessageModifyChange(Node newValue, Node oldValue, List<LeveledNode> additionalOldNodes, List<LeveledNode> addiditonalNewNodes) {
+    public List<Change> createMessageModifyChange(Node newValue, Node oldValue, List<LeveledNode> additionalOldNodes, List<LeveledNode> addiditonalNewNodes, ChangeLog changeLog) {
         logger.debug("Creating message modify instance of change " + newValue.getCreateEdge().getName());
         List<Change> changes = new ArrayList<>();
         Change change = new ChangeImpl(newValue.getId(), ChangeType.MESSAGE_MODIFY);
         change.setNewValue(newValue);
         change.setOldValue(oldValue);
-        if (shouldAddLifeline(additionalOldNodes, newValue.getName(), newValue.getId())) {
+        if (shouldAddLifeline(additionalOldNodes, newValue.getName(), newValue.getId(), changeLog)) {
             logger.debug("Message modify {} also contains lifeline add change, creating lifeline add of {}.", newValue.getCreateEdge().getName(), newValue.getName());
             Change lifelineChange = new ChangeImpl(newValue.getId(), ChangeType.LIFELINE_ADD);
             lifelineChange.setNewValue(newValue);
@@ -78,14 +79,22 @@ public class ChangeListGeneratorImpl implements ChangeListGenerator {
         return changes;
     }
 
-    private boolean shouldAddLifeline(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId) {
+    private boolean shouldAddLifeline(List<LeveledNode> leveledNodes, String lifelineName, String comparedLifelineId, ChangeLog changeLog) {
         for (LeveledNode node : leveledNodes) {
-            if (node.getNode().getId().equals(comparedLifelineId)) {
-                return true;
-            }
-            if (node.getNode().getName().equals(lifelineName)) {
+            //if (node.getNode().getId().equals(comparedLifelineId)) {
+            //    return true;
+            //}
+            if (node.getNode().getName().equals(lifelineName)) { //in case diagram already contains lifeline
                 return false;
             }
+        }
+        for(Change change : changeLog.changes()) {
+        	if(change.getChangeType().equals(ChangeType.LIFELINE_ADD)) {
+        		Node node = (Node) change.getNewValue();
+        		if(node.getName().equals(lifelineName)) {
+        			return false;
+        		}
+        	}
         }
         return true;
     }

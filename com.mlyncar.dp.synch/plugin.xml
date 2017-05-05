@@ -16,7 +16,7 @@
                 </separator>
             </menu>
             <action
-                label="&amp;Synch Action"
+                label="&amp;Synchronize Sequence Diagrams"
                 icon="icons/sample.gif"
                 class="com.mlyncar.dp.synch.actions.SynchAction"
                 tooltip="Synchronize sequence diagram and source code"

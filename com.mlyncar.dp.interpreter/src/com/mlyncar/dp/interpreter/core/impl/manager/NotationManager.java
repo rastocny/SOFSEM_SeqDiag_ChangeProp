@@ -17,6 +17,7 @@ import org.eclipse.papyrus.uml.diagram.sequence.providers.UMLViewProvider;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
 import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Interaction;
+import org.eclipse.uml2.uml.InteractionFragment;
 import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.LiteralString;
 import org.eclipse.uml2.uml.Message;
@@ -177,7 +178,21 @@ public class NotationManager {
         View startLifeline = getLifelineView(fragment.getNode().getParentNode().getName());
         Object compartment = getLifelineCompartment();
         NotationBoundsManager boundsManager = new NotationBoundsManager(this);
-        Bounds bounds = boundsManager.extractFragmentBounds(fragment.getNode(), (org.eclipse.gmf.runtime.notation.Node) startLifeline);
+        CombinedFragment innerFragment = null;
+        for(InteractionFragment intFragment : newCombinedFragment.getOperands().get(0).getFragments()) {
+        	if(intFragment instanceof CombinedFragment) {
+        		innerFragment = (CombinedFragment) intFragment;
+        	}
+        }
+        
+        Bounds bounds;
+        if(innerFragment != null) {
+        	logger.debug("Inner combined fragment detected in {}. {}", newCombinedFragment.toString(), innerFragment.toString());
+        	bounds = boundsManager.extractCombinedFragmentBounds(fragment.getNode(), innerFragment);
+        } else {
+            bounds = boundsManager.extractFragmentBounds(fragment.getNode(), (org.eclipse.gmf.runtime.notation.Node) startLifeline);
+        }
+
         final String nodeType = UMLVisualIDRegistry.getType(CombinedFragmentEditPart.VISUAL_ID);
         org.eclipse.gmf.runtime.notation.Node fragmentView = ViewService.createNode((View) compartment, newCombinedFragment, nodeType, UMLDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
         if (fragmentView == null) {
@@ -252,6 +267,20 @@ public class NotationManager {
         return null;
     }
 
+    View getFragmentView(String fragmentView) {
+        View compartment = (View) getLifelineCompartment();
+        logger.debug("Fragment view to get: {}", fragmentView);
+        for (Object obj : compartment.getChildren()) {
+            View view = (View) obj;
+            if (view.getElement() instanceof CombinedFragment) {
+                if (((CombinedFragment) view.getElement()).getName().equals(fragmentView)) {
+                    return view;
+                }
+            }
+        }
+        return null;
+    }
+    
     private View addLifeline(Lifeline lifeline) {
         Object compartment = getLifelineCompartment();
         NotationBoundsManager boundsManager = new NotationBoundsManager(this);

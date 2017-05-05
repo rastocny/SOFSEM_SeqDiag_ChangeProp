@@ -1,11 +1,13 @@
 package com.mlyncar.dp.interpreter.core.impl.manager;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.ListIterator;
 
 import org.eclipse.gmf.runtime.notation.Bounds;
 import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
+import org.eclipse.uml2.uml.CombinedFragment;
 import org.eclipse.uml2.uml.Lifeline;
 import org.eclipse.uml2.uml.MessageOccurrenceSpecification;
 import org.slf4j.Logger;
@@ -61,6 +63,16 @@ public class NotationBoundsManager {
         View lifelineCompartment = (View) notationManager.getLifelineCompartment();
         for (Object lifelineObj : lifelineCompartment.getChildren()) {
             View lifelineView = (View) lifelineObj;
+            org.eclipse.gmf.runtime.notation.Node fragmentComp = (org.eclipse.gmf.runtime.notation.Node) lifelineObj;
+            if(lifelineView.getElement() instanceof CombinedFragment) {
+            	CombinedFragment fragment = (CombinedFragment) lifelineView.getElement();
+                Bounds bounds = (Bounds) fragmentComp.getLayoutConstraint();
+                logger.debug("MoveReference {}, Y {}", moveReference, bounds.getY());
+            	if (bounds.getY() > moveReference) {
+            		logger.debug("Combined fragment {} is below.",fragment.toString());
+            		bounds.setY(bounds.getY() + newHeight);
+            	}
+            }
             for (Object lifelineComponentObj : lifelineView.getChildren()) {
                 org.eclipse.gmf.runtime.notation.Node lifelineComponent = (org.eclipse.gmf.runtime.notation.Node) lifelineComponentObj;
 
@@ -124,6 +136,18 @@ public class NotationBoundsManager {
         logger.debug("Setting fragment width {}", bounds.getWidth());
         return bounds;
     }
+    
+    public Bounds extractCombinedFragmentBounds(Node node, CombinedFragment combinedFragment) {
+	  Bounds bounds = NotationFactory.eINSTANCE.createBounds();
+	  org.eclipse.gmf.runtime.notation.Node view = (org.eclipse.gmf.runtime.notation.Node) notationManager.getFragmentView(combinedFragment.getName());
+	  Bounds fragmentBounds = (Bounds) view.getLayoutConstraint();
+	  
+	  bounds.setHeight(fragmentBounds.getHeight() + 30);
+	  bounds.setY(fragmentBounds.getY() - 10);
+	  bounds.setX(fragmentBounds.getX() - 50);
+	  bounds.setWidth(fragmentBounds.getWidth() + 100);
+	  return bounds;
+    }
 
     public void updateFragmentSize(org.eclipse.gmf.runtime.notation.Node fragment, Bounds actionBounds) {
     	Bounds bounds = (Bounds) fragment.getLayoutConstraint();
@@ -172,7 +196,11 @@ public class NotationBoundsManager {
                 }
             }
         }
-        throw new ExecSpecNotFoundException("Unable to locate sibling action occurrence specification bounds of message " + node.getCreateEdge().getName());
+        if(node.getLeftSibling() != null) {
+        	return getNodeExecutionNotationEnd(node.getLeftSibling());
+        } else {
+        	return null;
+        }
     }
 
     private org.eclipse.gmf.runtime.notation.Node getNodeExecutionNotationStart(Node node) throws InterpreterException {
@@ -212,15 +240,19 @@ public class NotationBoundsManager {
             }
             if(isEnd) {
                 Bounds siblingBounds = getNodeExecutionOccurrenceEndBounds(newValue.getLeftSibling());
-                x = siblingBounds.getX();
-                if(newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
-                	x += 7;
+                if(siblingBounds != null) {
+                    x = siblingBounds.getX();
+                    if(newValue.getCreateEdge().getEdgeType().equals(EdgeType.SELF)) {
+                    	x += 7;
+                    }
+                    return x;
                 }
             } else {
-                Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
+            	Bounds siblingBounds = getNodeExecutionOccurrenceStartBounds(newValue.getLeftSibling());
                 x = siblingBounds.getX();
+                return x;
             }
-            return x;
+
         }
         View lifelineView;
         if (isEnd) {

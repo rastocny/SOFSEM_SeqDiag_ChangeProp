@@ -54,7 +54,7 @@ public class GraphBindingEngineImpl implements GraphBindingEngine {
         }
         Double comparisonIndex = numberOfEqualChilds / (double) root.childNodes().size();
         logger.debug("Comparison index: {}", comparisonIndex);
-        if (comparisonIndex > 0.25) {
+        if (comparisonIndex > 0.35) {
             logger.debug("Comparison index match conditions, node {} is suitable for ROOT", possibleRoot.getName());
             return true;
         } else {

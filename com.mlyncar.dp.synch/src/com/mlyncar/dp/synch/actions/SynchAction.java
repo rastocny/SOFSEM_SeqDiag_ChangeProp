@@ -40,7 +40,7 @@ public class SynchAction implements IWorkbenchWindowActionDelegate {
             MessageDialog.openInformation(
                     window.getShell(),
                     "Synchronization Tool",
-                    "Synchronization Successfull");
+                    "Synchronization Successful");
         } catch (SynchronizationException ex) {
             ex.printStackTrace();
             MessageDialog.openInformation(
