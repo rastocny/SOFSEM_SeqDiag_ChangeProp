@@ -123,7 +123,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             MethodUnit newMethod = (MethodUnit) call.getTo();
                             String newMethodClassName = getMethodClassName(newMethod);
                             String methodClassName = getMethodClassName(method);
-                            JavaDiscoveryOutput output = new JavaDiscoveryHelper().getMethodName(methodClassName, method.getName(), statementPosition);
+                            JavaDiscoveryOutput output = new JavaDiscoveryHelper().getMethodName(methodClassName, method.getName(), statementPosition, newMethod.getName());
                             String variableName = output.getVariableName();
                             MessageType type = MessageType.SYNCH;
                             if (newMethodClassName.equals(methodClassName)) {
@@ -138,7 +138,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), type, newMethod.getName(),
                                     new LifelineImpl(variableName + newMethodClassName, newPackage),
                                     new LifelineImpl(currentVariableName + methodClassName, thisPackage), newFragments));
-                            logger.debug("Adding new message to diagram: " + newMethod.toString());
+                            logger.debug("Adding new message to diagram: {}, {}", newMethod.getName(), newMethod.toString());
 
                             analyzeMethodUnit(diagram, newMethod, variableName, newFragments);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
@@ -160,7 +160,7 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
                                     new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage),
                                     new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage), newFragments));
-                            logger.debug("Adding new message to diagram: " + newMethod.toString());
+                            logger.debug("Adding new message to diagram: {}, CONSTRUCTOR {}", newMethod.getName(), newMethod.toString());
                             analyzeMethodUnit(diagram, newMethod, variableName, newFragments);
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.RETURN, newMethod.getName() + "Ret",
                                     new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage),

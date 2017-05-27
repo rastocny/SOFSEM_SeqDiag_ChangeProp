@@ -1,5 +1,6 @@
 package com.mlyncar.dp.synch.config;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -35,6 +36,15 @@ public class PropertyLoader {
         	}
             this.properties = new Properties();
             properties.load(configFileStream);
+        } catch(FileNotFoundException ex) {
+            this.properties = new Properties();
+            InputStream configFileStream = getClass().getClassLoader().getResourceAsStream(CONFIG_PATH_PROPERTY_NAME);
+            try {
+                properties.load(configFileStream);
+            } catch(IOException exx) {
+            	exx.printStackTrace();
+                throw new ConfigurationException("Unable to load configuration file: " + ex.getMessage(), ex);
+            }
         } catch (IOException ex) {
         	ex.printStackTrace();
             throw new ConfigurationException("Unable to load configuration file: " + ex.getMessage(), ex);

@@ -80,7 +80,7 @@ public class NotationManager {
         if(fragment != null) {
         	for(Object obj : getLifelineCompartment().getChildren()) {
         		View view = (View) obj;
-        		if(view.getElement() instanceof CombinedFragment && ((CombinedFragment) view.getElement()).getName().equals(fragment.getName())) {
+        		if(view.getElement() instanceof CombinedFragment && ((CombinedFragment) view.getElement()).getName().equals(fragment.getName()) && isFragmentLocatedInNode(fragment, nodeToAdd.getLeftSibling()) && isFragmentLocatedInNode((CombinedFragment)fragment, nodeToAdd)) {
         			logger.debug("Stretching combined fragment {}", fragment.toString());
         			notationBoundsManager.updateFragmentSize((org.eclipse.gmf.runtime.notation.Node)view, location1);
         		}
@@ -90,6 +90,20 @@ public class NotationManager {
         addMessage(newReplyMessage, executionViewEnd, executionViewInit, true);
     }
 
+    private boolean isFragmentLocatedInNode(CombinedFragment fragment, Node node) {
+    	if(node == null) {
+    		return false;
+    	}
+    	String fragmentBody = ((LiteralString) fragment.getOperands().get(0).getGuard().getSpecification()).getValue();
+    	for(NodeCombinedFragment fr : node.combinedFragments()) {
+    		logger.debug("isFragmentLocatedInNode {} {}", fragment.getInteractionOperator().getName(), fr.getCombinedFragmentType().getCode());
+    		if(fr.getFragmentBody().equals(fragmentBody) && fragment.getInteractionOperator().getName().equals(fr.getCombinedFragmentType().getCode())) {
+    			return true;
+    			
+    		}
+    	}
+    	return false;
+    }
     public void removeLifelineFromNotation(Node nodeToRemove) throws InterpreterException {
         View lifelineCompartment = (View) getLifelineCompartment();
         View lifelineToRemove = null;

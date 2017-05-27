@@ -35,6 +35,9 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
     protected void interpretMessageAdd(Change change) {
         String outputLine;
         Node newValue = (Node) change.getNewValue();
+        if(newValue.isReply()) {
+        	return;
+        }
         if (newValue.getLeftSibling() != null && newValue.getLeftSibling().getCreateEdge() != null) {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + newValue.getLeftSibling().getCreateEdge().getName() + "; " + newValue.getCreateEdge().getName();
         } else {
@@ -46,7 +49,11 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
 
     @Override
     protected void interpretLifelineAdd(Change change) {
-        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + ((Node) change.getNewValue()).getName();
+    	Node node = (Node) change.getNewValue();
+    	if(node.isReply()) {
+    		return;
+    	}
+    	String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + ((Node) change.getNewValue()).getName();
         logger.debug(outputLine);
         fileWriter.println(outputLine);
     }
@@ -55,6 +62,9 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
     protected void interpretMessageRemove(Change change) {
         String outputLine;
         Node newValue = (Node) change.getNewValue();
+        if(newValue.isReply()) {
+        	return;
+        }
         if (newValue.getLeftSibling() != null && newValue.getLeftSibling().getCreateEdge() != null) {
             outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = After:" + newValue.getLeftSibling().getCreateEdge().getName() + "; " + newValue.getCreateEdge().getName();
         } else {
@@ -98,7 +108,10 @@ public class ChangeLogInterpreter extends AbstractInterpreter {
     protected void interpretFragmentAdd(Change change)
             throws InterpreterException {
         NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
-        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + fragment.getCombinedFragmentType().getCode() + ":" + fragment.getFragmentBody();
+    	if(fragment.getNode().isReply()) {
+    		return;
+    	}
+        String outputLine = new Date().toString() + ": " + change.getChangeType().getCode() + " = " + fragment.getCombinedFragmentType().getCode() + ":" + fragment.getFragmentBody() + ". Message covered: " + fragment.getNode().getCreateEdge().getName();
         logger.debug(outputLine);
         fileWriter.println(outputLine);
     }

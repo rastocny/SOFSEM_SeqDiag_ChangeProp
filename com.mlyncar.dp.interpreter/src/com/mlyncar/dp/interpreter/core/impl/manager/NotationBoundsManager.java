@@ -1,6 +1,5 @@
 package com.mlyncar.dp.interpreter.core.impl.manager;
 
-import java.io.ObjectInputStream.GetField;
 import java.util.ListIterator;
 
 import org.eclipse.gmf.runtime.notation.Bounds;
@@ -110,7 +109,12 @@ public class NotationBoundsManager {
             bounds.setY(siblingBounds.getY() + siblingBounds.getHeight() + 30);
         } else {
             Bounds parentBounds = getNodeExecutionOccurrenceStartBounds(newValue.getParentNode());
-            bounds.setY(parentBounds.getY() + 30);
+            if(parentBounds == null) {
+            	bounds.setY(30);
+            } else {
+                bounds.setY(parentBounds.getY() + 30);
+            }
+
         }
         if (isEnd) {
             bounds.setHeight(40);
@@ -152,7 +156,7 @@ public class NotationBoundsManager {
     public void updateFragmentSize(org.eclipse.gmf.runtime.notation.Node fragment, Bounds actionBounds) {
     	Bounds bounds = (Bounds) fragment.getLayoutConstraint();
     	bounds.setWidth(calculateLifelinePosition() - bounds.getX());
-    	bounds.setHeight(bounds.getHeight() + actionBounds.getHeight());
+    	bounds.setHeight(bounds.getHeight() + actionBounds.getHeight() + 20);
     	fragment.setLayoutConstraint(bounds);
     }
     

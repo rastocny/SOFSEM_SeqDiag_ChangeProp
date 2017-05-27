@@ -44,11 +44,12 @@ public class JavaDiscoveryHelper {
 
     Logger logger = LoggerFactory.getLogger(JavaDiscoveryHelper.class);
 
-    public JavaDiscoveryOutput getMethodName(String className, String methodName, int statementPosition) throws SourceCodeAnalyzerException {
+    public JavaDiscoveryOutput getMethodName(String className, String methodName, int statementPosition, String statementName) throws SourceCodeAnalyzerException {
 
         DiscoverJavaModelFromJavaProject javaDiscovery = new DiscoverJavaModelFromJavaProject();
         IProgressMonitor monitor = new NullProgressMonitor();
         try {
+        	logger.debug("Getting method name of {} in {}", statementName, methodName);
             javaDiscovery.discoverElement(EclipseProjectNavigatorHelper.getCurrentProject(), monitor);
             Resource resource = javaDiscovery.getTargetModel();
             Iterator<EObject> it = resource.getAllContents();
@@ -61,12 +62,13 @@ public class JavaDiscoveryHelper {
                         for (BodyDeclaration bodyDeclaration : clazz.getBodyDeclarations()) {
                             if (bodyDeclaration instanceof MethodDeclaration && bodyDeclaration.getName().equals(methodName)) {
                                 MethodDeclaration methodDecl = (MethodDeclaration) bodyDeclaration;
-                                return analyzeBodyStatement(statementPosition, methodDecl.getBody().getStatements(), methodName);
+                                return analyzeBodyStatement(statementPosition, methodDecl.getBody().getStatements(), methodName, statementName);
                             }
                         }
                     }
                 }
             }
+            logger.debug("Unable to get method variable name of {} and {}", methodName, className);
             return new JavaDiscoveryOutput(new ArrayList<CombFragment>(), "");
         } catch (DiscoveryException ex) {
             throw new SourceCodeAnalyzerException(
@@ -74,18 +76,20 @@ public class JavaDiscoveryHelper {
         }
     }
 
-    private JavaDiscoveryOutput analyzeBodyStatement(int statementPosition, EList<Statement> statements, String methodName) {
+    private JavaDiscoveryOutput analyzeBodyStatement(int statementPosition, EList<Statement> statements, String methodName, String statementName) {
         int statementNum = 0;
         logger.debug("Number of statements in declaration {}", statements.size());
         for (Statement statement : statements) {
             statementNum++;
+            logger.debug("Analyzing statement {} with statementNum {}", statement.toString(), statementNum);
             if (statement instanceof ExpressionStatement) {
                 ExpressionStatement exprStatement = (ExpressionStatement) statement;
                 if (exprStatement.getExpression() instanceof MethodInvocation) {
                     MethodInvocation methodInvocation = (MethodInvocation) exprStatement.getExpression();
                     if (methodInvocation.getExpression() instanceof SingleVariableAccess) {
                         SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
-                        if (statementNum == statementPosition) {
+                        if (statementNum == statementPosition && methodInvocation.getMethod().getName().equals(statementName)) {
+                            logger.debug("Variable from assignment statement methodName {} found: {}", methodInvocation.getMethod().getName(), access.getVariable().getName());
                             return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                         }
                     }
@@ -99,53 +103,57 @@ public class JavaDiscoveryHelper {
                             SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
                            	logger.debug("RightHandSide variable access {}", access.toString());
                            	logger.debug("StatementNum {}, StatementPoistion {}", statementNum, statementPosition);
-                            if (statementNum == statementPosition) {
-                                logger.debug("Variable from assignment statement methodName {} found: {}", methodName, access.getVariable().getName());
+                            if (statementNum == statementPosition && methodInvocation.getMethod().getName().equals(statementName)) {
+                                logger.debug("Variable from assignment statement methodName {} found: {}", methodInvocation.getMethod().getName(), access.getVariable().getName());
                                 return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                             }
                         }
                     }
                 }
-            } else if (statement instanceof ReturnStatement) {
+            }  
+            if (statement instanceof ReturnStatement) {
                 ReturnStatement exprStatement = (ReturnStatement) statement;
                 if (exprStatement.getExpression() instanceof MethodInvocation) {
                     MethodInvocation methodInvocation = (MethodInvocation) exprStatement.getExpression();
                     if (methodInvocation.getExpression() instanceof SingleVariableAccess) {
                         SingleVariableAccess access = (SingleVariableAccess) methodInvocation.getExpression();
-                        if (statementNum == statementPosition) {
+                        if (statementNum == statementPosition && methodInvocation.getMethod().getName().equals(statementName)) {
                             logger.debug("Variable from return statement methodName {} found: {}", methodName, access.getVariable().getName());
                             return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                         }
                     }
                 }
-            } else if (statement instanceof IfStatement) {
-                IfStatement exprStatement = (IfStatement) statement;
-                Block block = (Block) exprStatement.getThenStatement();
-                JavaDiscoveryOutput result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName);
-                if (result.getVariableName().isEmpty() && exprStatement.getElseStatement() != null) {
-                    block = (Block) exprStatement.getElseStatement();
-                    result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName);
-                }
-                if (result.getVariableName().isEmpty()) {
-                    continue;
-                }
-                return result;
-            } else if (statement instanceof ForStatement) {
+            }  
+            if (statement instanceof ForStatement) {
+            	logger.debug("For statement found during analysis of method {}", methodName);
             	ForStatement forStatement = (ForStatement) statement;
                 Block block = (Block) forStatement.getBody();
-                JavaDiscoveryOutput result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName);
-                if (result.getVariableName().isEmpty()) {
-                    continue;
+                JavaDiscoveryOutput result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName, statementName);
+                if (!result.getVariableName().isEmpty()) {
+                    return result;
                 }
-                return result;
             }
+            if (statement instanceof IfStatement) {
+            	logger.debug("IF statement found during analysis of method {}", methodName);
+                IfStatement exprStatement = (IfStatement) statement;
+                Block block = (Block) exprStatement.getThenStatement();
+                JavaDiscoveryOutput result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName, statementName);
+                if (result.getVariableName().isEmpty() && exprStatement.getElseStatement() != null) {
+                    block = (Block) exprStatement.getElseStatement();
+                    result = analyzeBodyStatement(statementPosition, block.getStatements(), methodName, statementName);
+                }
+                if (!result.getVariableName().isEmpty()) {
+                    return result;
+                }
+            }
+
         }
         logger.debug("Variable in method name {} not found. Index: {}", methodName, statementPosition);
         return new JavaDiscoveryOutput(new ArrayList<CombFragment>(), "");
     }
 
     private List<CombFragment> getMethodCombinedFragments(EObject statement) {
-        logger.debug("Checking if method {} call contains combined fragments", statement.toString());
+        logger.debug("Checking if method {} call contains combined fragments", ((MethodInvocation) statement).getMethod().getName());
         List<CombFragment> fragments = new ArrayList<CombFragment>();
         EObject container = (EObject) statement;
         while (container.eContainer() != null && !(container.eContainer() instanceof MethodDeclaration)) {

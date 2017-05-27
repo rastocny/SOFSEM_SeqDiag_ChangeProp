@@ -144,9 +144,12 @@ public class UmlModelInterpreter extends AbstractInterpreter {
             throws InterpreterException {
         NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
         if (fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment)) {
+        	logger.debug("Fragment_add Ignore: Parent contains fragment, node: {}", fragment.getNode().getCreateEdge().getName());
         	return;
         } else if(fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment)) {
-        	
+        	logger.debug("Sibling: {}, fragments {}", fragment.getNode().getLeftSibling().getCreateEdge().getName(), fragment.getNode().getLeftSibling().getLeftSibling().combinedFragments().size());
+        	logger.debug("Fragment_add Ignore: Sibling contains fragment, node: {}", fragment.getNode().getCreateEdge().getName());
+        	return;
         } else {
             CombinedFragment newFragment = this.modelManager.addFragmentToModel((NodeCombinedFragment) change.getNewValue());
             if(newFragment == null) {

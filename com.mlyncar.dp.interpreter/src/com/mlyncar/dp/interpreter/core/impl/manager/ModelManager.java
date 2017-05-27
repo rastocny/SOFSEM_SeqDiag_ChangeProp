@@ -263,6 +263,7 @@ public class ModelManager {
             default:
                 break;
         }
+
         InteractionOperand operand = UMLFactory.eINSTANCE.createInteractionOperand();
         List<InteractionFragment> fragmentsToRelocate = new ArrayList<InteractionFragment>();
         for (ListIterator<InteractionFragment> iter = interaction.getFragments().listIterator(); iter.hasNext();) {
@@ -271,6 +272,8 @@ public class ModelManager {
                 fragmentsToRelocate.add(interactionFragment);
             }
         }
+        MessagePlacementHolder holder = getPlacementIndex(fragment.getNode(), interaction, null);
+        holder.getContainer().add(holder.getIndex() + 1, newFragment);
         for (InteractionFragment interFragment : fragmentsToRelocate) {
             operand.getFragments().add(interFragment);
             interaction.getFragments().remove(interFragment);
@@ -280,9 +283,12 @@ public class ModelManager {
         string.setValue(fragment.getFragmentBody());
         guard.setSpecification(string);
         newFragment.getOperands().add(operand);
-        interaction.getFragments().add(newFragment);
+  
+        //interaction.getFragments().add(newFragment);
+        //INDEX OF FRAGMENT ADD REQUIRED
         return newFragment;
     }
+
 
     private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, Node node) {
         if (interactionFragment instanceof MessageOccurrenceSpecification) {
@@ -304,13 +310,31 @@ public class ModelManager {
         return false;
     }
 
+    private boolean isMessageAncestor(String message, Node node) {
+    	for(Node child: node.childNodes()) {
+    		if(message.equals(child.getCreateEdge().getName()) || isMessageAncestor(message, child)) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
     private boolean isMessageInBranch(String message, Node node) {
+    	
+    	if(isMessageAncestor(message, node)) {
+    		return true;
+    	}
+    	//for(Node child : node.childNodes()) {
+    	//	if(child.isReply() && message.equals(child.getCreateEdge().getName())) {
+    	//		return true;
+    	//	}
+    	//} 
         while (node != null) {
-            if (node.getCreateEdge() != null && node.getCreateEdge().getName().equals(message)) {
+            if (node.getCreateEdge() != null && (message.equals(node.getCreateEdge().getName()))) {
                 return true;
             }
             node = node.getParentNode();
         }
+        
         return false;
     }
 
@@ -349,7 +373,7 @@ public class ModelManager {
         } else if (nodeToAdd.getParentNode() != null) {
             nodeToFound = nodeToAdd.getParentNode();
         } else {
-        	return new MessagePlacementHolder(null, 0, fr);
+        	return new MessagePlacementHolder(null, -1, fr);
         }
         int index = 0;
         boolean firstFound = false;
@@ -369,26 +393,47 @@ public class ModelManager {
                 	if(spec.getMessage() != null) {
                         String messageName = spec.getMessage().getName();
                         logger.debug("Checking if placement of {} should be after {}", nodeToAdd.getCreateEdge().getName(), messageName);
-                        if (messageName.contains(nodeToFound.getCreateEdge().getName()) && !firstFound) {
+                        if (messageName.equals(nodeToFound.getCreateEdge().getName() + "Ret") && !firstFound) {
                             firstFound = true;
-                        } else if (messageName.contains(nodeToFound.getCreateEdge().getName()) && firstFound) {
+                        } else if (messageName.equals(nodeToFound.getCreateEdge().getName() + "Ret") && firstFound) {
                             return new MessagePlacementHolder(fragments, index, fr);
                         }
                 	}
                 }
-            } else if (fragment instanceof CombinedFragment) {
-            	logger.debug("Found fragment - starting to check nested fragments {}", fragment.toString());
-            	MessagePlacementHolder nestedPlacement = getPlacementIndex(nodeToAdd, ((CombinedFragment) fragment).getOperands().get(0), (CombinedFragment) fragment);
-            	if(nestedPlacement.getIndex() != -1) {
-            		logger.debug("Index found, returning {}", nestedPlacement.getIndex());
-            		return nestedPlacement;
+            } else if (fragment instanceof CombinedFragment && isFragmentLocatedInNode((CombinedFragment)fragment, nodeToFound)) {
+            	if(isFragmentLocatedInNode((CombinedFragment) fragment, nodeToAdd)) {
+                  	logger.debug("Found fragment - starting to check nested fragments {}", fragment.toString());
+                	MessagePlacementHolder nestedPlacement = getPlacementIndex(nodeToAdd, ((CombinedFragment) fragment).getOperands().get(0), (CombinedFragment) fragment);
+                	if(nestedPlacement.getIndex() != -1) {
+                		logger.debug("Index found, returning {}", nestedPlacement.getIndex());
+                		return nestedPlacement;
+                	}
+            	} else {
+            		return new MessagePlacementHolder(fragments, index, fr);
             	}
             }
             index++;
         }
+        if(nodeToFound.getCreateEdge() == null) {
+            return new MessagePlacementHolder(fragments, -1, fr);
+        }
         logger.debug("Placement not found: {}", nodeToFound.getCreateEdge().getName());
         return getPlacementIndex(nodeToFound, fragmentSet, fr);
-        //   return new MessagePlacementHolder(null, -1, fr);
+        //return new MessagePlacementHolder(null, -1, fr);
+    }
+    
+    private boolean isFragmentLocatedInNode(CombinedFragment fragment, Node node) {
+    	if(node == null) {
+    		return false;
+    	}
+    	String fragmentBody = ((LiteralString) fragment.getOperands().get(0).getGuard().getSpecification()).getValue();
+    	for(NodeCombinedFragment fr : node.combinedFragments()) {
+    		if(fr.getFragmentBody().equals(fragmentBody) && fragment.getInteractionOperator().getName().equals(fr.getCombinedFragmentType().getCode())) {
+    			return true;
+    			
+    		}
+    	}
+    	return false;
     }
     
     private InteractionFragment getCombinedFragment(NodeCombinedFragment fragment) {
