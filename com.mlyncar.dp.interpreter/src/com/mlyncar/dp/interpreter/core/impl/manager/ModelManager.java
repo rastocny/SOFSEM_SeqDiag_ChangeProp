@@ -3,6 +3,7 @@ package com.mlyncar.dp.interpreter.core.impl.manager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.ActionExecutionSpecification;
@@ -103,7 +104,7 @@ public class ModelManager {
 
         if(placementIndex.getFragment() != null) {
             logger.debug("Message {} added to Fragment {}, current size of elements {}", messageName, placementIndex.getFragment(), placementIndex.getFragment().getOperands().get(0).getFragments().size());
-            logger.debug("Size within interaction {}", ((CombinedFragment )interaction.getFragment(placementIndex.getFragment().getName())).getOperands().get(0).getFragments().size());
+            //logger.debug("Size within interaction {}", ((CombinedFragment )interaction.getFragment(placementIndex.getFragment().getName())).getOperands().get(0).getFragments().size());
         }
  
         Message newMessage = UMLFactory.eINSTANCE.createMessage();
@@ -128,15 +129,45 @@ public class ModelManager {
     }
 
     public void removeMessageFromModel(Node nodeToRemove, Node nodeToRemoveReturn, MessageRemoveModelSet modelSet) {
-        interaction.getMessage(nodeToRemove.getCreateEdge().getName()).destroy();
-        interaction.getMessage(nodeToRemoveReturn.getCreateEdge().getName()).destroy();
+
+    	Message msg1 = interaction.getMessage(nodeToRemove.getCreateEdge().getName());
+        Message msg2 = interaction.getMessage(nodeToRemoveReturn.getCreateEdge().getName());
+    	removeMessageOccurences(msg1, interaction.getFragments(), null);
+    	removeMessageOccurences(msg2, interaction.getFragments(), null);
+        msg1.destroy();
+        msg2.destroy();
         modelSet.getTargetOccurrence().destroy();
         modelSet.getSourceOccurrence().destroy();
+        modelSet.getTargetOccurrenceRet().destroy();
+        modelSet.getSourceOccurrenceRet().destroy();
         if(modelSet.getActionToRemoveEnd() != null) {
             modelSet.getActionToRemoveEnd().destroy();
         }
         if(modelSet.getActionToRemoveStart() != null) {
             modelSet.getActionToRemoveStart().destroy();
+        }
+    }
+    
+    private void removeMessageOccurences(Message message, List<InteractionFragment> fragments, List<InteractionFragment> fragmentsToRemove) {
+    	boolean firstIteration = false;
+    	if(fragmentsToRemove == null) {
+    		fragmentsToRemove = new ArrayList<InteractionFragment>();
+    		firstIteration = true;
+    	}
+        for (ListIterator<InteractionFragment> iter = fragments.listIterator(); iter.hasNext();) {
+        	InteractionFragment fragment = iter.next();
+        	if(fragment instanceof MessageOccurrenceSpecification) {
+        		if(((MessageOccurrenceSpecification) fragment).getMessage().getName().equals(message.getName())) {
+        			fragmentsToRemove.add(fragment);
+        		}
+        	} else if (fragment instanceof CombinedFragment) {
+        		removeMessageOccurences(message, ((CombinedFragment) fragment).getOperands().get(0).getFragments(), fragmentsToRemove);
+        	}
+        }
+        if(firstIteration) {
+        	for(InteractionFragment fr : fragmentsToRemove) {
+        		fr.destroy();
+        	}
         }
     }
 
@@ -253,6 +284,7 @@ public class ModelManager {
 			return null;
 		}
         CombinedFragment newFragment = UMLFactory.eINSTANCE.createCombinedFragment();
+        newFragment.setName("CombinedFragment" + UUID.randomUUID().toString());
         switch (fragment.getCombinedFragmentType()) {
             case OPT:
                 newFragment.setInteractionOperator(InteractionOperatorKind.OPT_LITERAL);
@@ -268,7 +300,7 @@ public class ModelManager {
         List<InteractionFragment> fragmentsToRelocate = new ArrayList<InteractionFragment>();
         for (ListIterator<InteractionFragment> iter = interaction.getFragments().listIterator(); iter.hasNext();) {
             InteractionFragment interactionFragment = iter.next();
-            if (isLocatedInNodeBranch(interactionFragment, fragment.getNode())) {
+            if (isLocatedInNodeBranch(interactionFragment, fragment)) {
                 fragmentsToRelocate.add(interactionFragment);
             }
         }
@@ -278,7 +310,7 @@ public class ModelManager {
             operand.getFragments().add(interFragment);
             interaction.getFragments().remove(interFragment);
         }
-        InteractionConstraint guard = operand.createGuard("guard");
+        InteractionConstraint guard = operand.createGuard("guard" + UUID.randomUUID().toString());
         LiteralString string = UMLFactory.eINSTANCE.createLiteralString();
         string.setValue(fragment.getFragmentBody());
         guard.setSpecification(string);
@@ -290,19 +322,19 @@ public class ModelManager {
     }
 
 
-    private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, Node node) {
+    private boolean isLocatedInNodeBranch(InteractionFragment interactionFragment, NodeCombinedFragment nodeFragment) {
         if (interactionFragment instanceof MessageOccurrenceSpecification) {
             MessageOccurrenceSpecification spec = (MessageOccurrenceSpecification) interactionFragment;
             if(spec.getMessage() == null) {
             	return false;
             }
-            return isMessageInBranch(spec.getMessage().getName(), node);
+            return isMessageInBranch(spec.getMessage().getName(), nodeFragment);
         } else if (interactionFragment instanceof ActionExecutionSpecification) {
             ActionExecutionSpecification spec = (ActionExecutionSpecification) interactionFragment;
-            return isMessageInBranch(((MessageOccurrenceSpecification) spec.getStart()).getMessage().getName(), node);
+            return isMessageInBranch(((MessageOccurrenceSpecification) spec.getStart()).getMessage().getName(), nodeFragment);
         } else if (interactionFragment instanceof CombinedFragment) {
             for(InteractionFragment intFr : ((CombinedFragment) interactionFragment).getOperands().get(0).getFragments()) {
-            	return isLocatedInNodeBranch(intFr, node);
+            	return isLocatedInNodeBranch(intFr, nodeFragment);
             }
             //return isLocatedInNodeBranch(interactionFragment, node)//todo - nesting of com fragments;
             return false;
@@ -318,8 +350,9 @@ public class ModelManager {
     	}
     	return false;
     }
-    private boolean isMessageInBranch(String message, Node node) {
+    private boolean isMessageInBranch(String message, NodeCombinedFragment fragment) {
     	
+    	Node node = fragment.getNode();
     	if(isMessageAncestor(message, node)) {
     		return true;
     	}
@@ -329,7 +362,7 @@ public class ModelManager {
     	//	}
     	//} 
         while (node != null) {
-            if (node.getCreateEdge() != null && (message.equals(node.getCreateEdge().getName()))) {
+            if (node.getCreateEdge() != null && (message.equals(node.getCreateEdge().getName())) && node.containsFragment(fragment)) {
                 return true;
             }
             node = node.getParentNode();

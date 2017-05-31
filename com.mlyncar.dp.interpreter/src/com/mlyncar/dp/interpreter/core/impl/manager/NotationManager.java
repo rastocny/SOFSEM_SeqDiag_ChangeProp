@@ -128,7 +128,8 @@ public class NotationManager {
 
         MessageOccurrenceSpecification targetOccurrence = null;
         MessageOccurrenceSpecification sourceOccurrence = null;
-
+        MessageOccurrenceSpecification targetOccurrenceRet = null;
+        MessageOccurrenceSpecification sourceOccurrenceRet = null;
         for (Object edge : diagram.getEdges()) {
             Edge edgeView = (Edge) edge;
             if (edgeView.getElement() instanceof Message) {
@@ -140,6 +141,8 @@ public class NotationManager {
                 }
                 if (messageElement.getName().equals(nodeToRemoveReturn.getCreateEdge().getName())) {
                     edgeToRemoveReturn = edgeView;
+                    targetOccurrenceRet = (MessageOccurrenceSpecification) messageElement.getReceiveEvent();
+                    sourceOccurrenceRet = (MessageOccurrenceSpecification) messageElement.getSendEvent();
                 }
             }
         }
@@ -150,8 +153,8 @@ public class NotationManager {
         View destinationLifelineView = getLifelineView(nodeToRemove.getName());
         View sourceLifelineView = getLifelineView(nodeToRemove.getParentNode().getName());
 
-        ActionExecutionSpecification actionToRemoveStart = EclipseUmlComponentAccessor.getActionExecutionModelComponent(interaction, sourceOccurrence.getName());
-        ActionExecutionSpecification actionToRemoveEnd = EclipseUmlComponentAccessor.getActionExecutionModelComponent(interaction, targetOccurrence.getName());
+        ActionExecutionSpecification actionToRemoveStart = EclipseUmlComponentAccessor.getActionExecutionModelComponent(interaction.getFragments(), sourceOccurrence.getName());
+        ActionExecutionSpecification actionToRemoveEnd = EclipseUmlComponentAccessor.getActionExecutionModelComponent(interaction.getFragments(), targetOccurrence.getName());
 
 
         diagram.removeEdge(edgeToRemove);
@@ -167,7 +170,7 @@ public class NotationManager {
             sourceLifelineView.removeChild(viewToRemove1);
         }
 
-        return new MessageRemoveModelSet(targetOccurrence, sourceOccurrence, actionToRemoveEnd, actionToRemoveStart);
+        return new MessageRemoveModelSet(targetOccurrence, sourceOccurrence, targetOccurrenceRet, sourceOccurrenceRet, actionToRemoveEnd, actionToRemoveStart);
     }
 
     public void relocateMessage(Node oldNode, Node newNode, ActionExecutionSpecification specToRelocate) throws InterpreterException {
@@ -224,6 +227,7 @@ public class NotationManager {
     					&& combFragment.getOperands().get(0).getGuard().getSpecification() instanceof LiteralString) {
 					LiteralString string = (LiteralString) combFragment.getOperands().get(0).getGuard().getSpecification();
 					if(string.getValue().equals(fragment.getFragmentBody())) {
+						logger.debug("Removing combined fragment {}", combFragment.getName());
 				    	((View) getLifelineCompartment()).removeChild(view);
 						return combFragment;
 					}	

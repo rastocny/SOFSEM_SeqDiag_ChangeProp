@@ -88,6 +88,11 @@ public class UmlModelInterpreter extends AbstractInterpreter {
             throw new InterpreterException("Unable to interpret message " + nodeToRemove.getCreateEdge().getName() + " because it does not contain return message");
         }
 
+        if(nodeToRemove.getParentNode().childNodes().size() == 2) {
+        	for(NodeCombinedFragment fragment : nodeToRemove.combinedFragments()) {
+            	interpretFragmentRemove(fragment);
+        	}
+        }
         MessageRemoveModelSet modelSet = notationManager.removeMessageFromNotation(nodeToRemove, nodeToRemoveReturn, modelManager.getInteraction());
         modelManager.removeMessageFromModel(nodeToRemove, nodeToRemoveReturn, modelSet);
         try {
@@ -170,11 +175,16 @@ public class UmlModelInterpreter extends AbstractInterpreter {
     protected void interpretFragmentRemove(Change change)
             throws InterpreterException {
         NodeCombinedFragment fragment = (NodeCombinedFragment) change.getNewValue();
+        interpretFragmentRemove(fragment);
+    }
+    
+    protected void interpretFragmentRemove(NodeCombinedFragment fragment) throws InterpreterException {
         if ((fragment.getNode().getParentNode() != null && fragment.getNode().getParentNode().containsFragment(fragment))
                 || (fragment.getNode().getLeftSibling() != null && fragment.getNode().getLeftSibling().containsFragment(fragment))) {
-        	//just stretch up
+        	logger.debug("Fragment should not be removed, just stretched up {} {}", fragment.getNode().getCreateEdge().getName(), fragment.getFragmentBody());
         } else {
-            CombinedFragment fr = this.notationManager.removeFragmentFromNotation((NodeCombinedFragment) change.getNewValue());
+        	logger.debug("Removing combined fragment from model and notation {} {}", fragment.getNode().getCreateEdge().getName(), fragment.getFragmentBody());
+            CombinedFragment fr = this.notationManager.removeFragmentFromNotation(fragment);
             this.modelManager.removeFragmentFromModel(fr, fragment);
             try {
                 storeNotationResource();

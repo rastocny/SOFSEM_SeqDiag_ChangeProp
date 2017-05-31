@@ -75,7 +75,7 @@ public class GraphComparatorImpl implements GraphComparator {
                             break;
                         case SIMILAR:
                             similarityFound = true;
-                            changeLog.addChanges(generator.createMessageModifyChange(referenceNode.getNode(), subNode.getNode(), referenceGraphNodes, subGraphNodes, changeLog));
+                            //changeLog.addChanges(generator.createMessageModifyChange(referenceNode.getNode(), subNode.getNode(), referenceGraphNodes, subGraphNodes, changeLog));
                             break innerLoop;
                         case SIMILAR_DIFF_BRANCH:
                             break;

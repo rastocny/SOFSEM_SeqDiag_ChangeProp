@@ -45,7 +45,7 @@ public class MessageImpl implements Message {
         if (combFragments == null) {
             this.combFragments = new ArrayList<CombFragment>();
         } else {
-            this.combFragments = combFragments;
+            this.combFragments = new ArrayList<CombFragment>(combFragments);
         }
     }
 

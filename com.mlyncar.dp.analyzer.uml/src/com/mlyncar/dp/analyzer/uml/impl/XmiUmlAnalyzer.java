@@ -88,7 +88,9 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
             EObject object = it.next();
             if (object instanceof Interaction) {
                 Interaction interaction = (Interaction) object;
-                diagrams.add(analyzeInteraction(interaction));
+                SeqDiagram newDiagram = analyzeInteraction(interaction);
+                TestHelper.validateDiagram(newDiagram);
+                diagrams.add(newDiagram);
             }
         }
         return diagrams;
@@ -153,6 +155,7 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
                                 new LifelineImpl(receiveOccurence.getCovered().getName()),
                                 new LifelineImpl(occurrence.getCovered().getName()), fragments);
                         logger.debug("Creating synch/self message {} from lifeline {} to lifeline {}", message.getName(), message.getSourceLifeline().getName(), message.getTargetLifeline().getName());
+                        logger.debug("Number of combined fragments {}", message.getCombFragments().size());
                         diagram.addMessage(message);
                     } else if (occurrence.getMessage().getMessageSort().equals(MessageSort.REPLY_LITERAL)) {
                         Message message = new MessageImpl(counter++, MessageType.RETURN, occurrence.getMessage().getName(),
@@ -173,9 +176,11 @@ public class XmiUmlAnalyzer implements UmlAnalyzer {
                 logger.debug("Operand guard: {}", guardValue);
                 try {
                     CombFragment fragment = new CombFragmentImpl(guardValue, CombFragmentType.fromCode(umlCombFragment.getInteractionOperator().getName()));
+                	logger.debug("Next messages are located withing combined fragment {}", fragment.getCombFragmentType());
                     List<CombFragment> newFragmentList = new ArrayList<CombFragment>(fragments);
-                    newFragmentList.add(fragment);
+                    newFragmentList.add(0,fragment);
                     analyzeFragmentSet(operand.getFragments(), diagram, newFragmentList);
+                	logger.debug("Messages with combined fragment {} processed. " + fragment.getCombFragmentType());
                 } catch (CombFragmentException e) {
                     throw new AnalyzerException("Unable to process seq diagram analysis, combined fragment cannot be created.", e);
                 }

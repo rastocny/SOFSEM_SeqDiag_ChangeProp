@@ -7,18 +7,24 @@ public class MessageRemoveModelSet {
 
     private final MessageOccurrenceSpecification targetOccurrence;
     private final MessageOccurrenceSpecification sourceOccurrence;
+    private final MessageOccurrenceSpecification targetOccurrenceRet;
+    private final MessageOccurrenceSpecification sourceOccurrenceRet;
     private final ActionExecutionSpecification actionToRemoveEnd;
     private final ActionExecutionSpecification actionToRemoveStart;
 
     public MessageRemoveModelSet(
             MessageOccurrenceSpecification targetOccurrence,
             MessageOccurrenceSpecification sourceOccurrence,
+            MessageOccurrenceSpecification targetOccurrenceRet,
+            MessageOccurrenceSpecification sourceOccurrenceRet,
             ActionExecutionSpecification actionToRemoveEnd,
             ActionExecutionSpecification actionToRemoveStart) {
         this.targetOccurrence = targetOccurrence;
         this.sourceOccurrence = sourceOccurrence;
         this.actionToRemoveEnd = actionToRemoveEnd;
         this.actionToRemoveStart = actionToRemoveStart;
+        this.targetOccurrenceRet = targetOccurrenceRet;
+        this.sourceOccurrenceRet = sourceOccurrenceRet;
     }
 
     public MessageOccurrenceSpecification getTargetOccurrence() {
@@ -27,6 +33,14 @@ public class MessageRemoveModelSet {
 
     public MessageOccurrenceSpecification getSourceOccurrence() {
         return sourceOccurrence;
+    }
+    
+    public MessageOccurrenceSpecification getTargetOccurrenceRet() {
+        return targetOccurrenceRet;
+    }
+
+    public MessageOccurrenceSpecification getSourceOccurrenceRet() {
+        return sourceOccurrenceRet;
     }
 
     public ActionExecutionSpecification getActionToRemoveEnd() {
