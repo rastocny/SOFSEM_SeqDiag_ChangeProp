@@ -13,6 +13,8 @@ import org.eclipse.gmt.modisco.java.Assignment;
 import org.eclipse.gmt.modisco.java.Block;
 import org.eclipse.gmt.modisco.java.BodyDeclaration;
 import org.eclipse.gmt.modisco.java.ClassDeclaration;
+import org.eclipse.gmt.modisco.java.ClassInstanceCreation;
+import org.eclipse.gmt.modisco.java.ConstructorDeclaration;
 import org.eclipse.gmt.modisco.java.Expression;
 import org.eclipse.gmt.modisco.java.ExpressionStatement;
 import org.eclipse.gmt.modisco.java.ForStatement;
@@ -108,6 +110,18 @@ public class JavaDiscoveryHelper {
                                 return new JavaDiscoveryOutput(getMethodCombinedFragments(methodInvocation), access.getVariable().getName() + ":");
                             }
                         }
+                    } else if (assignment.getRightHandSide() instanceof ClassInstanceCreation) {
+                    	ClassInstanceCreation creation = (ClassInstanceCreation) assignment.getRightHandSide();
+                    	logger.debug("Class instance method name {}, {}", creation.getMethod().getName(), statementName);
+                    	if (statementNum == statementPosition && creation.getMethod().getName().equals(statementName)) {
+                    		logger.debug("Returning Java discovery output of statement {} with index {}", statementName, statementNum);
+                    		String constructorVar = "new";
+                    		if(assignment.getLeftHandSide() instanceof SingleVariableAccess) {
+                    			 SingleVariableAccess access = (SingleVariableAccess) assignment.getLeftHandSide();
+                    			 constructorVar = access.getVariable().getName() + ":";
+                    		}
+                            return new JavaDiscoveryOutput(getMethodCombinedFragments(assignment.getRightHandSide()), constructorVar);
+                    	}
                     }
                 }
             }  
@@ -153,10 +167,10 @@ public class JavaDiscoveryHelper {
     }
 
     private List<CombFragment> getMethodCombinedFragments(EObject statement) {
-        logger.debug("Checking if method {} call contains combined fragments", ((MethodInvocation) statement).getMethod().getName());
+        logger.debug("Checking if method {} call contains combined fragments", statement.toString());
         List<CombFragment> fragments = new ArrayList<CombFragment>();
         EObject container = (EObject) statement;
-        while (container.eContainer() != null && !(container.eContainer() instanceof MethodDeclaration)) {
+        while (container.eContainer() != null && !((container.eContainer() instanceof MethodDeclaration) || (container.eContainer() instanceof ConstructorDeclaration))) {
             container = container.eContainer();
             logger.debug("Iterating via container {}", container.toString());
             if (container instanceof IfStatement) {

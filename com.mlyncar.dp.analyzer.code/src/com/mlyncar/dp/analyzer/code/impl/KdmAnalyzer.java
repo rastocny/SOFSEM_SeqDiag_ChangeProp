@@ -152,11 +152,14 @@ public class KdmAnalyzer implements SourceCodeAnalyzer {
                         if (object instanceof Calls) {
                             Calls call = (Calls) object;
                             MethodUnit newMethod = (MethodUnit) call.getTo();
-                            String variableName = getInstanceVariableName(actionElement);
                             String newPackage = getClassPackage(newMethod.eContainer());
                             String thisPackage = getClassPackage(method.eContainer());
                             List<CombFragment> newFragments = new ArrayList<CombFragment>(fragments);
-
+                            String methodClassName = getMethodClassName(method);
+                            
+                            JavaDiscoveryOutput output = new JavaDiscoveryHelper().getMethodName(methodClassName, method.getName(), statementPosition, newMethod.getName());
+                            String variableName = output.getVariableName();
+                            newFragments.addAll(output.getFragments());
                             diagram.addMessage(new MessageImpl(diagram.getMessages().size(), MessageType.SYNCH, newMethod.getName(),
                                     new LifelineImpl(variableName + ((ClassUnit) newMethod.eContainer()).getName(), newPackage),
                                     new LifelineImpl(currentVariableName + ((ClassUnit) method.eContainer()).getName(), thisPackage), newFragments));
