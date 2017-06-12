@@ -42,7 +42,7 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
     public NodeRelation getNodeRelationWithoutSignature(Node referenceNode, Node subNode) {
         if (nodesEqualName(referenceNode, subNode)) {
             if (edgesNotNull(referenceNode, subNode)) {
-                if (edgesEqualType(referenceNode, subNode) && edgesEqualName(referenceNode, subNode)) {
+                if (edgesEqualType(referenceNode, subNode) && edgesEqualName(referenceNode, subNode) && isNotDuplicate(referenceNode, subNode)) {
                     return NodeRelation.EQUAL;
                 } else {
                     return NodeRelation.DIFFERENT;
@@ -56,6 +56,35 @@ public class NodeRelationComparatorImpl implements NodeRelationComparator {
         } else {
             return NodeRelation.DIFFERENT;
         }
+    }
+    
+    private boolean isNotDuplicate(Node referenceNode, Node subNode) {
+    	if(referenceNode.getParentNode() == null) {
+    		return true;
+    	}
+    	int count = 0;
+    	for(Node node: referenceNode.getParentNode().childNodes()) {
+    		if(edgesEqualName(node, subNode)) {
+    			count++;
+    		}
+    	}
+    	if(count>1) {
+    		if(subNode.getLeftSibling() == null || referenceNode.getLeftSibling() == null) {
+    			return true;
+    		}
+    		Node node = referenceNode.getLeftSibling();
+    		while(node!=null) {
+    			if(edgesEqualName(node, subNode)) {
+    				return false;
+    			}
+    			if(edgesEqualName(subNode.getLeftSibling(), node)) {
+    				return true;
+    			}
+    			node = node.getLeftSibling();
+    			logger.debug("REFERENCE ID {}", referenceNode.getId());
+    		}
+    	}
+    	return true;
     }
 
     private boolean edgesEqualName(Node node1, Node node2) {
