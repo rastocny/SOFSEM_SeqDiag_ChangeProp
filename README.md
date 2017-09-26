@@ -40,4 +40,4 @@ Detailed description of test cases used in the evaluation is in the file [TestCa
 * synchronization log
 * resulted synchronized sequence diagram
 
-To replicate the evaluation, testing projects are stored in the directory [TestProjects](https://github.com/rastocny/SOFSEM_SeqDiag_ChangeProp/ReplicationPackage/TestProjects). You can open the projects in Eclipse Luna as a worskpace and execute synchronization as it is descrived [above](#sequence-diagram-synchronization). Then you can manually validate results of synchronization by observing changes in sequence diagrams.
+To replicate the evaluation, testing projects are stored in the directory [TestProjects](https://github.com/rastocny/SOFSEM_SeqDiag_ChangeProp/ReplicationPackage/TestProjects). You can open the projects in Eclipse Luna as a worskpace and execute synchronization as it is described [above](#sequence-diagram-synchronization). Then you can manually validate results of synchronization by observing changes in sequence diagrams.
