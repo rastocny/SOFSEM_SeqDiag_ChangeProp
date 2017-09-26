@@ -30,3 +30,14 @@ Synchronization is avaiable for `Java Standard Edition` projects, that have UML 
 
 ## Evaluation replication
 
+Detailed description of test cases used in the evaluation is in the file [TestCasesDescription.pdf](https://github.com/rastocny/SOFSEM_SeqDiag_ChangeProp/ReplicationPackage/TestCasesDescription.pdf). Each test case is described by:
+
+* original sequence diagram
+* original source code
+* description of source code modification
+* modified source code
+* description of synchronization results
+* synchronization log
+* resulted synchronized sequence diagram
+
+To replicate the evaluation, testing projects are stored in the directory [TestProjects](https://github.com/rastocny/SOFSEM_SeqDiag_ChangeProp/ReplicationPackage/TestProjects). You can open the projects in Eclipse Luna as a worskpace and execute synchronization as it is descrived [above](#sequence-diagram-synchronization). Then you can manually validate results of synchronization by observing changes in sequence diagrams.
